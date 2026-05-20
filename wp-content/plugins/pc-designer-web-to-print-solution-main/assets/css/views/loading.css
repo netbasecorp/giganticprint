@@ -1,0 +1,46 @@
+/* Animation */
+@-webkit-keyframes atom-rotate {
+  to {
+      -webkit-transform: rotate(360deg);
+      transform: rotate(360deg);
+  }
+}
+@keyframes atom-rotate {
+  to {
+      -webkit-transform: rotate(360deg);
+      transform: rotate(360deg);
+  }
+}
+/* Variables */
+/* Loading Icon */
+.atom-loading {
+  width: 100px;
+  height: 100px;
+  left: 50%;
+  top: 50%;
+  margin-left: -50px;
+  margin-top:  -50px;
+  position: relative;
+}
+.loading__ring {
+  position: absolute;
+  width: 100px;
+  height: 100px;
+}
+.loading__ring:first-child {
+  -webkit-transform: skew(30deg, 20deg);
+  transform: skew(30deg, 20deg);
+}
+.loading__ring:last-child {
+  -webkit-transform: skew(-30deg, -20deg) scale(-1, 1);
+  transform: skew(-30deg, -20deg) scale(-1, 1);
+}
+.loading__ring:last-child svg {
+  -webkit-animation-delay: -0.5s;
+  animation-delay: -0.5s;
+}
+.loading__ring svg {
+  -webkit-animation: atom-rotate 1s linear infinite;
+  animation: atom-rotate 1s linear infinite;
+  fill: rgba(0, 0, 0, 0.2);
+}        

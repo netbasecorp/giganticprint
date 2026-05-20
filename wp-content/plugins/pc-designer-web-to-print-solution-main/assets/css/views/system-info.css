@@ -1,0 +1,21 @@
+.system-info table {
+  margin: 20px 0;
+}
+.system-info table th {
+  font-weight: bold;
+  width: 25%;
+  padding: 20px 12px;
+}
+.system-info table td {
+  word-break: break-all;
+  padding: 20px 12px;
+}
+.system-info table td span{
+  margin-right: 5px;
+}
+.system-info table td.good{
+  color: #7ad03a;
+}
+.system-info table td.bad{
+  color: #a00
+}

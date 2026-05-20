@@ -1,0 +1,2122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>GiganticPrints.com — Custom Signs, Banners & Print | Powered by SignEdge Graphics</title>
+<meta name="description" content="GiganticPrints.com — order custom signs, banners, vehicle wraps, apparel and large-format printing 24/7. Produced locally by SignEdge Graphics in Fort Pierce, FL." />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  /* =========================================================
+     SignEdge Graphics — Landing Page
+     Built with designer-canvas-ux-ui design tokens.
+     Goal: Get Casey into a product page in ≤2 clicks.
+     ========================================================= */
+
+  /* ---------- DESIGN TOKENS — GiganticPrints brand palette ----------
+     Per colors_layout.png brand guide:
+       ee252e — CTA / primary action (red)
+       ffdd00 — highlights (yellow)
+       0099ff — accent (blue, from logo border)
+       eaeaea — surface
+       424244 — body text
+       0b0b0b — logo ink black
+  ------------------------------------------------------------------ */
+  :root {
+    /* Brand */
+    --nbd-mb-primary: #ee252e;            /* CTA red */
+    --nbd-mb-primary-pressed: #c91d25;
+    --nbd-mb-primary-soft: #ffe2e3;
+    --nbd-mb-accent: #0099ff;             /* Logo blue accent */
+    --nbd-mb-highlight: #ffdd00;          /* Brand yellow highlight */
+    --nbd-mb-highlight-soft: #fff4a3;
+    --nbd-mb-ink: #0b0b0b;                /* Deep black (logo) */
+    /* Text */
+    --nbd-mb-text: #424244;               /* Body text (brand spec) */
+    --nbd-mb-text-soft: #6b6d70;
+    --nbd-mb-text-on-primary: #ffffff;
+    /* Surface */
+    --nbd-mb-bg: #ffffff;
+    --nbd-mb-bg-soft: #f7f7f7;
+    --nbd-mb-bg-canvas: #eaeaea;          /* Brand surface */
+    --nbd-mb-overlay: rgba(0, 0, 0, 0.4);
+    /* Border */
+    --nbd-mb-border: #e5e5e5;
+    --nbd-mb-border-strong: #d1d1d1;
+    --nbd-mb-border-subtle: #f0f0f0;
+    /* Status */
+    --nbd-color-success: #10b981;
+    --nbd-color-success-soft: #d1fae5;
+    --nbd-color-warning: #f59e0b;
+    --nbd-color-warning-soft: #fef3c7;
+    --nbd-color-error: #ef4444;
+    --nbd-color-info: #3b82f6;
+    --nbd-color-info-soft: #dbeafe;
+
+    /* Spacing 4-pt */
+    --nbd-space-1: 4px;
+    --nbd-space-2: 8px;
+    --nbd-space-3: 12px;
+    --nbd-space-4: 16px;
+    --nbd-space-6: 24px;
+    --nbd-space-8: 32px;
+    --nbd-space-12: 48px;
+    --nbd-space-16: 64px;
+
+    /* Tap targets */
+    --nbd-tap-min: 44px;
+    --nbd-tap-desktop-min: 32px;
+    --nbd-tap-comfortable: 48px;
+
+    /* Radius */
+    --nbd-radius-sm: 4px;
+    --nbd-radius-md: 6px;
+    --nbd-radius-lg: 8px;
+    --nbd-radius-xl: 12px;
+    --nbd-radius-2xl: 16px;
+    --nbd-radius-full: 9999px;
+
+    /* Shadow */
+    --nbd-shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --nbd-shadow-md: 0 2px 4px 0 rgba(0, 0, 0, 0.08);
+    --nbd-shadow-lg: 0 4px 12px 0 rgba(0, 0, 0, 0.08);
+    --nbd-shadow-xl: 0 8px 24px 0 rgba(0, 0, 0, 0.16);
+    --nbd-shadow-card: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --nbd-shadow-toolbar: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --nbd-shadow-focus: 0 0 0 3px rgba(238, 37, 46, 0.25);
+
+    /* Z-index */
+    --nbd-z-bar: 100;
+
+    /* Motion */
+    --nbd-duration-fast: 120ms;
+    --nbd-duration-quick: 200ms;
+    --nbd-duration-normal: 220ms;
+    --nbd-duration-medium: 300ms;
+    --nbd-ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+    --nbd-ease-out: ease-out;
+
+    /* Type — Montserrat (brand spec) */
+    --nbd-font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+                       "Helvetica Neue", Arial, sans-serif;
+
+    /* Component */
+    --nbd-topbar-height-desktop: 54px;        /* Editor surfaces (per spec §9.2) */
+    --nbd-topbar-height-landing: 76px;        /* Marketing pages — accommodates 48px logo + breathing room */
+    --nbd-topbar-height-mobile-landing: 64px;
+    --nbd-cta-height: 44px;
+  }
+
+  /* ---------- RESET ---------- */
+  *, *::before, *::after { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: var(--nbd-font-family);
+    font-size: 15px;
+    line-height: 1.55;
+    color: var(--nbd-mb-text);
+    background: var(--nbd-mb-bg);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+  button { font-family: inherit; cursor: pointer; }
+  a { color: var(--nbd-mb-primary); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  img { max-width: 100%; display: block; }
+
+  /* Reduced motion */
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+
+  /* Container */
+  .container {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 0 var(--nbd-space-4);
+  }
+  @media (min-width: 768px) {
+    .container { padding: 0 var(--nbd-space-6); }
+  }
+
+  /* =========================================================
+     UTILITY BAR
+     ========================================================= */
+  .util-bar {
+    background: var(--nbd-mb-ink);
+    color: var(--nbd-mb-bg);
+    font-size: 12px;
+    padding: 7px var(--nbd-space-4);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--nbd-space-4);
+    letter-spacing: 0.02em;
+  }
+  .util-bar .left, .util-bar .right { display: flex; gap: var(--nbd-space-4); align-items: center; }
+  .util-bar a { color: var(--nbd-mb-bg); opacity: 0.85; }
+  .util-bar a:hover { opacity: 1; text-decoration: none; color: var(--nbd-mb-highlight); }
+  .util-bar strong { color: var(--nbd-mb-highlight); font-weight: 800; }
+  .util-bar .dot {
+    width: 8px; height: 8px;
+    background: var(--nbd-mb-highlight);
+    border-radius: var(--nbd-radius-full);
+    display: inline-block;
+    margin-right: var(--nbd-space-1);
+    box-shadow: 0 0 8px rgba(255,221,0,0.7);
+  }
+  @media (max-width: 767px) {
+    .util-bar .right .hide-mobile { display: none; }
+  }
+
+  /* =========================================================
+     TOP BAR
+     ========================================================= */
+  .topbar {
+    height: var(--nbd-topbar-height-landing);
+    background: var(--nbd-mb-bg);
+    border-bottom: 1px solid var(--nbd-mb-border);
+    box-shadow: var(--nbd-shadow-md);
+    padding: 0 var(--nbd-space-6);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--nbd-space-4);
+    position: sticky;
+    top: 0;
+    z-index: var(--nbd-z-bar);
+  }
+  @media (max-width: 767px) {
+    .topbar {
+      height: var(--nbd-topbar-height-mobile-landing);
+      padding: 0 var(--nbd-space-4);
+    }
+  }
+  .brand {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--nbd-space-3);
+    color: var(--nbd-mb-text);
+  }
+  .brand:hover { text-decoration: none; }
+  .brand-logo {
+    height: 48px;
+    width: auto;
+    display: block;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.15));
+    transition: transform var(--nbd-duration-fast) var(--nbd-ease-out);
+  }
+  .brand:hover .brand-logo { transform: translateY(-1px) scale(1.02); }
+  @media (max-width: 767px) {
+    .brand-logo { height: 40px; }
+  }
+  .brand-name {
+    /* Hidden visually — logo image carries the name — but kept for screen readers via aria-label.
+       Comment out if you also want a text label beside the logo. */
+    position: absolute;
+    width: 1px; height: 1px;
+    padding: 0; margin: -1px;
+    overflow: hidden;
+    clip: rect(0,0,0,0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  /* Nav links (desktop) */
+  .topbar-nav {
+    display: flex;
+    align-items: center;
+    gap: var(--nbd-space-1);
+  }
+  .nav-link {
+    height: 36px;
+    padding: 0 var(--nbd-space-4);
+    display: inline-flex;
+    align-items: center;
+    border-radius: var(--nbd-radius-md);
+    color: var(--nbd-mb-ink);
+    font-size: 13.5px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    background: transparent;
+    border: 0;
+    cursor: pointer;
+    font-family: inherit;
+    transition: background var(--nbd-duration-fast) var(--nbd-ease-out),
+                color var(--nbd-duration-fast) var(--nbd-ease-out);
+  }
+  .nav-link:hover { background: var(--nbd-mb-bg-canvas); color: var(--nbd-mb-ink); text-decoration: none; }
+  .nav-link:focus-visible {
+    outline: 2px solid var(--nbd-mb-primary);
+    outline-offset: 2px;
+  }
+  @media (max-width: 767px) { .topbar-nav { display: none; } }
+
+  .nbd-icon-btn {
+    width: 40px; height: 40px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    background: transparent;
+    border-radius: var(--nbd-radius-sm);
+    color: var(--nbd-mb-text);
+    transition: background var(--nbd-duration-fast) var(--nbd-ease-out);
+    position: relative;
+  }
+  .nbd-icon-btn:hover { background: rgba(0, 0, 0, 0.04); }
+  .nbd-icon-btn:focus-visible {
+    outline: 2px solid var(--nbd-mb-primary);
+    outline-offset: 2px;
+  }
+  .nbd-icon-btn svg { width: 20px; height: 20px; }
+  .nbd-icon-btn .badge {
+    position: absolute;
+    top: 4px; right: 4px;
+    min-width: 16px; height: 16px;
+    padding: 0 4px;
+    background: var(--nbd-mb-primary);
+    color: #fff;
+    border-radius: var(--nbd-radius-full);
+    font-size: 10px;
+    font-weight: 600;
+    display: grid;
+    place-items: center;
+  }
+  .topbar-actions { display: flex; align-items: center; gap: var(--nbd-space-1); }
+
+  .login-btn {
+    height: 40px;
+    padding: 0 var(--nbd-space-4);
+    background: var(--nbd-mb-bg);
+    border: 2px solid var(--nbd-mb-border-strong);
+    border-radius: var(--nbd-radius-lg);
+    color: var(--nbd-mb-ink);
+    font-size: 13px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    transition: all var(--nbd-duration-fast) var(--nbd-ease-out);
+    margin-left: var(--nbd-space-2);
+  }
+  .login-btn:hover {
+    background: var(--nbd-mb-bg-canvas);
+    border-color: var(--nbd-mb-ink);
+  }
+  .login-btn:focus-visible {
+    outline: 2px solid var(--nbd-mb-primary);
+    outline-offset: 2px;
+  }
+  /* Quick-Start CTA in topbar (red) */
+  .start-btn {
+    height: 40px;
+    padding: 0 var(--nbd-space-4);
+    background: var(--nbd-mb-primary);
+    border: none;
+    border-radius: var(--nbd-radius-lg);
+    color: #fff;
+    font-size: 13px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    box-shadow: 0 4px 12px rgba(238,37,46,0.30);
+    transition: all var(--nbd-duration-fast) var(--nbd-ease-out);
+    margin-left: var(--nbd-space-2);
+    display: inline-flex;
+    align-items: center;
+    gap: var(--nbd-space-2);
+  }
+  .start-btn:hover {
+    background: var(--nbd-mb-primary-pressed);
+    transform: translateY(-1px);
+    box-shadow: 0 8px 18px rgba(238,37,46,0.42);
+    color: #fff;
+    text-decoration: none;
+  }
+  @media (max-width: 767px) {
+    .start-btn { display: none; }
+  }
+
+  /* =========================================================
+     HERO
+     ========================================================= */
+  .hero {
+    background: var(--nbd-mb-bg);
+    padding: var(--nbd-space-12) 0 var(--nbd-space-8);
+    border-bottom: 1px solid var(--nbd-mb-border-subtle);
+    position: relative;
+    overflow: hidden;
+  }
+  /* Subtle grid texture + warm radials matching brand */
+  .hero::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image:
+      radial-gradient(900px 500px at 85% -10%, rgba(255,221,0,0.18), transparent 60%),
+      radial-gradient(700px 400px at -5% 110%, rgba(0,153,255,0.10), transparent 60%),
+      linear-gradient(rgba(0,0,0,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,0,0,0.03) 1px, transparent 1px);
+    background-size: auto, auto, 32px 32px, 32px 32px;
+    pointer-events: none;
+  }
+  .hero-inner {
+    position: relative;
+    display: grid;
+    grid-template-columns: 1.3fr 1fr;
+    gap: var(--nbd-space-8);
+    align-items: center;
+  }
+  @media (max-width: 900px) {
+    .hero-inner { grid-template-columns: 1fr; gap: var(--nbd-space-6); }
+  }
+  .hero-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--nbd-space-2);
+    padding: 0;
+    background: transparent;
+    color: #059669;
+    border-radius: 0;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0;
+    text-transform: none;
+    margin-bottom: var(--nbd-space-4);
+  }
+  .hero-eyebrow .dot {
+    width: 8px; height: 8px;
+    background: #10b981;
+    border-radius: var(--nbd-radius-full);
+    box-shadow: 0 0 0 0 rgba(16,185,129,0.5);
+    animation: pulse-green 2s infinite;
+  }
+  @keyframes pulse-green {
+    0%   { box-shadow: 0 0 0 0 rgba(16,185,129,0.6); }
+    70%  { box-shadow: 0 0 0 8px rgba(16,185,129,0); }
+    100% { box-shadow: 0 0 0 0 rgba(16,185,129,0); }
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+  .hero-title {
+    font-size: 48px;
+    font-weight: 900;
+    line-height: 1.04;
+    letter-spacing: -0.025em;
+    margin: 0 0 var(--nbd-space-3);
+    color: var(--nbd-mb-ink);
+  }
+  @media (max-width: 767px) {
+    .hero-title { font-size: 32px; }
+  }
+  /* Title accent in CTA red (per screenshot — "printed in 24 hours" red) */
+  .hero-title .accent {
+    color: var(--nbd-mb-primary);
+    background: none;
+    padding: 0;
+  }
+  .hero-desc {
+    font-size: 16px;
+    line-height: 1.6;
+    color: var(--nbd-mb-text-soft);
+    margin: 0 0 var(--nbd-space-6);
+    max-width: 540px;
+  }
+  .hero-cta-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--nbd-space-3);
+    align-items: center;
+  }
+
+  /* CTA Buttons */
+  .btn-primary {
+    height: var(--nbd-cta-height);
+    padding: 0 var(--nbd-space-6);
+    background: var(--nbd-mb-primary);
+    color: #fff;
+    border: none;
+    border-radius: var(--nbd-radius-lg);
+    font-size: 13px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--nbd-space-2);
+    transition: background var(--nbd-duration-fast) var(--nbd-ease-out),
+                transform var(--nbd-duration-fast) var(--nbd-ease-out),
+                box-shadow var(--nbd-duration-fast) var(--nbd-ease-out);
+    box-shadow: 0 4px 12px rgba(238,37,46,0.30);
+  }
+  .btn-primary:hover {
+    background: var(--nbd-mb-primary-pressed);
+    text-decoration: none;
+    transform: translateY(-1px);
+    box-shadow: 0 8px 18px rgba(238,37,46,0.42);
+  }
+  .btn-primary:active { background: var(--nbd-mb-primary-pressed); transform: translateY(0); }
+  .btn-primary:focus-visible {
+    outline: 2px solid var(--nbd-mb-primary);
+    outline-offset: 2px;
+    box-shadow: var(--nbd-shadow-focus);
+  }
+  .btn-primary svg { width: 16px; height: 16px; }
+
+  .btn-secondary {
+    height: var(--nbd-cta-height);
+    padding: 0 var(--nbd-space-6);
+    background: var(--nbd-mb-ink);
+    color: #fff;
+    border: 1px solid var(--nbd-mb-ink);
+    border-radius: var(--nbd-radius-lg);
+    font-size: 13px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--nbd-space-2);
+    transition: all var(--nbd-duration-fast) var(--nbd-ease-out);
+  }
+  .btn-secondary:hover {
+    background: #2a2a2a;
+    color: #fff;
+    text-decoration: none;
+    transform: translateY(-1px);
+  }
+  .btn-secondary:focus-visible {
+    outline: 2px solid var(--nbd-mb-primary);
+    outline-offset: 2px;
+  }
+
+  .hero-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--nbd-space-4);
+    margin-top: var(--nbd-space-6);
+    padding-top: var(--nbd-space-6);
+    border-top: 1px solid var(--nbd-mb-border-subtle);
+  }
+  .hero-meta-item {
+    display: flex;
+    align-items: center;
+    gap: var(--nbd-space-2);
+    font-size: 13px;
+    color: var(--nbd-mb-text-soft);
+  }
+  .hero-meta-item strong {
+    color: var(--nbd-mb-text);
+    font-weight: 600;
+  }
+  .hero-meta-item svg {
+    width: 16px; height: 16px;
+    color: var(--nbd-mb-primary);
+    stroke-width: 2;
+    fill: none;
+    stroke: currentColor;
+    flex-shrink: 0;
+  }
+
+  /* Hero visual — typography lockup on purple gradient (matches screenshot) */
+  .hero-visual {
+    position: relative;
+    aspect-ratio: 5 / 4;
+    border-radius: var(--nbd-radius-xl);
+    overflow: hidden;
+    background:
+      radial-gradient(80% 60% at 30% 30%, #5a3a9a 0%, transparent 60%),
+      radial-gradient(70% 60% at 80% 80%, #6a2858 0%, transparent 60%),
+      linear-gradient(135deg, #3a2870 0%, #2a1850 50%, #1a1244 100%);
+    box-shadow: var(--nbd-shadow-xl);
+    display: grid;
+    place-items: center;
+    color: #fff;
+  }
+  .hero-visual::before {
+    /* Inner dashed border per spec */
+    content: "";
+    position: absolute;
+    inset: 16px;
+    border: 1.5px dashed rgba(255,255,255,0.28);
+    border-radius: var(--nbd-radius-md);
+    pointer-events: none;
+  }
+  .hero-banner-text {
+    position: relative;
+    text-align: center;
+    line-height: 0.92;
+    letter-spacing: -0.03em;
+    z-index: 1;
+    padding: 0 var(--nbd-space-6);
+  }
+  .hero-banner-text .l1,
+  .hero-banner-text .l2 {
+    display: block;
+    font-weight: 900;
+    text-shadow:
+      0 4px 0 rgba(0,0,0,0.25),
+      0 8px 24px rgba(0,0,0,0.35);
+  }
+  .hero-banner-text .l1 {
+    color: #fff;
+    font-size: clamp(46px, 7vw, 92px);
+    -webkit-text-stroke: 2px var(--nbd-mb-primary);
+  }
+  .hero-banner-text .l2 {
+    color: var(--nbd-mb-highlight);
+    font-size: clamp(54px, 8vw, 108px);
+    margin-top: 4px;
+    -webkit-text-stroke: 2px var(--nbd-mb-primary);
+  }
+  @media (max-width: 767px) {
+    .hero-banner-text .l1 { font-size: 44px; }
+    .hero-banner-text .l2 { font-size: 52px; }
+  }
+  .hero-visual-tagline {
+    position: relative;
+    z-index: 1;
+    margin-top: var(--nbd-space-3);
+    font-size: 13px;
+    letter-spacing: 0.36em;
+    color: rgba(255,255,255,0.8);
+    text-align: center;
+    font-weight: 700;
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--nbd-space-2);
+  }
+  .hero-visual-tagline::before,
+  .hero-visual-tagline::after {
+    content: "";
+    display: inline-block;
+    width: 24px;
+    height: 1px;
+    background: rgba(255,255,255,0.5);
+  }
+  /* Dimension marks */
+  .hero-visual-dim {
+    position: absolute;
+    z-index: 2;
+    background: var(--nbd-mb-ink);
+    color: #fff;
+    font-size: 12px;
+    font-weight: 700;
+    padding: 4px var(--nbd-space-2);
+    border-radius: var(--nbd-radius-sm);
+    letter-spacing: 0.02em;
+  }
+  .hero-visual-dim.top  { top: 10px;  left: 50%;  transform: translateX(-50%); }
+  .hero-visual-dim.side {
+    right: 10px; top: 50%;
+    transform: translateY(-50%) rotate(90deg);
+    transform-origin: center;
+  }
+
+  /* =========================================================
+     SECTION HEAD (re-used)
+     ========================================================= */
+  .section {
+    padding: var(--nbd-space-12) 0;
+  }
+  .section--soft { background: var(--nbd-mb-bg-soft); }
+  .section-head-row {
+    display: flex;
+    align-items: end;
+    justify-content: space-between;
+    gap: var(--nbd-space-4);
+    margin-bottom: var(--nbd-space-6);
+    flex-wrap: wrap;
+  }
+  .section-title-block .eyebrow {
+    font-size: 12px;
+    font-weight: 800;
+    color: var(--nbd-mb-primary);
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    margin-bottom: var(--nbd-space-1);
+  }
+  .section-title {
+    font-size: 30px;
+    font-weight: 900;
+    letter-spacing: -0.02em;
+    margin: 0;
+    color: var(--nbd-mb-ink);
+    line-height: 1.1;
+  }
+  @media (max-width: 767px) {
+    .section-title { font-size: 24px; }
+  }
+  .section-sub {
+    font-size: 14px;
+    color: var(--nbd-mb-text-soft);
+    margin-top: var(--nbd-space-1);
+  }
+  .section-link {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--nbd-mb-primary);
+    display: inline-flex;
+    align-items: center;
+    gap: var(--nbd-space-1);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+  .section-link svg { width: 14px; height: 14px; }
+
+  /* =========================================================
+     CATEGORY GRID (the main attraction)
+     ========================================================= */
+  .cat-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--nbd-space-3);
+  }
+  @media (min-width: 640px) {
+    .cat-grid { grid-template-columns: repeat(3, 1fr); gap: var(--nbd-space-4); }
+  }
+  @media (min-width: 1024px) {
+    .cat-grid { grid-template-columns: repeat(4, 1fr); }
+  }
+
+  /* All cat-cards same size — 4 cols × 2 rows = 8 cards */
+  .cat-card--featured {
+    grid-column: span 1;
+  }
+
+  .cat-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    border-radius: var(--nbd-radius-xl);
+    background: var(--nbd-mb-bg);
+    border: 1px solid var(--nbd-mb-border);
+    box-shadow: var(--nbd-shadow-md);
+    cursor: pointer;
+    transition: transform var(--nbd-duration-fast) var(--nbd-ease-out),
+                box-shadow var(--nbd-duration-fast) var(--nbd-ease-out),
+                border-color var(--nbd-duration-fast) var(--nbd-ease-out);
+    aspect-ratio: 1 / 1;
+    text-decoration: none;
+    color: inherit;
+  }
+  .cat-card--featured {
+    aspect-ratio: 2 / 1;
+  }
+  .cat-card:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--nbd-shadow-xl);
+    border-color: var(--nbd-mb-text);
+    text-decoration: none;
+  }
+  .cat-card:focus-visible {
+    outline: 2px solid var(--nbd-mb-primary);
+    outline-offset: 2px;
+    text-decoration: none;
+  }
+  .cat-card:active { transform: translateY(0); }
+
+  .cat-card-visual {
+    flex: 1;
+    position: relative;
+    background: var(--cat-bg, linear-gradient(180deg, #1a1a1a 0%, #0a0a0a 100%));
+    overflow: hidden;
+    display: grid;
+    place-items: center;
+  }
+  /* Yellow radial glow on hover */
+  .cat-card-visual::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at 50% 40%, rgba(255,221,0,0.0), transparent 60%);
+    transition: background var(--nbd-duration-normal) var(--nbd-ease-out);
+    pointer-events: none;
+  }
+  .cat-card:hover .cat-card-visual::after {
+    background: radial-gradient(circle at 50% 40%, rgba(255,221,0,0.22), transparent 60%);
+  }
+  /* PNG metallic icon (no SVG anymore) */
+  .cat-card-illo {
+    width: 64%;
+    max-width: 180px;
+    height: auto;
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .cat-card-illo img {
+    max-width: 100%;
+    max-height: 130px;
+    width: auto;
+    height: auto;
+    filter: drop-shadow(0 4px 16px rgba(0,0,0,0.4));
+    transition: transform var(--nbd-duration-normal) var(--nbd-ease-out);
+  }
+  .cat-card:hover .cat-card-illo img { transform: scale(1.06) translateY(-2px); }
+  .cat-card--featured .cat-card-illo {
+    width: 44%;
+    max-width: 220px;
+  }
+  .cat-card--featured .cat-card-illo img { max-height: 170px; }
+  .cat-card-content {
+    padding: var(--nbd-space-3) var(--nbd-space-4) var(--nbd-space-4);
+    background: var(--nbd-mb-bg);
+    border-top: 1px solid var(--nbd-mb-border-subtle);
+  }
+  .cat-card-title {
+    font-size: 15px;
+    font-weight: 700;
+    margin: 0 0 2px;
+    color: var(--nbd-mb-ink);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--nbd-space-2);
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+  }
+  .cat-card--featured .cat-card-title { font-size: 18px; }
+  .cat-card-sub {
+    font-size: 12px;
+    color: var(--nbd-mb-text-soft);
+    line-height: 1.45;
+  }
+  .cat-card--featured .cat-card-sub {
+    font-size: 13px;
+    margin-top: 2px;
+  }
+  .cat-card-arrow {
+    width: 28px; height: 28px;
+    border-radius: var(--nbd-radius-full);
+    background: var(--nbd-mb-highlight);
+    color: var(--nbd-mb-ink);
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+    transition: all var(--nbd-duration-fast) var(--nbd-ease-out);
+  }
+  .cat-card-arrow svg { width: 14px; height: 14px; stroke: currentColor; stroke-width: 2.5; fill: none; }
+  .cat-card:hover .cat-card-arrow {
+    background: var(--nbd-mb-primary);
+    color: #fff;
+    transform: translateX(2px);
+  }
+  .cat-card-badge {
+    position: absolute;
+    top: var(--nbd-space-3);
+    right: var(--nbd-space-3);
+    z-index: 2;
+    padding: 4px var(--nbd-space-2);
+    background: var(--nbd-mb-primary);
+    color: #fff;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    border-radius: var(--nbd-radius-sm);
+    text-transform: uppercase;
+  }
+
+  /* Category color presets — varied dark tones with brand-aware highlights.
+     PNG icons are metallic silver so they pop nicely against dark gradients. */
+  .cat-card[data-cat="banner"]   .cat-card-visual { --cat-bg: linear-gradient(180deg, #1a1a1a 0%, #0a0a0a 100%); }
+  .cat-card[data-cat="rigid"]    .cat-card-visual { --cat-bg: linear-gradient(180deg, #1c2330 0%, #0a0d13 100%); }
+  .cat-card[data-cat="adhesive"] .cat-card-visual { --cat-bg: linear-gradient(180deg, #1f1a2e 0%, #0d0a18 100%); }
+  .cat-card[data-cat="handheld"] .cat-card-visual { --cat-bg: linear-gradient(180deg, #16261c 0%, #060e09 100%); }
+  .cat-card[data-cat="magnet"]   .cat-card-visual { --cat-bg: linear-gradient(180deg, #2a1a12 0%, #100806 100%); }
+  .cat-card[data-cat="apparel"]  .cat-card-visual { --cat-bg: linear-gradient(180deg, #112524 0%, #050d0d 100%); }
+  .cat-card[data-cat="photo"]    .cat-card-visual { --cat-bg: linear-gradient(180deg, #14192a 0%, #060812 100%); }
+  .cat-card[data-cat="promo"]    .cat-card-visual { --cat-bg: linear-gradient(180deg, #2a1a1e 0%, #100608 100%); }
+  .cat-card[data-cat="misc"]     .cat-card-visual { --cat-bg: linear-gradient(180deg, #1e1530 0%, #0b0617 100%); }
+
+  /* =========================================================
+     POPULAR PRODUCTS — Real Gigantic Prints card pattern
+     (16:9 aspect, normal → rollover cross-fade on hover.
+      All product info is rendered into the PNG itself —
+      Acrylic / Aluminum / Coroplast / Foam Core / J-Bond / PVC.)
+     ========================================================= */
+  .product-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--nbd-space-4);
+  }
+  @media (min-width: 768px) {
+    .product-grid { grid-template-columns: repeat(2, 1fr); gap: var(--nbd-space-4); }
+  }
+  @media (min-width: 1024px) {
+    .product-grid { grid-template-columns: repeat(3, 1fr); }
+  }
+  @media (max-width: 480px) {
+    .product-grid { grid-template-columns: 1fr; }
+  }
+
+  .product-card {
+    position: relative;
+    aspect-ratio: 16 / 9;
+    border-radius: var(--nbd-radius-lg);
+    background: var(--nbd-mb-bg-canvas);
+    overflow: hidden;
+    cursor: pointer;
+    box-shadow: var(--nbd-shadow-sm);
+    text-decoration: none;
+    color: inherit;
+    transition: transform var(--nbd-duration-fast) var(--nbd-ease-out),
+                box-shadow var(--nbd-duration-fast) var(--nbd-ease-out);
+    display: block;
+  }
+  .product-card:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--nbd-shadow-lg);
+    text-decoration: none;
+  }
+  .product-card:focus-visible {
+    outline: 3px solid var(--nbd-mb-primary);
+    outline-offset: 3px;
+  }
+  /* Both layers fill the card, normal sits on top, rollover beneath */
+  .product-card .pc-img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    transition: opacity var(--nbd-duration-medium) var(--nbd-ease-in-out);
+  }
+  .product-card .pc-img.normal   { opacity: 1; z-index: 2; }
+  .product-card .pc-img.rollover { opacity: 0; z-index: 1; }
+  .product-card:hover  .pc-img.normal,
+  .product-card:focus-visible .pc-img.normal { opacity: 0; }
+  .product-card:hover  .pc-img.rollover,
+  .product-card:focus-visible .pc-img.rollover { opacity: 1; z-index: 2; }
+  /* Touch / no-hover: tap toggles rollover */
+  .product-card.is-revealed .pc-img.normal { opacity: 0; }
+  .product-card.is-revealed .pc-img.rollover { opacity: 1; z-index: 2; }
+
+  /* Accessibility label hidden visually but exposed to AT */
+  .pc-sr {
+    position: absolute;
+    width: 1px; height: 1px;
+    padding: 0; margin: -1px;
+    overflow: hidden;
+    clip: rect(0,0,0,0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  /* =========================================================
+     HOW IT WORKS (3 steps, trust)
+     ========================================================= */
+  .steps-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--nbd-space-4);
+  }
+  @media (max-width: 900px) {
+    .steps-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (max-width: 480px) {
+    .steps-grid { grid-template-columns: 1fr; }
+  }
+  .step-card {
+    padding: var(--nbd-space-6);
+    background: var(--nbd-mb-bg);
+    border: 1px solid var(--nbd-mb-border);
+    border-radius: var(--nbd-radius-xl);
+    box-shadow: var(--nbd-shadow-md);
+    position: relative;
+    transition: transform var(--nbd-duration-fast) var(--nbd-ease-out),
+                box-shadow var(--nbd-duration-fast) var(--nbd-ease-out);
+  }
+  .step-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--nbd-shadow-lg);
+  }
+  .step-num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px; height: 44px;
+    background: var(--nbd-mb-highlight);
+    color: var(--nbd-mb-ink);
+    border-radius: var(--nbd-radius-full);
+    font-size: 18px;
+    font-weight: 900;
+    margin-bottom: var(--nbd-space-3);
+    box-shadow: 0 4px 12px rgba(255,221,0,0.4);
+  }
+  .step-title {
+    font-size: 17px;
+    font-weight: 800;
+    margin: 0 0 var(--nbd-space-2);
+    color: var(--nbd-mb-ink);
+  }
+  .step-desc {
+    font-size: 13px;
+    color: var(--nbd-mb-text-soft);
+    line-height: 1.5;
+    margin: 0;
+  }
+  .step-icon {
+    position: absolute;
+    top: var(--nbd-space-6);
+    right: var(--nbd-space-6);
+    width: 40px; height: 40px;
+    background: var(--nbd-mb-primary-soft);
+    color: var(--nbd-mb-primary);
+    border-radius: var(--nbd-radius-lg);
+    display: grid;
+    place-items: center;
+  }
+  .step-icon svg { width: 20px; height: 20px; stroke: currentColor; stroke-width: 1.5; fill: none; }
+
+  /* =========================================================
+     B2B PROMO STRIP (callout for B2B awareness)
+     ========================================================= */
+  .b2b-strip {
+    background: var(--nbd-mb-ink);
+    color: #fff;
+    border-radius: var(--nbd-radius-2xl);
+    box-shadow: var(--nbd-shadow-xl);
+    padding: var(--nbd-space-8);
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: var(--nbd-space-6);
+    align-items: center;
+    position: relative;
+    overflow: hidden;
+  }
+  @media (max-width: 767px) {
+    .b2b-strip { grid-template-columns: 1fr; padding: var(--nbd-space-6); }
+  }
+  .b2b-strip::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image:
+      radial-gradient(circle at 90% 50%, rgba(255,221,0,0.18), transparent 50%);
+    pointer-events: none;
+  }
+  .b2b-strip-content { position: relative; }
+  .b2b-eyebrow {
+    display: inline-block;
+    font-size: 12px;
+    font-weight: 800;
+    color: var(--nbd-mb-highlight);
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    margin-bottom: var(--nbd-space-2);
+  }
+  .b2b-strip h3 {
+    font-size: 26px;
+    font-weight: 900;
+    margin: 0 0 var(--nbd-space-2);
+    color: #fff;
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+  }
+  .b2b-strip p {
+    margin: 0;
+    color: rgba(255,255,255,0.7);
+    font-size: 14px;
+    line-height: 1.5;
+  }
+  .b2b-actions {
+    display: flex;
+    gap: var(--nbd-space-3);
+    align-items: center;
+    position: relative;
+    flex-wrap: wrap;
+  }
+  .btn-on-dark {
+    background: var(--nbd-mb-primary);
+    color: #fff;
+  }
+  .btn-on-dark:hover { background: var(--nbd-mb-primary-pressed); }
+  .btn-ghost-on-dark {
+    background: transparent;
+    color: #fff;
+    border: 1px solid rgba(255,255,255,0.3);
+    height: var(--nbd-cta-height);
+    padding: 0 var(--nbd-space-6);
+    border-radius: var(--nbd-radius-lg);
+    font-size: 14px;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    transition: all var(--nbd-duration-fast);
+  }
+  .btn-ghost-on-dark:hover {
+    background: rgba(255,255,255,0.08);
+    border-color: #fff;
+    text-decoration: none;
+  }
+
+  /* =========================================================
+     CATEGORIES DROPDOWN — opens from topbar nav
+     "Categories" nav link → dropdown with small icon + name
+     ========================================================= */
+  .nav-dropdown {
+    position: relative;
+  }
+  .nav-dropdown > .nav-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    cursor: pointer;
+  }
+  .nav-dropdown > .nav-link::after {
+    content: "";
+    width: 0; height: 0;
+    border-left: 4px solid transparent;
+    border-right: 4px solid transparent;
+    border-top: 4px solid currentColor;
+    margin-left: 4px;
+    transition: transform var(--nbd-duration-fast) var(--nbd-ease-out);
+  }
+  .nav-dropdown[aria-expanded="true"] > .nav-link::after { transform: rotate(180deg); }
+  .nav-dropdown[aria-expanded="true"] > .nav-link { background: var(--nbd-mb-bg-canvas); color: var(--nbd-mb-ink); }
+
+  .nav-dropdown-menu {
+    position: absolute;
+    top: calc(100% + 6px);
+    left: 0;
+    min-width: 280px;
+    background: #fff;
+    border: 1px solid var(--nbd-mb-border);
+    border-radius: var(--nbd-radius-lg);
+    box-shadow: var(--nbd-shadow-xl);
+    padding: 8px;
+    display: none;
+    z-index: calc(var(--nbd-z-bar) + 5);
+    animation: dropdown-in 180ms var(--nbd-ease-out);
+  }
+  .nav-dropdown[aria-expanded="true"] .nav-dropdown-menu { display: grid; gap: 2px; }
+
+  @keyframes dropdown-in {
+    from { opacity: 0; transform: translateY(-6px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .nav-dropdown-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 12px;
+    border-radius: var(--nbd-radius-md);
+    color: var(--nbd-mb-ink);
+    font-size: 14px;
+    font-weight: 600;
+    text-transform: none;
+    letter-spacing: 0;
+    text-decoration: none;
+    transition: background var(--nbd-duration-fast) var(--nbd-ease-out);
+  }
+  .nav-dropdown-item:hover {
+    background: var(--nbd-mb-bg-canvas);
+    text-decoration: none;
+  }
+  .nav-dropdown-item img {
+    width: 28px;
+    height: 28px;
+    object-fit: contain;
+    flex-shrink: 0;
+    filter: drop-shadow(0 1px 2px rgba(0,0,0,0.2));
+  }
+  .nav-dropdown-item .label {
+    flex: 1;
+    line-height: 1.2;
+  }
+  .nav-dropdown-item .label small {
+    display: block;
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--nbd-mb-text-soft);
+    margin-top: 1px;
+  }
+  .nav-dropdown-divider {
+    height: 1px;
+    background: var(--nbd-mb-border-subtle);
+    margin: 6px 4px;
+  }
+  .nav-dropdown-footer {
+    padding: 10px 12px;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--nbd-mb-primary);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .nav-dropdown-footer:hover { background: var(--nbd-mb-bg-canvas); text-decoration: none; }
+  .nav-dropdown-footer svg { width: 14px; height: 14px; stroke: currentColor; stroke-width: 2.5; fill: none; }
+
+  /* Mobile: dropdown becomes full-width below topbar */
+  @media (max-width: 767px) {
+    .nav-dropdown-menu {
+      position: fixed;
+      top: var(--nbd-topbar-height-mobile-landing);
+      left: 0;
+      right: 0;
+      min-width: 0;
+      max-height: calc(100vh - var(--nbd-topbar-height-mobile-landing));
+      overflow-y: auto;
+      border-radius: 0;
+      border-left: 0;
+      border-right: 0;
+    }
+  }
+
+  /* =========================================================
+     CATEGORY CARD — Photo variant (uses real product image)
+     Overrides the icon-on-dark default for cards that have
+     real product photography. The featured card uses a 2-col
+     layout (photo on left, content on right), while standard
+     cards stack photo above content.
+     ========================================================= */
+  .cat-card.has-photo .cat-card-visual {
+    background: var(--nbd-mb-bg-canvas);
+    padding: 0;
+  }
+  .cat-card.has-photo .cat-card-visual::after { display: none; }
+  .cat-card.has-photo .cat-card-illo {
+    width: 100%;
+    max-width: none;
+    height: 100%;
+    aspect-ratio: auto;
+  }
+  .cat-card.has-photo .cat-card-illo img {
+    max-width: 100%;
+    max-height: 100%;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    filter: none;
+    transition: transform var(--nbd-duration-normal) var(--nbd-ease-out);
+  }
+  .cat-card.has-photo:hover .cat-card-illo img { transform: scale(1.04); }
+  /* Placeholder cards (no real asset yet) — keep brand icon centered on subtle gray */
+  .cat-card.is-placeholder .cat-card-visual {
+    background: linear-gradient(180deg, #f0f0f0 0%, #e0e0e0 100%);
+  }
+  .cat-card.is-placeholder .cat-card-visual::after { display: none; }
+  .cat-card.is-placeholder .cat-card-illo {
+    width: 50%;
+    max-width: 140px;
+    height: auto;
+    opacity: 0.55;
+    filter: grayscale(0.3);
+  }
+  .cat-card.is-placeholder .cat-card-illo img {
+    max-height: 110px;
+    filter: drop-shadow(0 4px 16px rgba(0,0,0,0.25));
+  }
+  .cat-card--featured.is-placeholder .cat-card-illo {
+    width: 38%;
+    max-width: 200px;
+  }
+  .cat-card--featured.is-placeholder .cat-card-illo img { max-height: 160px; }
+  .cat-card.is-placeholder::after {
+    content: "Coming soon";
+    position: absolute;
+    top: 10px; left: 10px;
+    background: rgba(0,0,0,0.6);
+    color: #fff;
+    padding: 3px 10px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    border-radius: var(--nbd-radius-sm);
+    z-index: 3;
+  }
+
+  /* =========================================================
+     "VIEW ALL CATEGORIES" CTA TILE
+     A dashed card that fills the 6th grid slot, inviting
+     users to see categories not yet on the home page.
+     ========================================================= */
+  .cat-cta-tile {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    gap: var(--nbd-space-2);
+    border-radius: var(--nbd-radius-lg);
+    background: var(--nbd-mb-bg-soft);
+    border: 2px dashed var(--nbd-mb-border-strong);
+    padding: var(--nbd-space-6);
+    text-decoration: none;
+    color: var(--nbd-mb-text);
+    transition: border-color var(--nbd-duration-fast) var(--nbd-ease-out),
+                background var(--nbd-duration-fast) var(--nbd-ease-out),
+                transform var(--nbd-duration-fast) var(--nbd-ease-out);
+    min-height: 280px;
+  }
+  .cat-cta-tile:hover {
+    border-color: var(--nbd-mb-primary);
+    background: var(--nbd-mb-primary-soft);
+    text-decoration: none;
+    transform: translateY(-3px);
+    color: var(--nbd-mb-primary);
+  }
+  .cat-cta-tile .icon-stack {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 6px;
+    margin-bottom: var(--nbd-space-2);
+    max-width: 88px;
+  }
+  .cat-cta-tile .icon-stack img {
+    width: 40px; height: 40px;
+    object-fit: contain;
+    opacity: 0.6;
+    filter: grayscale(0.2);
+    transition: opacity var(--nbd-duration-fast) var(--nbd-ease-out);
+  }
+  .cat-cta-tile:hover .icon-stack img { opacity: 1; }
+  .cat-cta-tile h3 {
+    font-size: 17px;
+    font-weight: 800;
+    margin: 0;
+    color: var(--nbd-mb-ink);
+  }
+  .cat-cta-tile:hover h3 { color: var(--nbd-mb-primary); }
+  .cat-cta-tile p {
+    margin: 0;
+    font-size: 13px;
+    color: var(--nbd-mb-text-soft);
+    line-height: 1.4;
+  }
+  .cat-cta-tile .arrow {
+    margin-top: var(--nbd-space-2);
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    font-weight: 800;
+    color: var(--nbd-mb-primary);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+  .cat-cta-tile .arrow svg {
+    width: 14px; height: 14px;
+    stroke: currentColor;
+    stroke-width: 2.5;
+    fill: none;
+    transition: transform var(--nbd-duration-fast) var(--nbd-ease-out);
+  }
+  .cat-cta-tile:hover .arrow svg { transform: translateX(3px); }
+
+  /* =========================================================
+     ITEMS & ACCESSORIES — add-ons / hardware
+     Single-state cards (no rollover) on brand yellow.
+     Per brand spec colors_layout.png "Items" pattern.
+     ========================================================= */
+  .items-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--nbd-space-4);
+  }
+  @media (max-width: 900px) {
+    .items-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (max-width: 560px) {
+    .items-grid { grid-template-columns: 1fr; }
+  }
+  .item-card {
+    position: relative;
+    aspect-ratio: 16 / 9;
+    border-radius: var(--nbd-radius-lg);
+    overflow: hidden;
+    cursor: pointer;
+    background: var(--nbd-mb-highlight);
+    box-shadow: var(--nbd-shadow-sm);
+    text-decoration: none;
+    color: inherit;
+    transition: transform var(--nbd-duration-fast) var(--nbd-ease-out),
+                box-shadow var(--nbd-duration-fast) var(--nbd-ease-out);
+    display: block;
+  }
+  .item-card:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--nbd-shadow-lg);
+    text-decoration: none;
+  }
+  .item-card:focus-visible {
+    outline: 3px solid var(--nbd-mb-primary);
+    outline-offset: 3px;
+  }
+  .item-card img {
+    position: absolute;
+    inset: 0;
+    width: 100%; height: 100%;
+    object-fit: cover;
+    object-position: center;
+  }
+  /* Subtle add-to-cart pill on hover */
+  .item-card-cta {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    padding: 14px 18px;
+    background: linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.0) 30%, rgba(0,0,0,0.85) 100%);
+    display: flex; justify-content: flex-end; align-items: center;
+    gap: 8px;
+    color: #fff;
+    font-size: 12px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    opacity: 0;
+    transition: opacity var(--nbd-duration-normal) var(--nbd-ease-out);
+  }
+  .item-card:hover .item-card-cta { opacity: 1; }
+  .item-card-cta svg { width: 16px; height: 16px; stroke: currentColor; stroke-width: 2.5; fill: none; }
+  .item-card.is-revealed .item-card-cta { opacity: 1; }
+
+  /* Section variant — white bg so yellow cards pop */
+  .section--white { background: var(--nbd-mb-bg); }
+
+  /* =========================================================
+     FOOTER
+     ========================================================= */
+  .footer {
+    background: var(--nbd-mb-ink);
+    color: rgba(255,255,255,0.85);
+    padding: var(--nbd-space-12) 0 var(--nbd-space-6);
+  }
+  .footer-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr;
+    gap: var(--nbd-space-8);
+  }
+  @media (max-width: 767px) {
+    .footer-grid { grid-template-columns: 1fr 1fr; gap: var(--nbd-space-6); }
+  }
+  .footer-logo {
+    height: 64px;
+    width: auto;
+    margin-bottom: var(--nbd-space-3);
+    filter: drop-shadow(0 2px 6px rgba(0,0,0,0.5));
+  }
+  .footer-brand {
+    font-size: 16px;
+    font-weight: 800;
+    color: #fff;
+    margin-bottom: var(--nbd-space-2);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  .footer-tagline {
+    font-size: 13px;
+    color: rgba(255,255,255,0.6);
+    line-height: 1.55;
+    max-width: 320px;
+    margin-bottom: var(--nbd-space-3);
+  }
+  .footer-powered {
+    background: rgba(255,221,0,0.08);
+    border-left: 3px solid var(--nbd-mb-highlight);
+    padding: 10px 12px;
+    border-radius: 4px;
+    font-size: 12.5px;
+    color: rgba(255,255,255,0.85);
+    max-width: 320px;
+  }
+  .footer-powered strong { color: var(--nbd-mb-highlight); }
+  .footer h4 {
+    font-size: 12px;
+    font-weight: 800;
+    color: #fff;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    margin: 0 0 var(--nbd-space-3);
+    position: relative;
+    padding-bottom: 10px;
+  }
+  .footer h4::after {
+    content: "";
+    position: absolute;
+    left: 0; bottom: 0;
+    width: 28px; height: 3px;
+    background: var(--nbd-mb-highlight);
+  }
+  .footer ul { list-style: none; padding: 0; margin: 0; }
+  .footer ul li {
+    font-size: 13px;
+    margin-bottom: var(--nbd-space-2);
+    color: rgba(255,255,255,0.75);
+  }
+  .footer ul li a { color: inherit; }
+  .footer ul li a:hover { color: var(--nbd-mb-highlight); text-decoration: none; }
+  .footer-contact-row {
+    display: flex;
+    align-items: center;
+    gap: var(--nbd-space-2);
+    font-size: 13px;
+    color: rgba(255,255,255,0.85);
+    margin-bottom: var(--nbd-space-2);
+  }
+  .footer-contact-row a { color: inherit; }
+  .footer-contact-row a:hover { color: var(--nbd-mb-highlight); text-decoration: none; }
+  .footer-contact-row svg {
+    width: 14px; height: 14px;
+    stroke: var(--nbd-mb-highlight);
+    stroke-width: 1.5;
+    fill: none;
+    flex-shrink: 0;
+  }
+  .footer-bottom {
+    margin-top: var(--nbd-space-8);
+    padding-top: var(--nbd-space-4);
+    border-top: 1px solid rgba(255,255,255,0.1);
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: var(--nbd-space-2);
+    font-size: 12px;
+    color: rgba(255,255,255,0.5);
+  }
+  .footer-bottom a { color: inherit; }
+  .footer-bottom a:hover { color: var(--nbd-mb-highlight); text-decoration: none; }
+
+</style>
+</head>
+<body>
+
+<!-- ============ UTILITY BAR ============ -->
+<div class="util-bar">
+  <div class="left">
+    <span><span class="dot"></span>Ordering open <strong>24 / 7</strong> · Ships from Fort Pierce, FL</span>
+  </div>
+  <div class="right">
+    <a href="#" class="hide-mobile">FAQs</a>
+    <a href="#" class="hide-mobile">How-to videos</a>
+    <a href="#">Track order</a>
+    <a href="tel:7724298818" class="hide-mobile">📞 772-429-8818</a>
+  </div>
+</div>
+
+<!-- ============ TOP BAR ============ -->
+<header class="topbar" role="banner">
+  <a href="#" class="brand" aria-label="GiganticPrints.com home">
+    <img src="assets/logo.png" alt="GiganticPrints.com" class="brand-logo">
+    <span class="brand-name">GiganticPrints.com — Powered by SignEdge Graphics</span>
+  </a>
+
+  <nav class="topbar-nav" aria-label="Primary">
+    <div class="nav-dropdown" data-dropdown aria-expanded="false">
+      <button type="button" class="nav-link" aria-haspopup="true">Categories</button>
+      <div class="nav-dropdown-menu" role="menu">
+        <a class="nav-dropdown-item" href="#cat-banners" role="menuitem">
+          <img src="assets/icons/banners.png" alt="">
+          <span class="label">Banners<small>Vinyl scrim · HDPE · Mesh · Stands</small></span>
+        </a>
+        <a class="nav-dropdown-item" href="#cat-rigid" role="menuitem">
+          <img src="assets/icons/rigid.png" alt="">
+          <span class="label">Rigid signs<small>Coroplast · Aluminum · PVC · J-Bond · Foam · Acrylic</small></span>
+        </a>
+        <a class="nav-dropdown-item" href="#cat-adhesive" role="menuitem">
+          <img src="assets/icons/adhesive.png" alt="">
+          <span class="label">Adhesive vinyl<small>Decals · window graphics · wraps</small></span>
+        </a>
+        <a class="nav-dropdown-item" href="#cat-apparel" role="menuitem">
+          <img src="assets/icons/apparel.png" alt="">
+          <span class="label">Apparel<small>DTF · screen print · embroidery</small></span>
+        </a>
+        <a class="nav-dropdown-item" href="#cat-magnet" role="menuitem">
+          <img src="assets/icons/magnetic.png" alt="">
+          <span class="label">Magnetic<small>Vehicle magnets · mobile ads</small></span>
+        </a>
+        <a class="nav-dropdown-item" href="#cat-photo" role="menuitem">
+          <img src="assets/icons/photo.png" alt="">
+          <span class="label">Photo prints<small>Canvas · acrylic · poster</small></span>
+        </a>
+        <a class="nav-dropdown-item" href="#cat-promo" role="menuitem">
+          <img src="assets/icons/promo.png" alt="">
+          <span class="label">Promo &amp; print<small>Business cards · flyers · brochures</small></span>
+        </a>
+        <a class="nav-dropdown-item" href="#cat-imagezone" role="menuitem">
+          <img src="assets/icons/imagezone.png" alt="">
+          <span class="label">Image Zone<small>Wall murals · backdrops</small></span>
+        </a>
+        <a class="nav-dropdown-item" href="#cat-misc" role="menuitem">
+          <img src="assets/icons/misc.png" alt="">
+          <span class="label">Misc &amp; accessories<small>Hardware · stands · stakes</small></span>
+        </a>
+        <div class="nav-dropdown-divider"></div>
+        <a class="nav-dropdown-footer" href="#categories" role="menuitem">
+          Browse all categories
+          <svg viewBox="0 0 24 24"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+        </a>
+      </div>
+    </div>
+    <a href="#popular" class="nav-link">Popular</a>
+    <a href="#how" class="nav-link">How it works</a>
+    <a href="#b2b" class="nav-link">B2B / Wholesale</a>
+  </nav>
+
+  <div class="topbar-actions">
+    <button class="nbd-icon-btn" aria-label="Image Zone — your saved artwork (login required)">
+      <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5" fill="none"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="M21 15l-5-5L5 21"/></svg>
+    </button>
+    <button class="nbd-icon-btn" aria-label="Shopping cart">
+      <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5" fill="none"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.7 13.4a2 2 0 002 1.6h9.7a2 2 0 002-1.6L23 6H6"/></svg>
+    </button>
+    <button class="login-btn">Log in</button>
+    <a href="#categories" class="start-btn">
+      Start an Order
+      <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" fill="none" width="14" height="14"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+    </a>
+  </div>
+</header>
+
+
+<!-- ============ HERO ============ -->
+<section class="hero">
+  <div class="container">
+    <div class="hero-inner">
+      <div>
+        <div class="hero-eyebrow">
+          <span class="dot"></span>
+          Now accepting 24-hour orders
+        </div>
+        <h1 class="hero-title">
+          Large-format signs,<br/>
+          <span class="accent">printed in 24 hours.</span>
+        </h1>
+        <p class="hero-desc">
+          Upload your artwork or design online. Real-time pricing, real-time preview. Ships from Fort Pierce, FL to anywhere in the US.
+        </p>
+        <div class="hero-cta-row">
+          <a href="#categories" class="btn-primary">
+            Browse products
+            <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+          </a>
+          <a href="#b2b" class="btn-secondary">B2B pricing</a>
+        </div>
+
+        <div class="hero-meta">
+          <div class="hero-meta-item">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+            <span><strong>24-hour</strong> turnaround</span>
+          </div>
+          <div class="hero-meta-item">
+            <svg viewBox="0 0 24 24"><path d="M3 9l9-6 9 6v11a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><path d="M9 22V12h6v10"/></svg>
+            <span><strong>No login</strong> to design</span>
+          </div>
+          <div class="hero-meta-item">
+            <svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            <span>Ships from <strong>Florida</strong></span>
+          </div>
+        </div>
+      </div>
+
+      <div class="hero-visual" aria-hidden="true">
+        <span class="hero-visual-dim top">55"</span>
+        <span class="hero-visual-dim side">68"</span>
+        <div>
+          <div class="hero-banner-text">
+            <span class="l1">GIGANTIC</span>
+            <span class="l2">PRINTS</span>
+          </div>
+          <div class="hero-visual-tagline">24-hour production</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ CATEGORIES ============ -->
+<section class="section" id="categories">
+  <div class="container">
+    <div class="section-head-row">
+      <div class="section-title-block">
+        <div class="eyebrow">Browse by category</div>
+        <h2 class="section-title">What are you printing today?</h2>
+        <div class="section-sub">Eight top categories — all produced in our Fort Pierce shop. <a href="#" style="color: var(--nbd-mb-primary); font-weight: 700;">See full catalog →</a></div>
+      </div>
+    </div>
+
+    <div class="cat-grid">
+      <!-- Banners -->
+      <a href="#" class="cat-card" data-cat="banner" id="cat-banners">
+        <div class="cat-card-visual">
+          <div class="cat-card-illo" aria-hidden="true">
+            <img src="assets/icons/banners.png" alt="">
+          </div>
+        </div>
+        <div class="cat-card-content">
+          <h3 class="cat-card-title">
+            Banners
+            <span class="cat-card-arrow" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+            </span>
+          </h3>
+          <p class="cat-card-sub">Vinyl Scrim · HDPE · Mesh · Stands</p>
+        </div>
+      </a>
+
+      <!-- Rigid -->
+      <a href="#" class="cat-card" data-cat="rigid" id="cat-rigid">
+        <div class="cat-card-visual">
+          <div class="cat-card-illo" aria-hidden="true">
+            <img src="assets/icons/rigid.png" alt="">
+          </div>
+        </div>
+        <div class="cat-card-content">
+          <h3 class="cat-card-title">
+            Rigid signs
+            <span class="cat-card-arrow" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+            </span>
+          </h3>
+          <p class="cat-card-sub">Coroplast · PVC · Aluminum · J-Bond · Acrylic · Foam</p>
+        </div>
+      </a>
+
+      <!-- Adhesive -->
+      <a href="#" class="cat-card" data-cat="adhesive" id="cat-adhesive">
+        <div class="cat-card-visual">
+          <div class="cat-card-illo" aria-hidden="true">
+            <img src="assets/icons/adhesive.png" alt="">
+          </div>
+        </div>
+        <div class="cat-card-content">
+          <h3 class="cat-card-title">
+            Adhesive vinyl
+            <span class="cat-card-arrow" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+            </span>
+          </h3>
+          <p class="cat-card-sub">Decals · window graphics · wraps</p>
+        </div>
+      </a>
+
+      <!-- Apparel (NEW) -->
+      <a href="#" class="cat-card" data-cat="apparel" id="cat-apparel">
+        <span class="cat-card-badge">New</span>
+        <div class="cat-card-visual">
+          <div class="cat-card-illo" aria-hidden="true">
+            <img src="assets/icons/apparel.png" alt="">
+          </div>
+        </div>
+        <div class="cat-card-content">
+          <h3 class="cat-card-title">
+            Apparel
+            <span class="cat-card-arrow" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+            </span>
+          </h3>
+          <p class="cat-card-sub">DTF · screen print · embroidery</p>
+        </div>
+      </a>
+
+      <!-- Magnet -->
+      <a href="#" class="cat-card" data-cat="magnet" id="cat-magnet">
+        <div class="cat-card-visual">
+          <div class="cat-card-illo" aria-hidden="true">
+            <img src="assets/icons/magnetic.png" alt="">
+          </div>
+        </div>
+        <div class="cat-card-content">
+          <h3 class="cat-card-title">
+            Magnetic
+            <span class="cat-card-arrow" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+            </span>
+          </h3>
+          <p class="cat-card-sub">Vehicle magnets · mobile ads</p>
+        </div>
+      </a>
+
+      <!-- Photo Prints -->
+      <a href="#" class="cat-card" data-cat="photo" id="cat-photo">
+        <div class="cat-card-visual">
+          <div class="cat-card-illo" aria-hidden="true">
+            <img src="assets/icons/photo.png" alt="">
+          </div>
+        </div>
+        <div class="cat-card-content">
+          <h3 class="cat-card-title">
+            Photo prints
+            <span class="cat-card-arrow" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+            </span>
+          </h3>
+          <p class="cat-card-sub">Canvas · acrylic · poster · gallery</p>
+        </div>
+      </a>
+
+      <!-- Promo & Print -->
+      <a href="#" class="cat-card" data-cat="promo" id="cat-promo">
+        <div class="cat-card-visual">
+          <div class="cat-card-illo" aria-hidden="true">
+            <img src="assets/icons/promo.png" alt="">
+          </div>
+        </div>
+        <div class="cat-card-content">
+          <h3 class="cat-card-title">
+            Promo &amp; print
+            <span class="cat-card-arrow" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+            </span>
+          </h3>
+          <p class="cat-card-sub">Business cards · flyers · brochures</p>
+        </div>
+      </a>
+
+      <!-- Image Zone -->
+      <a href="#" class="cat-card" data-cat="imagezone" id="cat-imagezone">
+        <div class="cat-card-visual">
+          <div class="cat-card-illo" aria-hidden="true">
+            <img src="assets/icons/imagezone.png" alt="">
+          </div>
+        </div>
+        <div class="cat-card-content">
+          <h3 class="cat-card-title">
+            Image Zone
+            <span class="cat-card-arrow" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+            </span>
+          </h3>
+          <p class="cat-card-sub">Wall murals · backdrops · large-format</p>
+        </div>
+      </a>
+
+    </div>
+  </div>
+</section>
+
+<!-- ============ FEATURED PRODUCTS — cross-category top picks ============ -->
+<section class="section section--soft" id="popular">
+  <div class="container">
+    <div class="section-head-row">
+      <div class="section-title-block">
+        <div class="eyebrow">Top sellers</div>
+        <h2 class="section-title">Featured this week.</h2>
+        <div class="section-sub">A few of the products our customers come back for, across every category. Hover any card to see the specs.</div>
+      </div>
+      <a href="#" class="section-link">
+        View all
+        <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+      </a>
+    </div>
+
+    <div class="product-grid">
+      <a href="#" class="product-card" aria-label="Coroplast — Vibrant Yard Signs. 4mm and 10mm corrugated plastic, UV direct printed, fluted for stakes.">
+        <img class="pc-img normal"   src="assets/products/coroplast.png"          alt="" loading="lazy">
+        <img class="pc-img rollover" src="assets/products/coroplast_rollover.png" alt="" loading="lazy">
+        <span class="pc-sr">Coroplast — Vibrant Yard Signs</span>
+      </a>
+
+      <a href="#" class="product-card" aria-label="Premium Vinyl Banner — Stunningly vibrant premium vinyl scrim, 13, 15 and 18 oz weights, hemmed and grommeted.">
+        <img class="pc-img normal"   src="assets/products/banner.png"          alt="" loading="lazy">
+        <img class="pc-img rollover" src="assets/products/banner_rollover.png" alt="" loading="lazy">
+        <span class="pc-sr">Premium Vinyl Banner — Vibrant Vinyl Scrim</span>
+      </a>
+
+      <a href="#" class="product-card" aria-label="Aluminum — Heavy Duty Signage. 0.04 and 0.08 inch, ideal for outdoor use, post or frame mount.">
+        <img class="pc-img normal"   src="assets/products/aluminum.png"          alt="" loading="lazy">
+        <img class="pc-img rollover" src="assets/products/aluminum_rollover.png" alt="" loading="lazy">
+        <span class="pc-sr">Aluminum — Heavy Duty Signage</span>
+      </a>
+
+      <a href="#" class="product-card" aria-label="DTF Apparel — Direct to Film. Up to 22 inches wide, for cotton and polyester, vibrant heat transfer. Apparel, totes, hats.">
+        <img class="pc-img normal"   src="assets/products/dtf.png"          alt="" loading="lazy">
+        <img class="pc-img rollover" src="assets/products/dtf_rollover.png" alt="" loading="lazy">
+        <span class="pc-sr">DTF Apparel — Direct To Film</span>
+      </a>
+
+      <a href="#" class="product-card" aria-label="Art Canvas — Stretch and frame, gallery quality. Polyester cotton, gesso finish, smooth finish, décor.">
+        <img class="pc-img normal"   src="assets/products/canvas.png"          alt="" loading="lazy">
+        <img class="pc-img rollover" src="assets/products/canvas_rollover.png" alt="" loading="lazy">
+        <span class="pc-sr">Art Canvas — Stretch &amp; Frame</span>
+      </a>
+
+      <a href="#" class="product-card" aria-label="Magnetic — Premium vehicle magnet for mobile advertising. Maximize exposure for your brand.">
+        <img class="pc-img normal"   src="assets/products/magnet.png"          alt="" loading="lazy">
+        <img class="pc-img rollover" src="assets/products/magnet_rollover.png" alt="" loading="lazy">
+        <span class="pc-sr">Magnetic — Premium Vehicle Magnet</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ============ ITEMS & ACCESSORIES — add-ons / hardware ============ -->
+<section class="section section--white" id="items">
+  <div class="container">
+    <div class="section-head-row">
+      <div class="section-title-block">
+        <div class="eyebrow">Order with your signs</div>
+        <h2 class="section-title">Items &amp; accessories.</h2>
+        <div class="section-sub">Hardware, stakes, stand-offs and add-on items — everything you need to install and present your prints.</div>
+      </div>
+      <a href="#cat-misc" class="section-link">
+        Browse all
+        <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+      </a>
+    </div>
+
+    <div class="items-grid">
+      <a href="#" class="item-card" aria-label="Step Stakes — 10 x 30 inch 2-Wire Step Stake, 9 gauge wire. Fits small to medium corrugated plastic signs. 50 stakes per box.">
+        <img src="assets/products/stepstake.png" alt="" loading="lazy">
+        <span class="item-card-cta">
+          Add to order
+          <svg viewBox="0 0 24 24"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+        </span>
+      </a>
+
+      <a href="#" class="item-card" aria-label="Stand Offs — Complete install kit including wall anchors and screws. Available in polished silver and anodized black aluminum. 50 stand offs per box.">
+        <img src="assets/products/standoffs.png" alt="" loading="lazy">
+        <span class="item-card-cta">
+          Add to order
+          <svg viewBox="0 0 24 24"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+        </span>
+      </a>
+
+      <a href="#" class="item-card" aria-label="Hard Cards — Aluminum business cards, 2 by 3.5 inch rigid cards. Vivid high gloss finish, direct print technology. 55 cards per order.">
+        <img src="assets/products/hardcard.png" alt="" loading="lazy">
+        <span class="item-card-cta">
+          Add to order
+          <svg viewBox="0 0 24 24"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+        </span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ============ HOW IT WORKS ============ -->
+<section class="section" id="how">
+  <div class="container">
+    <div class="section-head-row">
+      <div class="section-title-block">
+        <div class="eyebrow">4 steps</div>
+        <h2 class="section-title">How it works</h2>
+        <div class="section-sub">From "I need a sign" to "it's on the way" — no phone tag required.</div>
+      </div>
+    </div>
+
+    <div class="steps-grid">
+      <div class="step-card">
+        <div class="step-num">1</div>
+        <div class="step-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 3v18"/></svg>
+        </div>
+        <h3 class="step-title">Choose your product</h3>
+        <p class="step-desc">Browse our nine categories — banners, rigid signs, vehicle wraps, apparel, magnets, photo prints and more.</p>
+      </div>
+
+      <div class="step-card">
+        <div class="step-num">2</div>
+        <div class="step-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><path d="M16 16l-4-4-4 4M12 12v9"/><path d="M20 16v3a2 2 0 01-2 2H6a2 2 0 01-2-2v-3"/></svg>
+        </div>
+        <h3 class="step-title">Upload or design</h3>
+        <p class="step-desc">Drop your PDF, AI, PSD, PNG, or JPG file — or build a layout with our free online designer. No login required.</p>
+      </div>
+
+      <div class="step-card">
+        <div class="step-num">3</div>
+        <div class="step-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><path d="M21 12l-9 9-9-9V3h18z"/><circle cx="12" cy="9" r="2"/></svg>
+        </div>
+        <h3 class="step-title">Configure &amp; preview</h3>
+        <p class="step-desc">Pick size, material, grommets, welding, wind slits, stakes. Real-time price as you adjust.</p>
+      </div>
+
+      <div class="step-card">
+        <div class="step-num">4</div>
+        <div class="step-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/><path d="M3.27 6.96L12 12.01l8.73-5.05M12 22.08V12"/></svg>
+        </div>
+        <h3 class="step-title">Order any time, day or night</h3>
+        <p class="step-desc">Standard orders enter production the next business day from our Fort Pierce, FL facility.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ B2B STRIP ============ -->
+<section class="section" id="b2b">
+  <div class="container">
+    <div class="b2b-strip">
+      <div class="b2b-strip-content">
+        <div class="b2b-eyebrow">B2B / Wholesale</div>
+        <h3>Print buyer? Get up to 24% off retail.</h3>
+        <p>Print shops, marketing agencies, event companies, and high-volume buyers — apply for a B2B account to unlock tiered pricing, private templates, Image Zone storage, and 1-click reorder.</p>
+      </div>
+      <div class="b2b-actions">
+        <a href="#" class="btn-primary btn-on-dark">
+          Apply for B2B
+          <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+        </a>
+        <a href="#" class="btn-ghost-on-dark">Learn more</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FOOTER ============ -->
+<footer class="footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div>
+        <img src="assets/logo.png" alt="GiganticPrints.com" class="footer-logo">
+        <div class="footer-tagline">
+          The online ordering arm of SignEdge Graphics. Custom signs, banners, vehicle wraps, apparel and large-format printing — produced right here in Fort Pierce, FL.
+        </div>
+        <div class="footer-powered">
+          <strong>Powered by SignEdge Graphics</strong><br>
+          Same people. Same production team. Same experience.
+        </div>
+      </div>
+      <div>
+        <h4>Contact</h4>
+        <div class="footer-contact-row">
+          <svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72c.13.96.37 1.9.7 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.91.33 1.85.57 2.81.7A2 2 0 0122 16.92z"/></svg>
+          <a href="tel:7724298818">772-429-8818</a>
+        </div>
+        <div class="footer-contact-row">
+          <svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><path d="M22 6l-10 7L2 6"/></svg>
+          <a href="mailto:hoyle@giganticprints.com">hoyle@giganticprints.com</a>
+        </div>
+        <div class="footer-contact-row">
+          <svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          2101 Orange Ave, Ft. Pierce, FL
+        </div>
+        <div class="footer-contact-row" style="margin-top: 14px;">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+          Mon–Fri · 8:00 AM – 5:00 PM
+        </div>
+      </div>
+      <div>
+        <h4>Products</h4>
+        <ul>
+          <li><a href="#cat-banners">HD vinyl banners</a></li>
+          <li><a href="#">Rigid signs</a></li>
+          <li><a href="#">Adhesive vinyl</a></li>
+          <li><a href="#">Vehicle wraps</a></li>
+          <li><a href="#">Magnets</a></li>
+          <li><a href="#">Apparel</a></li>
+          <li><a href="#">Photo prints</a></li>
+          <li><a href="#">Promo &amp; print</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Account</h4>
+        <ul>
+          <li><a href="#">Sign in</a></li>
+          <li><a href="#">Order history</a></li>
+          <li><a href="#">Reorder previous</a></li>
+          <li><a href="#">Image Zone</a></li>
+          <li><a href="#b2b">Apply for B2B</a></li>
+          <li><a href="#">Track order</a></li>
+          <li><a href="https://signedgegraphics.com" target="_blank" rel="noopener">SignEdge Graphics →</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <div>© <span id="yr">2026</span> GiganticPrints.com · A SignEdge Graphics company. All rights reserved.</div>
+      <div><a href="#">Terms</a> · <a href="#">Privacy</a> · <a href="#">Refund policy</a> · <a href="#">Accessibility</a></div>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // Auto year
+  document.getElementById('yr').textContent = new Date().getFullYear();
+
+  // Categories dropdown toggle
+  document.querySelectorAll('[data-dropdown]').forEach(dd => {
+    const trigger = dd.querySelector('.nav-link');
+    const close = () => dd.setAttribute('aria-expanded', 'false');
+    const open  = () => dd.setAttribute('aria-expanded', 'true');
+    trigger.addEventListener('click', e => {
+      e.stopPropagation();
+      dd.getAttribute('aria-expanded') === 'true' ? close() : open();
+    });
+    // Close when clicking inside an item (so smooth-scroll still fires)
+    dd.querySelectorAll('.nav-dropdown-item, .nav-dropdown-footer').forEach(item => {
+      item.addEventListener('click', () => setTimeout(close, 80));
+    });
+    // Click outside closes
+    document.addEventListener('click', e => {
+      if (!dd.contains(e.target)) close();
+    });
+    // ESC closes
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape') close();
+    });
+  });
+
+  // Smooth scroll for in-page nav
+  document.querySelectorAll('a[href^="#"]').forEach(a => {
+    a.addEventListener('click', e => {
+      const id = a.getAttribute('href');
+      if (id.length > 1 && document.querySelector(id)) {
+        e.preventDefault();
+        document.querySelector(id).scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    });
+  });
+
+  // Category card click → would navigate to product list
+  document.querySelectorAll('.cat-card').forEach(c => {
+    c.addEventListener('click', e => {
+      e.preventDefault();
+      // In production: navigate to /category/{slug}
+    });
+  });
+
+  // Product card + Item card behaviour (matches brand spec):
+  //   Desktop: hover swaps normal → rollover (pure CSS) / reveals item CTA.
+  //   Touch:   first tap reveals rollover/CTA, second tap navigates.
+  const hasHover = window.matchMedia('(hover: hover)').matches;
+  document.querySelectorAll('.product-card, .item-card').forEach(card => {
+    card.addEventListener('click', e => {
+      if (hasHover) {
+        e.preventDefault();
+        // In production: navigate to /product/{slug}
+        return;
+      }
+      if (!card.classList.contains('is-revealed')) {
+        e.preventDefault();
+        // Collapse other revealed cards so only one is "open" on touch
+        document.querySelectorAll('.product-card.is-revealed, .item-card.is-revealed').forEach(c => {
+          if (c !== card) c.classList.remove('is-revealed');
+        });
+        card.classList.add('is-revealed');
+        clearTimeout(card._collapse);
+        card._collapse = setTimeout(() => card.classList.remove('is-revealed'), 5000);
+      } else {
+        e.preventDefault();
+        // 2nd tap = navigate. In production: real href.
+      }
+    });
+  });
+</script>
+
+</body>
+</html>

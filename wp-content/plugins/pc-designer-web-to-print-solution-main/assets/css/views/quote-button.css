@@ -1,0 +1,9 @@
+.single_variation_wrap .variations_button button{
+  display:none!important;
+}
+.cart button.single_add_to_cart_button{
+  display:none!important;
+}
+.single-product div.product form.cart .quantity {
+  float: none;
+}

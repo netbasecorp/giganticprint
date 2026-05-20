@@ -1,0 +1,26 @@
+# WordPress
+wp-config.php
+
+# Uploads
+wp-content/uploads/
+
+# Cache
+wp-content/cache/
+wp-content/wflogs/
+
+# Node
+node_modules/
+
+# Logs
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# XAMPP
+xampp/wp-content/ai1wm-backups/
+wp-content/updraft/
+wp-content/uploads/
+wp-content/cache/
+.env

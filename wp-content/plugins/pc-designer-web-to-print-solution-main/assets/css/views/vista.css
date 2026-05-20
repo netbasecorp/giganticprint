@@ -1,0 +1,107 @@
+.nbd-mode-vista .nbd-stages .page-toolbar .page-main ul li i.nbd-icon-vista-arrow-upward{
+  background: #ddd;
+  border-radius: 12px;
+  padding: 8px 0;
+}
+.nbd-mode-vista .v-toolbox .v-toolbox-item {
+  max-width: 320px;
+}
+@media(min-width: 768px){
+  .nbd-visual-layout .entry-summary {
+      width: 100% !important;
+  }
+  .nbd-visual-layout .nbo-fields-wrapper {
+      width: 50% !important;
+      float: left !important;
+      padding-right: 1.1em;
+  }
+  .nbd-visual-layout .nbo-summary-wrapper {
+      width: 50% !important;
+      float: left !important;
+  }    
+}
+.nbd-designer #primary,.nbd-designer.woocommerce div.product {
+overflow: unset !important;
+}
+.nbd-on-task:after {
+  content: "";
+  position: fixed;
+  top: 0px;
+  left: 0px;
+  background: #fff;
+  opacity: 1;
+  width: 100vw;
+  height: 100vh;
+  z-index: 10000001;
+  transition: opacity 250ms ease;
+  cursor: default;
+}
+.nbd-on-task .nbd-vista-ctrl {
+  position: relative;
+  z-index: 10000002;
+}
+.nbd-mode-vista .v-toolbox .v-toolbox-item{
+  top: 100%;
+  left: 50%;
+  transform: translateX(-100%);
+  -webkit-transition: all 0.3s;
+  -moz-transition: all 0.3s;
+  transition: all 0.3s;
+}
+.nbd-mode-vista .v-sidebar .v-content .text-editor.active .text-field{
+  background: #888;
+  color: #fff;
+  -webkit-transition: all 0.4s;
+  -moz-transition: all 0.4s;
+  transition: all 0.4s;
+}
+.nbd-mode-vista .nbd-stages .stages-inner .stage .stage-main .design-wrap {
+  overflow: hidden;
+}
+.nbd-mode-vista .nbd-stages .stages-inner .stage .stage-main .design-wrap .bounding-layers .bounding-layers-inner .layer-angle span {
+  font-size: 10px;
+}
+.nbd-mode-vista .v-toolbox .v-toolbox-text .toolbar-font-search input{
+  border: 1px solid #ebebeb !important;
+}
+.v-content.nbd-tab-contents:after,
+#tab-text.nbd-tab-contents:after,
+#tab-photo .v-content:after,
+#tab-element .v-content:after{
+  content: '';
+  position: absolute;
+  bottom: -30px;
+  width: 100%;
+  height: 30px;
+  pointer-events: none;
+  box-shadow: 0px 1px 0px rgba(255, 255, 255, 0.8) inset, 0px -15px 15px rgba(255, 255, 255, 0.6);
+}
+@media screen and (max-width: 768px){
+  .nbd-mode-vista .v-workspace {
+      width: 100%;
+  }
+  .nbd-mode-vista .v-layout{
+      width: 100% !important;
+  }
+  .v-workspace {
+      flex-wrap: wrap;
+  }
+  .toolbar-input {
+      font-size: 16px !important;
+  }
+  .nbd-mode-vista .v-sidebar .v-content .text-editor .text-field{
+      font-size: 16px;
+  }
+  .nbd-mode-vista.nbd-mobile .v-toolbar .main-toolbar .v-toolbar-item:after {
+      display: block;
+      position: absolute;
+      top: 0;
+      right: 0;
+      height: 100%;
+      content: '';
+      width: 60px;
+      background-color: transparent;
+      background-image: linear-gradient(to right, rgba(255,255,255,0) , rgba(255,255,255,0.55));
+      pointer-events: none; 
+  }
+}

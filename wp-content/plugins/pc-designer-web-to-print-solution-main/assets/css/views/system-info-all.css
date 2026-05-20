@@ -1,0 +1,16 @@
+.system-info table {
+  margin: 20px 0;
+}
+.system-info table th {
+  font-weight: bold;
+  width: 25%;
+  padding: 20px 12px;
+}
+.system-info table td {
+  word-break: break-all;
+  padding: 20px 12px;
+}
+.phpinfo img {
+  float: right;
+  border: 0;
+}

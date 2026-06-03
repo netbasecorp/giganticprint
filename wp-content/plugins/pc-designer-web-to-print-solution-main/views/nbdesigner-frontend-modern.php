@@ -215,7 +215,7 @@
                     );
                     $nbds_frontend = array(
                         'wc_currency_format_num_decimals'               =>  wc_get_price_decimals(),
-                        'currency_format_num_decimals'                  =>  nbdesigner_get_option( 'nbdesigner_number_of_decimals', 4 ),
+                        'currency_format_num_decimals'                  =>  nbdesigner_get_option( 'nbdesigner_number_of_decimals', wc_get_price_decimals() ),
                         'currency_format_symbol'                        =>  html_entity_decode( (string) get_woocommerce_currency_symbol(), ENT_QUOTES, 'UTF-8'),
                         'currency_format_decimal_sep'                   =>  stripslashes( wc_get_price_decimal_separator() ),
                         'currency_format_thousand_sep'                  =>  stripslashes( wc_get_price_thousand_separator() ),

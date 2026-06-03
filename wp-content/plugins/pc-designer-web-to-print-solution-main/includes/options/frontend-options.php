@@ -1588,7 +1588,7 @@ if( !class_exists( 'NBD_FRONTEND_PRINTING_OPTIONS' ) ){
         }
         public function nbd_js_object( $args ){
             $args['wc_currency_format_num_decimals'] = wc_get_price_decimals();
-            $args['currency_format_num_decimals'] = nbdesigner_get_option( 'nbdesigner_number_of_decimals', 4 );
+            $args['currency_format_num_decimals'] = nbdesigner_get_option( 'nbdesigner_number_of_decimals', wc_get_price_decimals() );
             $args['currency_format_symbol'] = get_woocommerce_currency_symbol();
             $args['currency_format_decimal_sep'] = stripslashes( wc_get_price_decimal_separator() );
             $args['currency_format_thousand_sep'] = stripslashes( wc_get_price_thousand_separator() );

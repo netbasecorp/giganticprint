@@ -72,7 +72,7 @@ class Cmsmart_UI_Override {
             'cmsmart-ui-override',
             CMSMART_UI_OVERRIDE_URL . 'assets/js/override.js',
             array( 'jquery' ),
-            '1.5.3',
+            '1.5.4',
             true
         );
 

@@ -7,7 +7,7 @@ jQuery( function ( $ ) {
     // ── Design card config ───────────────────────────────────────────────────
     var designCardCfg = [
         { id: '#startDesign',  cls: 'cui-btn-icon--design',   desc: 'Templates · fonts · clipart' },
-        { id: '#startUpload',  cls: 'cui-btn-icon--upload',   desc: 'PDF, AI, PNG · 25MB'         },
+        { id: '#startUpload',  cls: 'cui-btn-icon--upload',   desc: 'PDF, AI, EPS, TIFF, PNG, JPG · up to 200 MB' },
         { id: '#useTemplate',  cls: 'cui-btn-icon--template', desc: 'Browse our designs'           }
     ];
 

@@ -11,7 +11,76 @@ class PCS_Quotes {
     /* Generate unique quote number                                       */
     /* ---------------------------------------------------------------- */
     public static function generate_number() {
-        return 'Q-' . date( 'Y' ) . '-' . str_pad( rand( 1, 9999 ), 4, '0', STR_PAD_LEFT );
+        return 'Q-' . date( 'Y' ) . '-' . str_pad( (string) random_int( 1, 9999 ), 4, '0', STR_PAD_LEFT );
+    }
+
+    /* ---------------------------------------------------------------- */
+    /* Access + guarded customer response (accept / decline)              */
+    /* ---------------------------------------------------------------- */
+    public static function user_can_access( $quote, $user_id ) {
+        $user_id = absint( $user_id );
+        if ( ! $quote || ! $user_id ) return false;
+        if ( user_can( $user_id, 'manage_options' ) ) return true;
+        if ( (int) $quote->user_id === $user_id ) return true;
+        if ( ! empty( $quote->store_id ) ) {
+            $store = PCS_DB::get_store_by_id( $quote->store_id );
+            if ( $store && (int) $store->user_id === $user_id ) return true;
+            if ( PCS_DB::get_member_by_user( $quote->store_id, $user_id ) ) return true;
+        }
+        return false;
+    }
+
+    public static function is_expired( $quote ) {
+        if ( empty( $quote->valid_until ) || '0000-00-00' === substr( (string) $quote->valid_until, 0, 10 ) ) return false;
+        $ts = strtotime( $quote->valid_until );
+        if ( ! $ts ) return false;
+        if ( strlen( trim( (string) $quote->valid_until ) ) <= 10 ) $ts += DAY_IN_SECONDS - 1;
+        return $ts < current_time( 'timestamp' );
+    }
+
+    /**
+     * Accept or decline a quote. Returns array( status, order_id, order_url ) or WP_Error.
+     * The status flip is one guarded UPDATE (status = 'sent'), so only one caller can win.
+     */
+    public static function respond( $quote_id, $action, $user_id ) {
+        global $wpdb;
+        if ( ! in_array( $action, array( 'accept', 'decline' ), true ) ) {
+            return new WP_Error( 'invalid', 'Invalid request.' );
+        }
+        $quote = self::get( $quote_id );
+        if ( ! $quote || ! self::user_can_access( $quote, $user_id ) ) {
+            return new WP_Error( 'not_found', 'Quote not found.' );
+        }
+        if ( 'sent' !== $quote->status ) {
+            return new WP_Error( 'not_sent', 'This quote is no longer awaiting response.' );
+        }
+        if ( self::is_expired( $quote ) ) {
+            return new WP_Error( 'expired', 'This quote has expired. Please request a new one.' );
+        }
+
+        $new_status = 'accept' === $action ? 'accepted' : 'declined';
+        $rows = $wpdb->query( $wpdb->prepare(
+            "UPDATE {$wpdb->prefix}pcs_quotes SET status = %s, responded_at = %s WHERE id = %d AND status = 'sent'",
+            $new_status,
+            current_time( 'mysql' ),
+            absint( $quote_id )
+        ) );
+        if ( 1 !== (int) $rows ) {
+            return new WP_Error( 'not_sent', 'This quote is no longer awaiting response.' );
+        }
+
+        $order_id  = 0;
+        $order_url = '';
+        if ( 'accept' === $action ) {
+            $result = self::create_order_from_quote( $quote_id );
+            if ( ! is_wp_error( $result ) && $result ) {
+                $order_id  = (int) $result;
+                $order_url = wc_get_endpoint_url( 'view-order', $order_id, wc_get_page_permalink( 'myaccount' ) );
+            }
+        }
+        self::notify_admin_quote_response( $quote_id, $new_status );
+
+        return array( 'status' => $new_status, 'order_id' => $order_id, 'order_url' => $order_url );
     }
 
     /* ---------------------------------------------------------------- */
@@ -21,10 +90,14 @@ class PCS_Quotes {
         global $wpdb;
         $table = $wpdb->prefix . 'pcs_quotes';
 
+        $attempts = 0;
         do {
             $number = self::generate_number();
+            if ( ++$attempts > 20 ) {
+                $number .= '-' . strtoupper( substr( bin2hex( random_bytes( 3 ) ), 0, 4 ) );
+            }
             $exists = $wpdb->get_var( $wpdb->prepare( "SELECT id FROM $table WHERE quote_number = %s", $number ) );
-        } while ( $exists );
+        } while ( $exists && $attempts < 50 );
 
         $wpdb->insert( $table, array(
             'quote_number' => $number,
@@ -92,11 +165,15 @@ class PCS_Quotes {
         $values[]  = absint( $args['per_page'] );
         $values[]  = $offset;
 
+        $orderby_ok = array( 'id', 'created_at', 'updated_at', 'sent_at', 'responded_at', 'valid_until', 'total', 'status', 'quote_number', 'title' );
+        $orderby    = in_array( $args['orderby'], $orderby_ok, true ) ? $args['orderby'] : 'created_at';
+        $order      = 'ASC' === strtoupper( (string) $args['order'] ) ? 'ASC' : 'DESC';
+
         $sql = "SELECT q.*, u.display_name, u.user_email
                 FROM {$wpdb->prefix}pcs_quotes q
                 LEFT JOIN {$wpdb->users} u ON u.ID = q.user_id
                 WHERE $where_sql
-                ORDER BY q.{$args['orderby']} {$args['order']}
+                ORDER BY q.{$orderby} {$order}
                 LIMIT %d OFFSET %d";
 
         return $wpdb->get_results( $wpdb->prepare( $sql, $values ) );

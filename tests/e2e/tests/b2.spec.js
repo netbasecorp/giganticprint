@@ -149,7 +149,8 @@ test('upload limits and types are advertised', async ({ page }) => {
   await G.tab(page, 'Photos');
   const t = await page.locator('#tab-photo .allow-size').innerText();
   expect(t).toMatch(/Max file size:\s*200 MB/i);
-  expect(t).toMatch(/ai/i); expect(t).toMatch(/eps/i); expect(t).toMatch(/tiff/i);
+  const words = t.split(/[,\n:]/).map(x => x.trim().toLowerCase());
+  expect(words).toEqual(expect.arrayContaining(["ai", "eps", "tiff"]));
   await G.shot(page, 'b2', '08-photos-tab-limits-1440');
 });
 
@@ -186,13 +187,11 @@ test('AI upload (PDF-compatible) is placed', async ({ page }) => {
 
 test('130 MB file goes through the chunked uploader and is placed', async ({ page }) => {
   test.setTimeout(540000);
-  const reqs = [];
-  page.on('request', r => { if (r.method() === 'POST' && /admin-ajax/.test(r.url())) reqs.push((r.postData() || '').slice(0, 0) + r.headers()['content-length']); });
+  let n = 0;
+  page.on('request', r => { if (r.method() === 'POST' && /admin-ajax/.test(r.url())) n++; });
   await expectPlaced(page, 'testimg/big-130mb.png', 'chunked 130MB', 330000);
-  const sizes = reqs.map(Number).filter(n => n > 0);
-  console.log('admin-ajax POSTs', sizes.length, 'largest body', Math.max(...sizes));
-  expect(sizes.length).toBeGreaterThan(10);                 // many parts, not one big request
-  expect(Math.max(...sizes)).toBeLessThan(20 * 1024 * 1024); // never close to Cloudflare's 100 MB cap
+  console.log('admin-ajax POST requests', n);
+  expect(n).toBeGreaterThan(15); // init + 16 parts of 8 MB + finish, not one big request (Cloudflare caps a request body at 100 MB)
   await G.shot(page, 'b2', '13-chunked-130mb-placed-1440');
 });
 

@@ -107,11 +107,11 @@ $total_spent = (float) wc_get_customer_total_spent( $user_id );
   <div>
     <!-- Status + tier -->
     <div class="pcs-pcard">
-      <div class="pcs-pcard-head <?php echo 'active' === $store->status ? 'pcs-pcard-head-success' : 'pcs-pcard-head-warning'; ?>">
+      <div class="pcs-pcard-head <?php echo PCS_DB::store_is_approved( $store->status ) ? 'pcs-pcard-head-success' : 'pcs-pcard-head-warning'; ?>">
         <h3 class="pcs-pcard-title">Account status</h3>
       </div>
       <div class="pcs-pcard-body" style="text-align:center;padding:24px 16px;">
-        <?php if ( 'active' === $store->status ) : ?>
+        <?php if ( PCS_DB::store_is_approved( $store->status ) ) : ?>
           <div style="font-size:40px;margin-bottom:8px;">✅</div>
           <div style="font-weight:700;font-size:16px;margin-bottom:4px;">Active</div>
           <div style="font-size:12px;color:#6b7280;">Your B2B account is in good standing.</div>

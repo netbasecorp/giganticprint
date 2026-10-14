@@ -3,6 +3,14 @@ if ( ! defined( 'ABSPATH' ) ) exit;
 
 class PCS_DB {
 
+    /* Canonical store status is 'active'; 'approved' is accepted on read for legacy rows */
+    const STORE_STATUS_ACTIVE = 'active';
+    const STORE_APPROVED_STATUSES = array( 'active', 'approved' );
+
+    public static function store_is_approved( $status ) {
+        return in_array( (string) $status, self::STORE_APPROVED_STATUSES, true );
+    }
+
     /* ---------------------------------------------------------------- */
     /* B2B Stores                                                         */
     /* ---------------------------------------------------------------- */
@@ -329,7 +337,11 @@ class PCS_DB {
         $where_sql = implode( ' AND ', $where );
         $offset    = ( absint( $args['paged'] ) - 1 ) * absint( $args['per_page'] );
 
-        $sql = "SELECT * FROM $table WHERE $where_sql ORDER BY {$args['orderby']} {$args['order']} LIMIT %d OFFSET %d";
+        $orderby_ok = array( 'id', 'created_at', 'expires_at', 'email', 'company_name', 'contact_name', 'status', 'proposed_tier' );
+        $orderby    = in_array( $args['orderby'], $orderby_ok, true ) ? $args['orderby'] : 'created_at';
+        $order      = 'ASC' === strtoupper( (string) $args['order'] ) ? 'ASC' : 'DESC';
+
+        $sql = "SELECT * FROM $table WHERE $where_sql ORDER BY $orderby $order LIMIT %d OFFSET %d";
         $values[] = absint( $args['per_page'] );
         $values[] = $offset;
 
@@ -378,6 +390,27 @@ class PCS_DB {
             "SELECT * FROM {$wpdb->prefix}pcs_invitations WHERE email = %s AND status = 'pending' ORDER BY id DESC LIMIT 1",
             sanitize_email( $email )
         ) );
+    }
+
+    /* Single-use claim: pending -> accepted, true only for the one caller that wins */
+    public static function claim_invitation( $id ) {
+        global $wpdb;
+        $rows = $wpdb->query( $wpdb->prepare(
+            "UPDATE {$wpdb->prefix}pcs_invitations SET status = 'accepted', accepted_at = %s WHERE id = %d AND status = 'pending'",
+            current_time( 'mysql' ),
+            absint( $id )
+        ) );
+        return 1 === (int) $rows;
+    }
+
+    public static function claim_team_invite( $id ) {
+        global $wpdb;
+        $rows = $wpdb->query( $wpdb->prepare(
+            "UPDATE {$wpdb->prefix}pcs_team_invitations SET status = 'accepted', responded_at = %s WHERE id = %d AND status = 'pending'",
+            current_time( 'mysql' ),
+            absint( $id )
+        ) );
+        return 1 === (int) $rows;
     }
 
     public static function get_invitation_by_id( $id ) {

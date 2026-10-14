@@ -523,6 +523,10 @@ define( 'GP_LINEAR_PRICING_VERSION', '1.0.0' );
 require_once CMSMART_UI_OVERRIDE_PATH . 'includes/class-gp-linear-pricing.php';
 add_action( 'plugins_loaded', array( 'GP_Linear_Pricing', 'init' ) );
 
+// Login rate limiting + user enumeration hardening.
+require_once CMSMART_UI_OVERRIDE_PATH . 'includes/class-gp-hardening.php';
+add_action( 'plugins_loaded', array( 'GP_Hardening', 'init' ) );
+
 // Designer page: globals first, then the script (same markup style as signedge-designer-ui).
 add_action( 'nbd_extra_js', 'gp_linear_pricing_designer_js', 4 );
 function gp_linear_pricing_designer_js() {

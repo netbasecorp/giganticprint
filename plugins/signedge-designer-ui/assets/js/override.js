@@ -3634,22 +3634,77 @@
         return prices;
     }
 
-    // Parse a formatted price string like "$6.63", "6,63 $", "1.234,56 $" → float
-    // Handles both US (dot decimal) and European (comma decimal) formats.
+    // Parse a formatted price string → float (fallback only: prefer numeric NBO scope values).
+    // Locale rule (tests: tests/parse-price.test.js):
+    //   1. both '.' and ',' present → the LAST one is the decimal mark, the other is thousands
+    //      ("1,234.56" = 1234.56, "1.234,56" = 1234.56)
+    //   2. one kind of separator, several times → thousands ("1,234,567" = 1234567)
+    //   3. one kind, once, exactly three digits after it and 1-3 digits before it (not "0")
+    //      → thousands ("1.234" = 1234, "1,234" = 1234)
+    //   4. otherwise a lone separator is the decimal mark ("16,63" = 16.63, "6.6", "0.125", "1234.567")
     function parseFormattedPrice(str) {
         if (!str || str === '—') return null;
-        // Keep only digits, dots, commas, and minus
         var s = String(str).replace(/[^0-9.,\-]/g, '');
-        if (!s) return null;
-        // Detect European format: comma followed by 1-2 digits at end (e.g. "6,63" "1.234,56")
-        if (/,\d{1,2}$/.test(s)) {
+        var neg = s.charAt(0) === '-';
+        s = s.replace(/-/g, '');
+        if (!/\d/.test(s)) return null;
+        var lastDot = s.lastIndexOf('.'), lastCom = s.lastIndexOf(',');
+        var dec = null; // decimal mark or null
+        if (lastDot >= 0 && lastCom >= 0) {
+            dec = lastDot > lastCom ? '.' : ',';
+        } else if (lastDot >= 0 || lastCom >= 0) {
+            var sep   = lastDot >= 0 ? '.' : ',';
+            var parts = s.split(sep);
+            if (parts.length === 2) {
+                var thousands = parts[1].length === 3 && /^[1-9]\d{0,2}$/.test(parts[0]);
+                dec = thousands ? null : sep;
+            }
+        }
+        if (dec === '.') {
+            s = s.replace(/,/g, '');
+        } else if (dec === ',') {
             s = s.replace(/\./g, '').replace(',', '.');
         } else {
-            // US / dot-decimal format: commas are thousands separators
-            s = s.replace(/,/g, '');
+            s = s.replace(/[.,]/g, '');
         }
         var n = parseFloat(s);
-        return isNaN(n) ? null : n;
+        if (isNaN(n)) return null;
+        return neg ? -n : n;
+    }
+
+    // Numeric price data straight from the NBO Angular scope (no text parsing).
+    // total = total for the current quantity, qty >= 1, base = numeric base price (per item).
+    // Returns null when the scope has no numeric total yet.
+    function getNboNumericPrices() {
+        var scope = getNboScope();
+        if (!scope) return null;
+        var total = parseFloat(scope.total_cart_item_price_num);
+        if (isNaN(total) || total <= 0) return null;
+        var qty = parseInt(scope.quantity, 10);
+        if (isNaN(qty) || qty < 1) qty = 1;
+        var base = parseFloat(scope.basePrice);
+        return { total: total, qty: qty, base: isNaN(base) ? null : base };
+    }
+
+    function getPriceDecimals() {
+        var f = window.nbds_frontend;
+        var d = f ? parseInt(f.wc_currency_format_num_decimals, 10) : NaN;
+        return isNaN(d) ? 2 : d;
+    }
+
+    // Bulk (quantity) extra % for qty from window.sg_b2b_bulk_rules [{minQty, extra}]
+    function sgBulkExtra(qty) {
+        var rules = window.sg_b2b_bulk_rules || [], best = 0;
+        for (var i = 0; i < rules.length; i++) {
+            var x = parseFloat(rules[i].extra) || 0;
+            if (qty >= rules[i].minQty && x > best) best = x;
+        }
+        return best;
+    }
+
+    // Percentage with up to 2 decimals, trailing zeros trimmed ("10", "12.5", "7.25")
+    function fmtPct(n) {
+        return String(parseFloat((parseFloat(n) || 0).toFixed(2)));
     }
 
     /* ----------------------------------------------------------------
@@ -3888,22 +3943,14 @@
         var totalPrice = null;
         var basePrice  = null;
 
-        /* Strategy 1 — Angular scope on the main controller */
+        /* Strategy 1 — NUMERIC values from the NBO Angular scope (raw, undiscounted):
+           total_cart_item_price_num (total for current qty), quantity, basePrice (per item) */
+        var nums = null;
         try {
-            var ngRoot = document.querySelector('[ng-controller]');
-            if (ngRoot && window.angular) {
-                var scope = angular.element(ngRoot).scope();
-                if (scope) {
-                    // NBO plugin exposes totalPrice / printOptionsPrice on scope
-                    var raw = scope.totalPrice || scope.nboTotalPrice || scope.printOptionsPrice;
-                    if (raw !== undefined && raw !== null) {
-                        totalPrice = formatPrice(raw);
-                    }
-                    var rawBase = scope.productPrice || scope.basePrice;
-                    if (rawBase !== undefined && rawBase !== null) {
-                        basePrice = formatPrice(rawBase);
-                    }
-                }
+            nums = getNboNumericPrices();
+            if (nums) {
+                totalPrice = formatPrice(nums.total);
+                if (nums.base !== null) basePrice = formatPrice(nums.base);
             }
         } catch (e) { /* Angular may not be bootstrapped yet */ }
 
@@ -3973,9 +4020,14 @@
         // Options total = total − base (avoids the NBO total_price which includes base/matrix)
         var optsRow = document.getElementById('sg-options-price-row');
         var optsEl  = document.getElementById('sg-options-price');
+        // RAW numbers (retail, per current quantity) used by the options and B2B rows.
+        // Numeric scope values first; the formatted text is only a fallback.
+        var retailTotal = nums ? nums.total : parseFormattedPrice(totalPrice);
+        var itemQty     = nums ? nums.qty : 1;
+        var baseNum     = (nums && nums.base !== null) ? nums.base : parseFormattedPrice(basePrice);
         if (optsRow && optsEl) {
-            var tNum = parseFormattedPrice(totalEl.textContent);
-            var bNum = parseFormattedPrice(baseEl ? baseEl.textContent : null);
+            var tNum = retailTotal !== null ? retailTotal / itemQty : null;   // retail per item
+            var bNum = baseNum;
             if (tNum !== null && bNum !== null) {
                 var optsNum = tNum - bNum;
                 if (optsNum > 0.005) {
@@ -3992,23 +4044,26 @@
         var b2bRow  = document.getElementById('sg-b2b-disc-row');
         var b2bVal  = document.getElementById('sg-b2b-disc-val');
         var b2bLbl  = document.getElementById('sg-b2b-disc-label');
-        var b2bDisc = parseFloat(window.sg_b2b_discount) || 0;
-        var b2bTier = window.sg_b2b_tier || 'b2c';
-        var displayTotal = totalPrice; // may be replaced by B2B-adjusted price below
-        if (b2bRow && b2bTier !== 'b2c' && b2bDisc >= 1 && totalPrice) {
-            var tNum = parseFormattedPrice(totalEl.textContent);
-            if (tNum !== null && tNum > 0 && b2bDisc < 100) {
-                var savings  = tNum * b2bDisc / 100;                  // e.g. 16.63 * 24/100 = 3.99
-                var b2bTotal = tNum * (1 - b2bDisc / 100);            // e.g. 16.63 * 0.76  = 12.64
+        // tier % (+ bulk % for this quantity) — applied ONCE to the raw numbers, same math as the cart:
+        // unit = round(raw_unit * (1 - rate/100)), total = unit * qty
+        var b2bRate = (parseFloat(window.sg_b2b_discount) || 0) + sgBulkExtra(itemQty);
+        var displayTotal = totalPrice; // retail unless a discount applies below
+        if (b2bRow && b2bRate > 0 && b2bRate < 100 && totalPrice) {
+            if (retailTotal !== null && retailTotal > 0) {
+                var dDec     = getPriceDecimals();
+                var rawUnit  = retailTotal / itemQty;
+                var b2bUnit  = parseFloat((rawUnit * (1 - b2bRate / 100)).toFixed(dDec));
+                var b2bTotal = b2bUnit * itemQty;
+                var savings  = retailTotal - b2bTotal;
                 if (b2bVal) b2bVal.textContent = '−' + formatPrice(savings);
                 if (b2bLbl) {
                     var tier = window.sg_b2b_tier || '';
                     var ts = tier === 'vip' ? 'VIP'
                            : /^b2b_/.test(tier) ? 'Tier ' + tier.replace('b2b_', '').toUpperCase()
-                           : tier.toUpperCase();
-                    b2bLbl.textContent = 'B2B · ' + ts + ' · ' + b2bDisc + '% off';
+                           : tier === 'b2c' ? 'Team' : tier.toUpperCase();
+                    b2bLbl.textContent = 'B2B · ' + ts + ' · ' + fmtPct(b2bRate) + '% off';
                 }
-                // Override displayed total with the B2B price
+                // Displayed total = discounted total (retail = base + options rows above)
                 displayTotal = formatPrice(b2bTotal);
                 totalEl.textContent = displayTotal;
                 b2bRow.style.removeProperty('display');
@@ -4030,18 +4085,23 @@
         var sym      = '';
         var decimals = 2;
         var format   = '%s%v'; // default: symbol then value
+        var decSep   = '.';
+        var thouSep  = '';
 
         if (window.nbds_frontend) {
             sym      = window.nbds_frontend.currency_format_symbol      || '$';
-            decimals = parseInt(window.nbds_frontend.currency_format_num_decimals, 10) || 2;
+            decimals = getPriceDecimals(); // shop price decimals (not the 4-decimal NBD option precision)
             format   = window.nbds_frontend.currency_format              || '%s%v';
+            decSep   = window.nbds_frontend.currency_format_decimal_sep  || '.';
+            thouSep  = window.nbds_frontend.currency_format_thousand_sep || '';
         }
 
         var val = parseFloat(amount);
         if (isNaN(val)) return String(amount);
 
-        var formatted = val.toFixed(decimals)
-            .replace('.', window.nbds_frontend ? (window.nbds_frontend.currency_format_decimal_sep || '.') : '.');
+        var fixed    = Math.abs(val).toFixed(decimals).split('.');
+        var intPart  = thouSep ? fixed[0].replace(/\B(?=(\d{3})+(?!\d))/g, thouSep) : fixed[0];
+        var formatted = (val < 0 ? '-' : '') + intPart + (fixed.length > 1 ? decSep + fixed[1] : '');
 
         var result = format.replace('%s', sym).replace('%v', formatted);
         // Decode HTML entities (e.g. &nbsp; from currency_format) so textContent shows correctly

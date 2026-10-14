@@ -28,7 +28,7 @@ class PCS_Team_Invitations {
         $portal_url = $portal_id ? get_permalink( $portal_id ) : home_url( '/' );
 
         /* Invalid or already responded */
-        if ( ! $invite ) {
+        if ( ! $invite || ! hash_equals( (string) $invite->token, $token ) ) {
             wp_safe_redirect( add_query_arg( 'pcs_invite_msg', 'invalid', $portal_url ) );
             exit;
         }
@@ -61,8 +61,12 @@ class PCS_Team_Invitations {
                 exit;
             }
 
+            /* Single use: only the caller that flips pending -> accepted adds the member */
+            if ( ! PCS_DB::claim_team_invite( $invite->id ) ) {
+                wp_safe_redirect( add_query_arg( 'pcs_invite_msg', 'already_accepted', $portal_url ) );
+                exit;
+            }
             PCS_DB::add_member( $invite->store_id, $user->ID, $invite->role, $invite->spending_limit );
-            PCS_DB::update_team_invite_status( $invite->id, 'accepted' );
 
             /* Auto-upgrade tier: if store tier > user's personal tier, upgrade user */
             self::maybe_upgrade_tier_on_join( $user->ID, $invite->store_id );
@@ -94,7 +98,7 @@ class PCS_Team_Invitations {
      */
     public static function maybe_upgrade_tier_on_join( $user_id, $store_id ) {
         $store = PCS_DB::get_store_by_id( $store_id );
-        if ( ! $store || $store->status !== 'approved' ) return;
+        if ( ! $store || ! PCS_DB::store_is_approved( $store->status ) ) return;
 
         $tiers          = PCS_DB::get_tiers_from_rules();
         $store_discount = isset( $tiers[ $store->tier ]['discount'] ) ? (float) $tiers[ $store->tier ]['discount'] : 0;

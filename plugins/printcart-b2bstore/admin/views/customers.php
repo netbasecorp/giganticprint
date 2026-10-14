@@ -159,7 +159,7 @@ $cust_url = function( $extra = array() ) use ( $filter_tier, $search, $paged, $b
               <div style="margin-top:4px;">
                 <span style="font-size:10px;background:#fef3c7;color:#92400e;padding:2px 6px;border-radius:4px;font-weight:600;">⏳ B2B pending</span>
               </div>
-            <?php elseif ( $cstore && $cstore->status === 'active' ) : ?>
+            <?php elseif ( $cstore && PCS_DB::store_is_approved( $cstore->status ) ) : ?>
               <div style="margin-top:4px;font-size:11px;color:var(--pcs-text-soft);"><?php echo esc_html( $cstore->company_name ); ?></div>
             <?php endif; ?>
           </td>

@@ -7,26 +7,29 @@ $success  = false;
 /* ---- Handle form submission ---- */
 if ( isset( $_POST['pcs_profile_nonce'] ) && wp_verify_nonce( $_POST['pcs_profile_nonce'], 'pcs_update_profile' ) ) {
 
-    $first_name   = sanitize_text_field( $_POST['first_name']   ?? '' );
-    $last_name    = sanitize_text_field( $_POST['last_name']    ?? '' );
-    $display_name = sanitize_text_field( $_POST['display_name'] ?? '' );
-    $email        = sanitize_email( $_POST['account_email']     ?? '' );
-    $phone        = sanitize_text_field( $_POST['phone']        ?? '' );
-    $pass1        = $_POST['password_1'] ?? '';
-    $pass2        = $_POST['password_2'] ?? '';
-    $pass_current = $_POST['password_current'] ?? '';
+    $first_name   = sanitize_text_field( wp_unslash( $_POST['first_name']   ?? '' ) );
+    $last_name    = sanitize_text_field( wp_unslash( $_POST['last_name']    ?? '' ) );
+    $display_name = sanitize_text_field( wp_unslash( $_POST['display_name'] ?? '' ) );
+    $email        = sanitize_email( wp_unslash( $_POST['account_email']     ?? '' ) );
+    $phone        = sanitize_text_field( wp_unslash( $_POST['phone']        ?? '' ) );
+    $pass1        = wp_unslash( $_POST['password_1'] ?? '' );
+    $pass2        = wp_unslash( $_POST['password_2'] ?? '' );
+    $pass_current = wp_unslash( $_POST['password_current'] ?? '' );
+    $email_changed = 0 !== strcasecmp( $email, $user->user_email );
 
     /* Validate */
     if ( empty( $first_name ) || empty( $last_name ) ) {
         $notices[] = array( 'error', 'First and last name are required.' );
     } elseif ( ! is_email( $email ) ) {
         $notices[] = array( 'error', 'Invalid email address.' );
-    } elseif ( $email !== $user->user_email && email_exists( $email ) ) {
+    } elseif ( $email_changed && email_exists( $email ) ) {
         $notices[] = array( 'error', 'That email is already in use.' );
     } elseif ( ! empty( $pass1 ) && $pass1 !== $pass2 ) {
         $notices[] = array( 'error', 'Passwords do not match.' );
-    } elseif ( ! empty( $pass1 ) && ! wp_check_password( $pass_current, $user->user_pass, $user_id ) ) {
-        $notices[] = array( 'error', 'Current password is incorrect.' );
+    } elseif ( ( ! empty( $pass1 ) || $email_changed ) && ! wp_check_password( $pass_current, $user->user_pass, $user_id ) ) {
+        $notices[] = array( 'error', $email_changed && empty( $pass1 )
+            ? 'Enter your current password to change your email address.'
+            : 'Current password is incorrect.' );
     } else {
         /* Update WP user */
         $args = array(

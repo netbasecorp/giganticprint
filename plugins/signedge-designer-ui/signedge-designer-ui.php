@@ -92,7 +92,9 @@ function sg_dui_inject_category_data() {
     if ( $product_id && function_exists( 'wc_get_product' ) ) {
         $product = wc_get_product( $product_id );
         if ( $product ) {
-            $raw = $product->get_price();
+            // RAW (undiscounted) price: the 'edit' context skips the B2B tier price filter,
+            // the designer applies the tier discount exactly once itself.
+            $raw = $product->get_price( 'edit' );
             $product_price = ( $raw !== '' && $raw !== false ) ? (float) $raw : null;
         }
     }
@@ -133,6 +135,10 @@ function sg_dui_inject_category_data() {
             $b2b_label = (string) PCS_Customers::tier_label( $b2b_tier );
         }
     }
+    $b2b_bulk_rules = array();
+    if ( $is_logged_in && class_exists( 'PCS_Pricing' ) && method_exists( 'PCS_Pricing', 'get_bulk_rules' ) ) {
+        $b2b_bulk_rules = PCS_Pricing::get_bulk_rules();
+    }
     $portal_page_id = (int) get_option( 'pcs_portal_page_id' );
     if ( $portal_page_id ) {
         $b2b_portal_url = add_query_arg( 'section', 'apply', get_permalink( $portal_page_id ) );
@@ -152,6 +158,7 @@ function sg_dui_inject_category_data() {
         . 'window.sg_user_name='       . wp_json_encode( $user_name )                         . ';'
         . 'window.sg_b2b_tier='        . wp_json_encode( $b2b_tier )                          . ';'
         . 'window.sg_b2b_discount='    . wp_json_encode( $b2b_discount )                      . ';'
+        . 'window.sg_b2b_bulk_rules='  . wp_json_encode( $b2b_bulk_rules )                    . ';'
         . 'window.sg_b2b_label='       . wp_json_encode( $b2b_label )                         . ';'
         . 'window.sg_b2b_portal_url='  . wp_json_encode( $b2b_portal_url )                    . ';'
         . 'window.sg_b2b_nonce='       . wp_json_encode( wp_create_nonce( 'sg_b2b_apply' ) )  . ';'
@@ -198,6 +205,9 @@ function sg_dui_handle_login() {
     ), is_ssl() );
 
     if ( is_wp_error( $user ) ) {
+        if ( 'too_many_attempts' === $user->get_error_code() ) {
+            wp_send_json_error( array( 'message' => 'Too many failed attempts. Please try again in 15 minutes.' ) );
+        }
         wp_send_json_error( array( 'message' => 'Incorrect username or password. Please try again.' ) );
     }
 
@@ -210,10 +220,18 @@ function sg_dui_handle_login() {
 ----------------------------------------------------------------------- */
 add_action( 'wp_ajax_sg_b2b_apply', 'sg_dui_handle_b2b_apply' );
 function sg_dui_handle_b2b_apply() {
-    check_ajax_referer( 'sg_b2b_apply', '_nonce' );
+    $nonce = isset( $_POST['_nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['_nonce'] ) ) : '';
+    if ( ! $nonce || ! wp_verify_nonce( $nonce, 'sg_b2b_apply' ) ) {
+        wp_send_json_error( array( 'message' => 'Security check failed. Please reload the page and try again.' ), 403 );
+    }
 
     if ( ! is_user_logged_in() ) {
         wp_send_json_error( array( 'message' => 'You must be logged in to apply.' ) );
+    }
+
+    // Option is unset on some sites: only an explicit '0' / 'no' disables self registration.
+    if ( in_array( strtolower( (string) get_option( 'pcs_b2b_self_register', '1' ) ), array( '0', 'no' ), true ) ) {
+        wp_send_json_error( array( 'message' => 'B2B self-registration is currently closed. Please contact us to open a B2B account.' ) );
     }
 
     if ( ! class_exists( 'PCS_DB' ) ) {
@@ -227,7 +245,9 @@ function sg_dui_handle_b2b_apply() {
         wp_send_json_error( array( 'message' => 'You have already submitted a B2B application.' ) );
     }
 
-    $company_name = sanitize_text_field( isset( $_POST['company_name'] ) ? $_POST['company_name'] : '' );
+    $post = wp_unslash( $_POST );
+
+    $company_name = sanitize_text_field( isset( $post['company_name'] ) ? $post['company_name'] : '' );
     if ( empty( $company_name ) ) {
         wp_send_json_error( array( 'message' => 'Company name is required.' ) );
     }
@@ -237,12 +257,12 @@ function sg_dui_handle_b2b_apply() {
         'user_id'        => $user_id,
         'company_name'   => $company_name,
         'company_slug'   => sanitize_title( $company_name ),
-        'industry'       => sanitize_text_field( isset( $_POST['industry'] )       ? $_POST['industry']       : '' ),
-        'contact_name'   => sanitize_text_field( isset( $_POST['contact_name'] )   ? $_POST['contact_name']   : $user->display_name ),
-        'contact_email'  => sanitize_email(      isset( $_POST['contact_email'] )  ? $_POST['contact_email']  : $user->user_email ),
-        'contact_phone'  => sanitize_text_field( isset( $_POST['contact_phone'] )  ? $_POST['contact_phone']  : '' ),
-        'website'        => esc_url_raw(         isset( $_POST['website'] )        ? $_POST['website']        : '' ),
-        'monthly_volume' => sanitize_text_field( isset( $_POST['monthly_volume'] ) ? $_POST['monthly_volume'] : '' ),
+        'industry'       => sanitize_text_field( isset( $post['industry'] )       ? $post['industry']       : '' ),
+        'contact_name'   => sanitize_text_field( isset( $post['contact_name'] )   ? $post['contact_name']   : $user->display_name ),
+        'contact_email'  => sanitize_email(      isset( $post['contact_email'] )  ? $post['contact_email']  : $user->user_email ),
+        'contact_phone'  => sanitize_text_field( isset( $post['contact_phone'] )  ? $post['contact_phone']  : '' ),
+        'website'        => esc_url_raw(         isset( $post['website'] )        ? $post['website']        : '' ),
+        'monthly_volume' => sanitize_text_field( isset( $post['monthly_volume'] ) ? $post['monthly_volume'] : '' ),
         'tier'           => get_option( 'pcs_b2b_default_tier', 'b2b_a' ),
         'status'         => 'pending',
     );

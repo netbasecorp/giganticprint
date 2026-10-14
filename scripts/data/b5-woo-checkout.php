@@ -65,8 +65,9 @@ foreach ( $wanted as $method_id => $settings ) {
 }
 
 /* ---- 3. design files for the admin + notifications recipient ---------------------- */
-GP_Data::say( '-- PC Designer: admin downloads of print-ready files' );
-foreach ( array( 'nbdesigner_download_design_png', 'nbdesigner_download_design_pdf', 'nbdesigner_download_design_upload_file' ) as $o ) { GP_Data::option_set( $o, '1' ); }
+GP_Data::say( '-- PC Designer: print-ready files for the admin' );
+// The admin downloads through wp-admin > Customer Design (admin.php?page=nbdesigner_detail_order); the 'customer download' group stays OFF.
+foreach ( array( 'nbdesigner_download_design_png', 'nbdesigner_download_design_pdf', 'nbdesigner_download_design_upload_file' ) as $o ) { GP_Data::option_set( $o, '0' ); }
 GP_Data::option_set( 'nbdesigner_enable_pdf_watermark', 'no' ); // print-ready PDFs must not be watermarked
 $recip = get_option( 'nbdesigner_notifications_emails', '' );
 if ( '' === trim( (string) $recip ) ) { GP_Data::option_set( 'nbdesigner_notifications_emails', get_option( 'admin_email' ) ); }

@@ -985,6 +985,21 @@
         }
     }
 
+    // Embedded dpi that readEmbeddedDpi found for an upload made in this
+    // session (filled asynchronously after upload start), or null when
+    // unknown / not a sane value.
+    function getEmbeddedDpiForUrl(url) {
+        if (!url) return null;
+        for (var k in sgUploadCaptureByIndex) {
+            var e = sgUploadCaptureByIndex[k];
+            if (e && e.url === url && e.dpiEntry) {
+                var d = parseFloat(e.dpiEntry.dpi);
+                return (d >= 30 && d <= 1200) ? d : null;
+            }
+        }
+        return null;
+    }
+
     // Returns true if it took over (image + dimension field both found —
     // the original add-to-canvas call will happen later, after resize).
     // Returns false to let the caller fall back to the normal behaviour
@@ -1037,8 +1052,11 @@
             // customer clicks Save/Add to Cart, so it's useless here.
             // settings.nbdesigner_default_dpi is the global-only fallback and
             // ignores any per-product override — don't read that either.)
-            var dpi = parseFloat(s.settings && s.settings.product_data && s.settings.product_data.option &&
-                s.settings.product_data.option.dpi) || 150;
+            // The image's own embedded dpi (same value the thumbnail label
+            // shows) wins when sane, so the placed size agrees with the
+            // thumbnail and low-resolution art triggers the warning.
+            var dpi = getEmbeddedDpiForUrl(url) || parseFloat(s.settings && s.settings.product_data &&
+                s.settings.product_data.option && s.settings.product_data.option.dpi) || 150;
             var widthIn = Math.round((probe.naturalWidth / dpi) * 1000) / 1000;
             var heightIn = Math.round((probe.naturalHeight / dpi) * 1000) / 1000;
 
@@ -1387,6 +1405,7 @@
     function initArtBar(workspace) {
         if (sgArtBar.timer) return;
         sgArtBar.timer = setInterval(artBarTick, 300);
+        window.addEventListener('resize', positionArtBars);
         artBarTick();
     }
 
@@ -1430,6 +1449,32 @@
             });
         });
         return bar;
+    }
+
+    // Keep the bar (and the low-res banner under it) inside the visible canvas
+    // region: right of the sidebar, left of the summary panel, centred there.
+    function positionArtBars() {
+        var bar = sgArtBar.el;
+        var parent = bar && bar.parentNode;
+        if (!parent || !bar.classList.contains('is-visible')) return;
+        var pr = parent.getBoundingClientRect();
+        var left = pr.left, right = pr.right;
+        var side = document.querySelector('.nbd-sidebar');
+        var sum = document.querySelector('.sg-summary');
+        if (side) { var sr = side.getBoundingClientRect(); if (sr.width > 0 && sr.right > left) left = sr.right; }
+        if (sum) { var mr = sum.getBoundingClientRect(); if (mr.width > 0 && mr.left < right && mr.left > left) right = mr.left; }
+        var regionW = Math.max(200, right - left);
+        var els = [bar, sgLowRes.el];
+        for (var i = 0; i < els.length; i++) {
+            var el = els[i];
+            if (!el || el.parentNode !== parent || !el.classList.contains('is-visible')) continue;
+            var maxW = Math.max(200, regionW - 16);
+            el.style.setProperty('max-width', maxW + 'px', 'important');
+            var w = Math.min(el.offsetWidth, maxW);
+            var ml = Math.max(0, Math.round(left - pr.left + (regionW - w) / 2));
+            el.style.setProperty('margin-left', ml + 'px', 'important');
+            el.style.setProperty('margin-right', '0', 'important');
+        }
     }
 
     function showArtBarError(msg) {
@@ -1588,14 +1633,28 @@
         if (!window.jQuery) return;
         var jq = window.jQuery;
         jq('#nav-photos').triggerHandler('click');
+        // Show the drop-zone view (not the source-picker grid) without
+        // touching the hidden file input. onClickTab is a toggle, so only
+        // click the Upload tile when the section is not already open.
+        function showUploadView() {
+            var tabPhotoEl = document.getElementById('tab-photo');
+            var tile = document.querySelector('#tab-photo .item[data-type="image-upload"]');
+            if (!tabPhotoEl || !tile) return;
+            var sc;
+            try { sc = window.angular && angular.element(tabPhotoEl).scope(); } catch (e) { sc = null; }
+            var open = !!(sc && sc.resource && sc.resource.photo && sc.resource.photo.onclick);
+            if (!open) jq(tile).click();
+            markSourceTileActive(tile);
+        }
         function flash() {
-            var tile = document.querySelector('#tab-photo [data-type="image-upload"]') ||
-                       document.querySelector('#tab-photo .form-upload');
+            showUploadView();
+            var tile = document.querySelector('#tab-photo .form-upload') ||
+                       document.querySelector('#tab-photo [data-type="image-upload"]');
             if (!tile) return;
             tile.classList.add('sg-flash');
             try { tile.scrollIntoView({ block: 'nearest' }); } catch (e) { /* old browser */ }
             clearTimeout(sgGuard.flashTimer);
-            sgGuard.flashTimer = setTimeout(function () { tile.classList.remove('sg-flash'); }, 1800);
+            sgGuard.flashTimer = setTimeout(function () { tile.classList.remove('sg-flash'); }, 1500);
         }
         flash();
         setTimeout(flash, 300); // the tile may only exist once the tab has rendered
@@ -1845,6 +1904,7 @@
             if (dim) syncArtBarInputs(dim, false);
 
             updateLowResWarning(bar, scope, stage, canvas, item);
+            positionArtBars();
 
             var btns = bar.querySelectorAll('[data-sg-art]');
             for (var i = 0; i < btns.length; i++) {

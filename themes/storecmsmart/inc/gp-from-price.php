@@ -54,7 +54,7 @@ function gp_from_price_compute( $product ) {
 	}
 	$base      = (float) $product->get_price( 'edit' );
 	$stamp     = isset( $row['modified'] ) ? $row['modified'] : md5( (string) $row['fields'] );
-	$cache_key = 'gp_from_' . $product->get_id() . '_' . md5( $stamp . '|' . $base );
+	$cache_key = 'gp_from_v2_' . $product->get_id() . '_' . md5( $stamp . '|' . $base );
 	$cached    = get_transient( $cache_key );
 	if ( false !== $cached ) {
 		return (float) $cached;

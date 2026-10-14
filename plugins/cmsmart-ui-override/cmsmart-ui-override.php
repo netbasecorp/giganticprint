@@ -522,6 +522,8 @@ new Cmsmart_UI_Override();
 define( 'GP_LINEAR_PRICING_VERSION', '1.0.0' );
 require_once CMSMART_UI_OVERRIDE_PATH . 'includes/class-gp-linear-pricing.php';
 add_action( 'plugins_loaded', array( 'GP_Linear_Pricing', 'init' ) );
+require_once CMSMART_UI_OVERRIDE_PATH . 'includes/class-gp-linear-admin.php';
+add_action( 'plugins_loaded', array( 'GP_Linear_Admin', 'init' ) );
 
 // Login rate limiting + user enumeration hardening.
 require_once CMSMART_UI_OVERRIDE_PATH . 'includes/class-gp-hardening.php';

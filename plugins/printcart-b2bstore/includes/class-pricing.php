@@ -227,10 +227,11 @@ class PCS_Pricing {
 <script>
 (function($) {
     var PCS_TIER_DISC = <?php echo (float) $discount; ?>;   /* tier % */
-    var PCS_DISCOUNT  = PCS_TIER_DISC / 100;               /* for Angular hook */
     var PCS_DECIMALS  = <?php echo (int) $decimals; ?>;
     var PCS_SYMBOL    = <?php echo wp_json_encode( html_entity_decode( get_woocommerce_currency_symbol() ) ); ?>;
-    var PCS_BULK_RULES = <?php echo $bulk_rules_json; ?>;  /* [{minQty:5,extra:10}, ...] */
+    var PCS_DECSEP    = <?php echo wp_json_encode( wc_get_price_decimal_separator() ); ?>;
+    var PCS_THOUSAND  = <?php echo wp_json_encode( wc_get_price_thousand_separator() ); ?>;
+    var PCS_BULK_RULES =<?php echo $bulk_rules_json; ?>;  /* [{minQty:5,extra:10}, ...] */
 
     /* Get bulk extra % for a given quantity */
     function pcsBulkExtra(qty) {
@@ -262,45 +263,23 @@ class PCS_Pricing {
                   + 'padding:2px 6px;border-radius:9999px;margin-left:6px;font-weight:700;'
                   + 'vertical-align:middle;">-<?php echo (int) $discount; ?>%</span>';
 
-    /* ---- Intercept Angular scope ---- */
-    function pcsHookScope(scope) {
-        if (scope._pcs_hooked) return;
-        scope._pcs_hooked = true;
-
-        var origConvert = scope.convert_to_wc_price;
-        if (typeof origConvert !== 'function') return;
-
-        /* Override convert_to_wc_price so every price CMSmart formats
-           already has the B2B discount applied at the number level */
-        scope.convert_to_wc_price = function(price, withCurrency) {
-            var num = parseFloat(price);
-            if (!isNaN(num) && num > 0) {
-                price = parseFloat((num * (1 - PCS_DISCOUNT)).toFixed(PCS_DECIMALS));
-            }
-            return origConvert.call(this, price, withCurrency);
-        };
-
-        /* Force Angular to re-render with the patched function */
-        if (!scope.$$phase) {
-            scope.$apply();
-        }
-    }
-
-    /* ---- Find Angular scope on #nbd-option-total ---- */
-    function pcsTryHook() {
+    /* ---- NUMERIC price data from the NBO Angular scope (raw, undiscounted) ----
+       The scope is never patched: the discount is applied ONCE here, to the raw
+       numbers, and mirrors the cart: unit = round(raw_unit * (1 - rate)), total = unit * qty.
+       Returns {total, qty} or null while the scope has no numeric total. */
+    function pcsGetScopeNumbers() {
         var el = document.getElementById('nbd-option-total');
-        if (!el) return false;
+        if (!el || !window.angular) return null;
         try {
             var scope = angular.element(el).scope();
-            if (scope && typeof scope.convert_to_wc_price === 'function') {
-                pcsHookScope(scope);
-                return true;
-            }
-        } catch(e) {}
-        return false;
+            if (!scope) return null;
+            var total = parseFloat(scope.total_cart_item_price_num);
+            if (isNaN(total) || total <= 0) return null;
+            var qty = parseInt(scope.quantity, 10);
+            if (isNaN(qty) || qty < 1) qty = 1;
+            return { total: total, qty: qty };
+        } catch(e) { return null; }
     }
-
-    var PCS_SYMBOL = <?php echo wp_json_encode( html_entity_decode( get_woocommerce_currency_symbol() ) ); ?>;
 
     /* Get qty from WooCommerce standard quantity input (for simple products) */
     function pcsGetQtyFromInput() {
@@ -309,27 +288,38 @@ class PCS_Pricing {
     }
 
     function pcsFmt(num) {
-        return PCS_SYMBOL + parseFloat(num).toFixed(PCS_DECIMALS);
+        var parts = Math.abs(parseFloat(num)).toFixed(PCS_DECIMALS).split('.');
+        var intPart = PCS_THOUSAND ? parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, PCS_THOUSAND) : parts[0];
+        return (parseFloat(num) < 0 ? '-' : '') + PCS_SYMBOL + intPart + (parts.length > 1 ? PCS_DECSEP + parts[1] : '');
     }
 
+    /* Locale-safe fallback parser (only used when the scope has no numeric total).
+       Both '.' and ',' present: the last one is the decimal mark; one kind several times:
+       thousands; one kind once: thousands only when exactly 3 digits follow and 1-3
+       non-zero-leading digits precede ("1.234" = 1234), else decimal ("16,63" = 16.63). */
     function pcsParsePrice(text) {
-        var m = text.replace(/,/g, '').match(/[\d]+(?:\.\d+)?/);
-        return m ? parseFloat(m[0]) : NaN;
+        var s = String(text || '').replace(/[^0-9.,]/g, '');
+        if (!/\d/.test(s)) return NaN;
+        var lastDot = s.lastIndexOf('.'), lastCom = s.lastIndexOf(',');
+        var dec = null;
+        if (lastDot >= 0 && lastCom >= 0) {
+            dec = lastDot > lastCom ? '.' : ',';
+        } else if (lastDot >= 0 || lastCom >= 0) {
+            var sep = lastDot >= 0 ? '.' : ',';
+            var parts = s.split(sep);
+            if (parts.length === 2) {
+                dec = (parts[1].length === 3 && /^[1-9]\d{0,2}$/.test(parts[0])) ? null : sep;
+            }
+        }
+        if (dec === '.') s = s.replace(/,/g, '');
+        else if (dec === ',') s = s.replace(/\./g, '').replace(',', '.');
+        else s = s.replace(/[.,]/g, '');
+        return parseFloat(s);
     }
 
-    /* Read only the VISIBLE price from #nbd-option-total (avoids hidden Angular span) */
-    function pcsReadFinalPrice($finalRow) {
-        var $nboTotal = $finalRow.find('#nbd-option-total, [id="nbd-option-total"]');
-        /* Angular uses ng-show/ng-hide → one span is display:none */
-        var visible = '';
-        $nboTotal.find('span').each(function() {
-            if ($(this).css('display') !== 'none' && $.trim($(this).text())) {
-                visible = $(this).text();
-                return false; /* break */
-            }
-        });
-        if (!visible) visible = $nboTotal.text(); /* fallback */
-        return pcsParsePrice(visible);
+    /* Trim a % to at most 2 decimals ("10", "12.5") */
+    function pcsPct(n) {
+        return String(parseFloat((parseFloat(n) || 0).toFixed(2)));
     }
 
     /* ---- Single update function: reads total from top price (always reliable) ---- */
@@ -379,37 +369,45 @@ class PCS_Pricing {
         var $amount = $('.summary .price .woocommerce-Price-amount, .summary .price .amount').first();
         if (!$amount.length) return;
 
-        var totalPrice = pcsParsePrice($amount.text());
+        /* RAW retail total for the current quantity: numeric scope values first,
+           the (undiscounted) visible top price + Subtotal row only as a fallback */
+        var totalPrice, qty = 1;
+        var nums = pcsGetScopeNumbers();
+        if (nums) {
+            totalPrice = nums.total;
+            qty        = nums.qty;
+        } else {
+            totalPrice = pcsParsePrice($amount.text());
+            var $subRow = $('tr').filter(function() {
+                return $(this).find('td').first().text().trim().toLowerCase().indexOf('subtotal') >= 0;
+            }).first();
+            if ($subRow.length) {
+                var qm = $subRow.find('td').last().text().match(/(\d+)\s*items?/i);
+                qty = qm ? parseInt(qm[1], 10) : 1;
+            }
+        }
         if (isNaN(totalPrice) || totalPrice <= 0) return;
 
-        /* --- Get qty from Subtotal row --- */
-        var qty = 1;
-        var $subRow = $('tr').filter(function() {
-            return $(this).find('td').first().text().trim().toLowerCase().indexOf('subtotal') >= 0;
-        }).first();
-        if ($subRow.length) {
-            var qm = $subRow.find('td').last().text().match(/(\d+)\s*items?/i);
-            qty = qm ? parseInt(qm[1]) : 1;
-        }
-
-        /* --- Calculate combined discount --- */
+        /* --- Combined discount, applied ONCE (same math as the cart:
+               unit = round(raw_unit * (1 - rate)), total = unit * qty) --- */
         var bulkExtra = pcsBulkExtra(qty);
         var rate      = pcsTotalRate(qty);   /* (tier + bulk) / 100 */
-        var b2bTotal  = (totalPrice * (1 - rate)).toFixed(PCS_DECIMALS);
+        var b2bUnit   = parseFloat((totalPrice / qty * (1 - rate)).toFixed(PCS_DECIMALS));
+        var b2bTotal  = b2bUnit * qty;
 
         /* --- TOP display --- */
         var topLabel = pcsFmt(b2bTotal);
         var $topWrap = $('#pcs-top-b2b');
         if ($topWrap.length) {
             $topWrap.find('.pcs-b2b-top-val').text(topLabel);
-            $topWrap.find('.pcs-b2b-top-badge').text('-' + (PCS_TIER_DISC + bulkExtra) + '%');
+            $topWrap.find('.pcs-b2b-top-badge').text('-' + pcsPct(PCS_TIER_DISC + bulkExtra) + '%');
         } else {
             $amount.closest('p.price, .price').after(
                 '<p id="pcs-top-b2b" style="margin:4px 0 12px;font-size:14px;line-height:1.8;">'
                 + '<span style="color:#374151;">Your B2B price: </span>'
                 + '<strong class="pcs-b2b-top-val" style="color:#2563eb;font-size:1.1em;">' + topLabel + '</strong>'
                 + '<span class="pcs-b2b-top-badge" style="font-size:11px;background:#dbeafe;color:#1e40af;'
-                + 'padding:2px 7px;border-radius:9999px;margin-left:6px;font-weight:700;">-' + (PCS_TIER_DISC + bulkExtra) + '%</span>'
+                + 'padding:2px 7px;border-radius:9999px;margin-left:6px;font-weight:700;">-' + pcsPct(PCS_TIER_DISC + bulkExtra) + '%</span>'
                 + '</p>'
             );
         }
@@ -423,7 +421,7 @@ class PCS_Pricing {
         /* Discount breakdown text */
         var discountInfo = '';
         if (bulkExtra > 0) {
-            discountInfo = 'Tier -' + PCS_TIER_DISC + '% + Quantity -' + bulkExtra + '% = -' + (PCS_TIER_DISC + bulkExtra) + '% total';
+            discountInfo = 'Tier -' + pcsPct(PCS_TIER_DISC) + '% + Quantity -' + pcsPct(bulkExtra) + '% = -' + pcsPct(PCS_TIER_DISC + bulkExtra) + '% total';
         }
 
         /* Upsell hint: tell user what bulk rule they can reach next */
@@ -466,7 +464,7 @@ class PCS_Pricing {
         /* Poll until Angular app is ready */
         var attempts = 0;
         var poll = setInterval(function() {
-            if (pcsTryHook() || ++attempts > 50) {
+            if (pcsGetScopeNumbers() || ++attempts > 50) {
                 clearInterval(poll);
                 pcsScheduleRefresh(400);
             }

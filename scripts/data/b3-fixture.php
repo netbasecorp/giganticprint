@@ -55,6 +55,17 @@ if ( 'status' === $mode ) {
 	exit( 0 );
 }
 
+if ( 'assign-private' === $mode || 'unassign-private' === $mode ) {
+	$store = gp_fx_find_store();
+	if ( ! $store ) { echo "no fixture store (run create first)
+"; exit( 1 ); }
+	if ( 'assign-private' === $mode ) { PCS_Private_Products::assign( (int) $store->id, 1263 ); echo "assigned product 1263 to store {$store->id}
+"; }
+	else { PCS_Private_Products::unassign( (int) $store->id, 1263 ); echo "unassigned product 1263
+"; }
+	exit( 0 );
+}
+
 if ( 'clear-ratelimit' === $mode ) {
 	$n = $wpdb->query( "DELETE FROM {$wpdb->options} WHERE option_name LIKE '\\_transient\\_gp\\_lf\\_%' OR option_name LIKE '\\_transient\\_timeout\\_gp\\_lf\\_%'" );
 	echo "cleared $n option rows\n";
@@ -76,6 +87,7 @@ if ( 'cleanup' === $mode ) {
 	}
 	$store = gp_fx_find_store();
 	if ( $store ) {
+		if ( class_exists( 'PCS_Private_Products' ) ) { PCS_Private_Products::unassign( (int) $store->id, 1263 ); }
 		$wpdb->delete( $wpdb->prefix . 'pcs_b2b_members', array( 'store_id' => $store->id ) );
 		$wpdb->delete( $wpdb->prefix . 'pcs_b2b_stores', array( 'id' => $store->id ) );
 		echo "deleted store {$store->id} and its members\n";

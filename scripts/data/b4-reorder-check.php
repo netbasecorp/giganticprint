@@ -87,9 +87,12 @@ try {
 			$order = wc_create_order( array( 'customer_id' => $user->ID, 'status' => 'pending' ) );
 			$order_id = $order->get_id();
 			$item_id  = $order->add_product( $product, 2 );
-			$order->add_item( gp_b4_gone_item() );
+			$gone_id = $order->add_product( $product, 1 );
 			$order->calculate_totals();
 			$order->save();
+			// turn the second line into a line whose product no longer exists
+			global $wpdb;
+			$wpdb->update( $wpdb->prefix . 'woocommerce_order_itemmeta', array( 'meta_value' => 999999991 ), array( 'order_item_id' => $gone_id, 'meta_key' => '_product_id' ) );
 
 			$item = $order->get_item( $item_id );
 			$item->add_meta_data( '_nbo_option_price', $option_price );

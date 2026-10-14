@@ -3775,7 +3775,16 @@
                          document.querySelector('#nbo-options-wrap');
             }
             if (!ctrlEl) return null;
-            return angular.element(ctrlEl).scope() || null;
+            var sc = angular.element(ctrlEl).scope() || null;
+            // On phones the options scope is compiled outside the designer scope chain, so it does not inherit
+            // applyOptions(); the function only uses the designer scope closure, so borrow it.
+            if (sc && typeof sc.applyOptions !== 'function') {
+                var dsc = getDesignScope();
+                if (dsc && typeof dsc.applyOptions === 'function') {
+                    sc.applyOptions = function () { return dsc.applyOptions.apply(dsc, arguments); };
+                }
+            }
+            return sc;
         } catch(e) { return null; }
     }
 

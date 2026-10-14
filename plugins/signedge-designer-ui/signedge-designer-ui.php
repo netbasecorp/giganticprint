@@ -14,7 +14,7 @@
 
 if ( ! defined( 'ABSPATH' ) ) exit;
 
-define( 'SG_DUI_VERSION', '1.10.138' );
+define( 'SG_DUI_VERSION', '1.10.139' );
 
 /** Cache-busting version of a plugin asset: plugin version + file mtime (assets are served with a 1 year max-age behind Cloudflare). */
 function sg_dui_asset_ver( $rel ) {

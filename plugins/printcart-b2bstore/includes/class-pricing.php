@@ -39,7 +39,7 @@ class PCS_Pricing {
         $row = $wpdb->get_row( $wpdb->prepare(
             "SELECT s.tier FROM {$wpdb->prefix}pcs_b2b_members m
              INNER JOIN {$wpdb->prefix}pcs_b2b_stores s ON s.id = m.store_id
-             WHERE m.user_id = %d AND s.status = 'approved'
+             WHERE m.user_id = %d AND s.status IN ('active','approved')
              ORDER BY m.joined_at DESC LIMIT 1",
             absint( $user_id )
         ) );

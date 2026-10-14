@@ -174,7 +174,7 @@ class PCS_Frontend {
                 $is_b2b = (bool) $wpdb->get_var( $wpdb->prepare(
                     "SELECT m.id FROM {$wpdb->prefix}pcs_b2b_members m
                      INNER JOIN {$wpdb->prefix}pcs_b2b_stores s ON s.id = m.store_id
-                     WHERE m.user_id = %d AND s.status = 'approved' LIMIT 1",
+                     WHERE m.user_id = %d AND s.status IN ('active','approved') LIMIT 1",
                     $user_id
                 ) );
             }

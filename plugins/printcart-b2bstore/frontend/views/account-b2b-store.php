@@ -141,11 +141,11 @@ foreach ( $orders_90d as $oid ) {
     <!-- Sidebar -->
     <div>
       <div class="pcs-card">
-        <div class="pcs-card-head <?php echo 'active' === $store->status ? 'success' : 'warning'; ?>">
+        <div class="pcs-card-head <?php echo PCS_DB::store_is_approved( $store->status ) ? 'success' : 'warning'; ?>">
           <h3 class="pcs-card-title">Account status</h3>
         </div>
         <div class="pcs-card-body" style="text-align:center;padding:20px;">
-          <?php if ( 'active' === $store->status ) : ?>
+          <?php if ( PCS_DB::store_is_approved( $store->status ) ) : ?>
           <div style="width:64px;height:64px;border-radius:50%;background:var(--pfe-success-s);display:grid;place-items:center;margin:0 auto 12px;font-size:28px;">✅</div>
           <div style="font-size:16px;font-weight:700;margin-bottom:4px;">Active</div>
           <div style="font-size:12px;color:var(--pfe-text-soft);">Your B2B account is in good standing.</div>

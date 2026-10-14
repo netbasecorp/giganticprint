@@ -94,7 +94,7 @@ class PCS_Team_Invitations {
      */
     public static function maybe_upgrade_tier_on_join( $user_id, $store_id ) {
         $store = PCS_DB::get_store_by_id( $store_id );
-        if ( ! $store || $store->status !== 'approved' ) return;
+        if ( ! $store || ! PCS_DB::store_is_approved( $store->status ) ) return;
 
         $tiers          = PCS_DB::get_tiers_from_rules();
         $store_discount = isset( $tiers[ $store->tier ]['discount'] ) ? (float) $tiers[ $store->tier ]['discount'] : 0;

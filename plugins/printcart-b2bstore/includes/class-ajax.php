@@ -525,7 +525,7 @@ class PCS_Ajax {
                 'contact_name'  => $u->display_name,
                 'contact_email' => $u->user_email,
                 'tier'          => $tier,
-                'status'        => 'approved',
+                'status'        => 'active',
                 'team_size'     => 5,
             ) );
             $store = PCS_DB::get_store_by_user( $current_user_id );

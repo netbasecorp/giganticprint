@@ -3,6 +3,14 @@ if ( ! defined( 'ABSPATH' ) ) exit;
 
 class PCS_DB {
 
+    /* Canonical store status is 'active'; 'approved' is accepted on read for legacy rows */
+    const STORE_STATUS_ACTIVE = 'active';
+    const STORE_APPROVED_STATUSES = array( 'active', 'approved' );
+
+    public static function store_is_approved( $status ) {
+        return in_array( (string) $status, self::STORE_APPROVED_STATUSES, true );
+    }
+
     /* ---------------------------------------------------------------- */
     /* B2B Stores                                                         */
     /* ---------------------------------------------------------------- */

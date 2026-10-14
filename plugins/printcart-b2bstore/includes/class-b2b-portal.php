@@ -19,6 +19,7 @@ class PCS_B2B_Portal {
         'team'          => array( 'label' => 'Teams',          'icon' => '👥', 'b2b_only' => true  ),
         'approvals'     => array( 'label' => 'Approval Queue', 'icon' => '✅', 'b2b_only' => true  ),
         'images'        => array( 'label' => 'Image Zone',     'icon' => '🖼️', 'b2b_only' => true  ),
+        'templates'     => array( 'label' => 'Templates',      'icon' => '📐', 'b2b_only' => true  ),
     );
 
     public static function init() {

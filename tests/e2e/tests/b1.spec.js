@@ -3,7 +3,7 @@ const { test, expect } = require('@playwright/test');
 const G = require('../lib/gp');
 
 test.use({ viewport: { width: 1440, height: 900 } });
-test.setTimeout(180000);
+test.setTimeout(240000);
 const US = /^\$\d{1,3}(,\d{3})*\.\d{2}$/;
 
 test('top menu in Signs365 order, Adhesive instead of VINIL', async ({ page }) => {
@@ -118,7 +118,13 @@ test('cart price equals designer price (server recalculation)', async ({ browser
   page.on('dialog', d => d.accept());
   try {
     expect(await G.openDesigner(page, 1168)).toBeTruthy();
-    await G.setSize(page, 24, 16);
+    // since B2 an empty print area cannot be added to the cart: upload the 24 x 16 in test art first (it sets the size)
+    await G.tab(page, 'Photos');
+    await page.setInputFiles('#tab-photo .form-upload input[type="file"], input[type=file]', 'testimg/test-24x16in-150dpi.png');
+    await page.waitForFunction(`(() => { try { const s = angular.element(document.querySelector('[ng-controller=designCtrl]')).scope(); return s.stages[s.currentStage].canvas.getObjects().some(o => o.type === 'image'); } catch (e) { return false; } })()`, null, { timeout: 120000 });
+    await page.waitForTimeout(2500);
+    expect(await G.dims(page)).toBe('24x16');
+    await G.tab(page, 'PRINTING');
     await G.pickOption(page, 'Top & Bottom');
     const designer = G.num(await G.price(page));
     expect(designer).toBeCloseTo(31.68, 2);

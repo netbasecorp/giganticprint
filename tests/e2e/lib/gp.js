@@ -43,6 +43,7 @@ async function openDesigner(page, pid) {
   return ok;
 }
 async function tab(page, name) {
+  if (name === 'PRINTING') { try { await page.locator('.main-tabs li.tab:has(.icon-nbd-package)').first().click({ timeout: 4000, force: true }); await page.waitForTimeout(900); } catch (e) {} return; }
   try { await page.locator(`text=${name}`).first().click({ timeout: 4000, force: true }); await page.waitForTimeout(900); } catch (e) {}
 }
 async function pickOption(page, text) {

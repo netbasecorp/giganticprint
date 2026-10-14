@@ -36,6 +36,14 @@ $sess = $wpdb->get_results( "SELECT session_id, session_key, FROM_UNIXTIME(sessi
 foreach ( $sess as $s ) { GP_Data::say( "  session #{$s['session_id']} key {$s['session_key']} expires {$s['expires']} ({$s['len']} bytes)" ); }
 if ( GP_Data::writing() && $sess ) { $wpdb->query( "DELETE FROM {$wpdb->prefix}woocommerce_sessions" ); GP_Data::say( '  deleted ' . count( $sess ) . ' session row(s)' ); }
 
+GP_Data::say( '-- checkout-draft orders (created by visiting the checkout as a guest)' );
+foreach ( wc_get_orders( array( 'limit' => -1, 'status' => 'checkout-draft' ) ) as $o ) {
+	$ts = $o->get_date_created() ? $o->get_date_created()->getTimestamp() : 0;
+	if ( $ts < $day_start || $ts >= $day_end ) { continue; }
+	GP_Data::say( '  draft order #' . $o->get_id() . ' total ' . $o->get_total() . ' created ' . gmdate( 'Y-m-d H:i', $ts ) . ' UTC' );
+	if ( GP_Data::writing() ) { $o->delete( true ); }
+}
+
 GP_Data::say( '-- persistent carts of the fixture users' );
 foreach ( array( 'gp_test_b2c', 'gp_test_b2b', 'gp_test_reseller' ) as $login ) {
 	$u = get_user_by( 'login', $login );

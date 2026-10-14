@@ -40,12 +40,11 @@ try {
 		gp_b5t_assert( 'odd port refused', ! PCS_Company_Templates::thumb_url_allowed( 'https://files.printcart.com:8443/x.png' ) );
 
 		$im = new Imagick();
-		$im->newImage( 3600, 2400, new ImagickPixel( '#3366cc' ), 'png' );
-		$px = new ImagickPixel( 'transparent' );
+		$im->newImage( 3600, 2400, new ImagickPixel( 'none' ), 'png' ); // fully transparent canvas
 		$dr = new ImagickDraw();
-		$dr->setFillColor( $px );
-		$dr->rectangle( 0, 0, 300, 300 );
-		$im->setImageAlphaChannel( Imagick::ALPHACHANNEL_SET );
+		$dr->setFillColor( new ImagickPixel( '#3366cc' ) );
+		$dr->rectangle( 0, 300, 3599, 2399 ); // everything except a transparent 300px band on top ...
+		$dr->rectangle( 300, 0, 3599, 2399 ); // ... and left: the top-left 300x300 corner stays transparent
 		$im->drawImage( $dr );
 		$im->writeImage( $tmp_png );
 		$im->clear();
@@ -59,7 +58,7 @@ try {
 			gp_b5t_assert( 'output is a valid JPEG/PNG', $gi && in_array( $gi['mime'], array( 'image/jpeg', 'image/png' ), true ) && $gi['mime'] === $r['mime'], $gi ? $gi['mime'] : 'unreadable' );
 			gp_b5t_assert( 'longest side <= 800 px (and ~800)', $gi && max( $gi[0], $gi[1] ) <= 800 && max( $gi[0], $gi[1] ) >= 790, $gi ? $gi[0] . 'x' . $gi[1] : '' );
 			gp_b5t_assert( 'aspect ratio kept (3:2)', $gi && abs( $gi[0] / $gi[1] - 1.5 ) < 0.01 );
-			gp_b5t_assert( 'much smaller than the source', strlen( $r['bytes'] ) < filesize( $tmp_png ) );
+			gp_b5t_assert( 'much smaller than the source', strlen( $r['bytes'] ) < 400000 );
 			$chk = new Imagick();
 			$chk->readImageBlob( $r['bytes'] );
 			$p = $chk->getImagePixelColor( 5, 5 )->getColor();

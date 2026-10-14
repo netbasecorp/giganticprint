@@ -198,6 +198,9 @@ function sg_dui_handle_login() {
     ), is_ssl() );
 
     if ( is_wp_error( $user ) ) {
+        if ( 'too_many_attempts' === $user->get_error_code() ) {
+            wp_send_json_error( array( 'message' => 'Too many failed attempts. Please try again in 15 minutes.' ) );
+        }
         wp_send_json_error( array( 'message' => 'Incorrect username or password. Please try again.' ) );
     }
 

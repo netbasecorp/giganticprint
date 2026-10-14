@@ -9,6 +9,9 @@ class PCS_Pricing {
         add_filter( 'woocommerce_product_get_sale_price', array( __CLASS__, 'apply_tier_price' ),      10, 2 );
         /* Bulk (quantity-based) discount applied at cart level */
         add_action( 'woocommerce_before_calculate_totals', array( __CLASS__, 'apply_bulk_discount_to_cart' ), 20 );
+        /* Flag NBDesigner cart items early so the price filters never discount them */
+        add_filter( 'woocommerce_get_cart_item_from_session', array( __CLASS__, 'flag_nbo_cart_item' ), 20 );
+        add_filter( 'woocommerce_add_cart_item',              array( __CLASS__, 'flag_nbo_cart_item' ), 20 );
         /* Patch CMSmart/NBDesigner product-page total display */
         add_action( 'wp_footer', array( __CLASS__, 'cmsmart_total_discount_patch' ) );
     }
@@ -50,15 +53,46 @@ class PCS_Pricing {
     /* ---------------------------------------------------------------- */
     /* Apply tier price to product price filter                           */
     /* ---------------------------------------------------------------- */
-    /* Products whose price was already fully set by apply_bulk_discount_to_cart */
-    private static $bulk_cart_set = array();
+    /* Plain / catalogue products only: cart items are priced exactly once by
+       apply_bulk_discount_to_cart() and flagged here so this filter never
+       discounts them again. */
+    /* Cart product objects owned by the cart pricing (spl_object_id => object).
+       The object is kept so the id cannot be reused by a different product. */
+    private static $cart_priced = array();
+
+    public static function flag_cart_product( $product ) {
+        if ( is_object( $product ) ) self::$cart_priced[ spl_object_id( $product ) ] = $product;
+    }
+
+    public static function is_cart_product( $product ) {
+        return is_object( $product ) && isset( self::$cart_priced[ spl_object_id( $product ) ] );
+    }
+
+    /* Flag NBDesigner cart items as soon as they are created / restored (core runs at priority 1) */
+    public static function flag_nbo_cart_item( $cart_item ) {
+        if ( is_array( $cart_item ) && isset( $cart_item['nbo_meta'], $cart_item['data'] ) ) {
+            self::flag_cart_product( $cart_item['data'] );
+        }
+        return $cart_item;
+    }
+
+    /* Single source of the discounted unit price: raw * (1 - (tier + bulk) / 100), rounded.
+       Pure function of $raw, so applying it again to the same raw value is idempotent. */
+    public static function discounted_unit_price( $raw, $user_id = null, $qty = 1 ) {
+        $raw  = (float) $raw;
+        $bulk = self::get_bulk_discount_for_qty( $qty );
+        $tier = ( get_option( 'pcs_apply_in_cart', '1' ) === '0' ) ? 0 : self::get_effective_discount( $user_id );
+        $rate = max( 0, min( 100, (float) $tier + (float) $bulk ) );
+        if ( $rate <= 0 || $raw <= 0 ) return $raw;
+        return round( $raw * ( 1 - $rate / 100 ), wc_get_price_decimals() );
+    }
 
     public static function apply_tier_price( $price, $product ) {
         if ( is_admin() && ! wp_doing_ajax() ) return $price;
         /* Setting: apply discounts in cart */
         if ( get_option( 'pcs_apply_in_cart', '1' ) === '0' ) return $price;
-        /* Skip if bulk_discount_to_cart already applied the combined discount */
-        if ( $product && isset( self::$bulk_cart_set[ $product->get_id() ] ) ) return $price;
+        /* Cart items are priced by apply_bulk_discount_to_cart (tier + bulk, once) */
+        if ( self::is_cart_product( $product ) ) return $price;
 
         $user_id  = get_current_user_id();
         $discount = self::get_effective_discount( $user_id );
@@ -96,39 +130,32 @@ class PCS_Pricing {
     }
 
     /* ---------------------------------------------------------------- */
-    /* Apply bulk (quantity-based) discount in cart                       */
-    /* Runs after apply_tier_price; overrides with tier + bulk combined   */
+    /* Cart pricing: the ONE place tier + bulk discount is applied to     */
+    /* cart items (priority 20, after core NBDesigner). Always starts     */
+    /* from the RAW unit price, so repeated calculate_totals is idempotent */
     /* ---------------------------------------------------------------- */
     public static function apply_bulk_discount_to_cart( $cart ) {
         if ( is_admin() && ! wp_doing_ajax() ) return;
         if ( ! $cart || $cart->is_empty() ) return;
 
-        $user_id       = get_current_user_id();
-        $tier_discount = self::get_effective_discount( $user_id );
+        $user_id = get_current_user_id();
 
         foreach ( $cart->get_cart() as $cart_item ) {
-            $qty     = (int) $cart_item['quantity'];
             $product = $cart_item['data'];
+            if ( ! is_object( $product ) ) continue;
 
-            $bulk_extra = self::get_bulk_discount_for_qty( $qty );
-            if ( $bulk_extra <= 0 ) continue;
+            /* RAW undiscounted unit price: NBDesigner stores it in nbo_meta['price'] */
+            $is_nbo = isset( $cart_item['nbo_meta']['price'] );
+            $raw    = $is_nbo ? (float) $cart_item['nbo_meta']['price'] : (float) $product->get_price( 'edit' );
+            if ( $raw <= 0 ) continue;
 
-            /* Temporarily remove our filter to get the REAL price including
-               CMSmart option costs (CMSmart already ran at lower priority) */
-            remove_filter( 'woocommerce_product_get_price',      array( __CLASS__, 'apply_tier_price' ), 10 );
-            remove_filter( 'woocommerce_product_get_sale_price', array( __CLASS__, 'apply_tier_price' ), 10 );
-            $base_with_options = (float) $product->get_price(); // $30 (base $10 + options $20)
-            add_filter( 'woocommerce_product_get_price',      array( __CLASS__, 'apply_tier_price' ), 10, 2 );
-            add_filter( 'woocommerce_product_get_sale_price', array( __CLASS__, 'apply_tier_price' ), 10, 2 );
+            /* From now on apply_tier_price leaves this object alone */
+            self::flag_cart_product( $product );
 
-            if ( $base_with_options <= 0 ) continue;
-
-            /* Mark this product so apply_tier_price skips it after set_price */
-            self::$bulk_cart_set[ $product->get_id() ] = true;
-
-            /* Apply tier + bulk combined on the full base (options included) */
-            $total_discount = $tier_discount + $bulk_extra;
-            $product->set_price( $base_with_options * ( 1 - $total_discount / 100 ) );
+            $new = self::discounted_unit_price( $raw, $user_id, (int) $cart_item['quantity'] );
+            /* Nothing to apply: keep plain items untouched; NBDesigner items already carry raw */
+            if ( ! $is_nbo && $new == $raw ) continue;
+            $product->set_price( $new );
         }
     }
 

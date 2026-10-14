@@ -92,7 +92,9 @@ function sg_dui_inject_category_data() {
     if ( $product_id && function_exists( 'wc_get_product' ) ) {
         $product = wc_get_product( $product_id );
         if ( $product ) {
-            $raw = $product->get_price();
+            // RAW (undiscounted) price: the 'edit' context skips the B2B tier price filter,
+            // the designer applies the tier discount exactly once itself.
+            $raw = $product->get_price( 'edit' );
             $product_price = ( $raw !== '' && $raw !== false ) ? (float) $raw : null;
         }
     }
@@ -133,6 +135,10 @@ function sg_dui_inject_category_data() {
             $b2b_label = (string) PCS_Customers::tier_label( $b2b_tier );
         }
     }
+    $b2b_bulk_rules = array();
+    if ( $is_logged_in && class_exists( 'PCS_Pricing' ) && method_exists( 'PCS_Pricing', 'get_bulk_rules' ) ) {
+        $b2b_bulk_rules = PCS_Pricing::get_bulk_rules();
+    }
     $portal_page_id = (int) get_option( 'pcs_portal_page_id' );
     if ( $portal_page_id ) {
         $b2b_portal_url = add_query_arg( 'section', 'apply', get_permalink( $portal_page_id ) );
@@ -152,6 +158,7 @@ function sg_dui_inject_category_data() {
         . 'window.sg_user_name='       . wp_json_encode( $user_name )                         . ';'
         . 'window.sg_b2b_tier='        . wp_json_encode( $b2b_tier )                          . ';'
         . 'window.sg_b2b_discount='    . wp_json_encode( $b2b_discount )                      . ';'
+        . 'window.sg_b2b_bulk_rules='  . wp_json_encode( $b2b_bulk_rules )                    . ';'
         . 'window.sg_b2b_label='       . wp_json_encode( $b2b_label )                         . ';'
         . 'window.sg_b2b_portal_url='  . wp_json_encode( $b2b_portal_url )                    . ';'
         . 'window.sg_b2b_nonce='       . wp_json_encode( wp_create_nonce( 'sg_b2b_apply' ) )  . ';'

@@ -174,6 +174,22 @@ class PCS_Pricing {
         return $row ? (float) $row->discount_value : 0;
     }
 
+    /* Active bulk rules as [ ['minQty' => int, 'extra' => float], ... ] (ascending minQty) */
+    public static function get_bulk_rules() {
+        global $wpdb;
+        $rows = $wpdb->get_results(
+            "SELECT CAST(target_value AS UNSIGNED) AS min_qty, discount_value AS extra
+             FROM {$wpdb->prefix}pcs_pricing_rules
+             WHERE rule_type = 'bulk' AND status = 'active' AND target_value != ''
+             ORDER BY CAST(target_value AS UNSIGNED) ASC"
+        );
+        $out = array();
+        foreach ( (array) $rows as $r ) {
+            $out[] = array( 'minQty' => (int) $r->min_qty, 'extra' => (float) $r->extra );
+        }
+        return $out;
+    }
+
     /* ---------------------------------------------------------------- */
     /* Get all tier rules for display                                     */
     /* ---------------------------------------------------------------- */

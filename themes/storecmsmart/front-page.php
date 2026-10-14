@@ -104,9 +104,9 @@ if ( class_exists( 'PCS_B2B_Portal' ) ) {
           <?php
           $_city = giga_option( 'giga_city', '' );
           if ( $_city ) {
-            printf( esc_html__( 'Eight top categories — all produced in our %s shop.', 'storecmsmart' ), esc_html( $_city ) );
+            printf( esc_html__( 'Our top categories — all produced in our %s shop.', 'storecmsmart' ), esc_html( $_city ) );
           } else {
-            esc_html_e( 'Eight top categories — all produced locally.', 'storecmsmart' );
+            esc_html_e( 'Our top categories — all produced locally.', 'storecmsmart' );
           }
           ?>
           <a href="<?php echo esc_url( $shop_url ); ?>" style="color:var(--nbd-mb-primary);font-weight:700;"><?php esc_html_e( 'See full catalog →', 'storecmsmart' ); ?></a>

@@ -14,7 +14,7 @@
 
 if ( ! defined( 'ABSPATH' ) ) exit;
 
-define( 'SG_DUI_VERSION', '1.10.131' );
+define( 'SG_DUI_VERSION', '1.10.132' );
 define( 'SG_DUI_URL', plugin_dir_url( __FILE__ ) );
 
 /**
@@ -70,18 +70,6 @@ function sg_dui_inject_category_data() {
             'image'  => $image,
             'is_new' => false,
         );
-    }
-
-    // Mark the most recently created category (highest term_id) as "new"
-    if ( ! empty( $data ) ) {
-        $max_id = max( array_column( $data, 'id' ) );
-        foreach ( $data as &$cat_item ) {
-            if ( $cat_item['id'] === $max_id ) {
-                $cat_item['is_new'] = true;
-                break;
-            }
-        }
-        unset( $cat_item );
     }
 
     // Determine which category IDs match the current product (for active highlight).

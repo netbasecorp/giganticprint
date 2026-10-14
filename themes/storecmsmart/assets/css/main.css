@@ -5542,9 +5542,10 @@ a.nbdesign-button:hover,
 .cat-nav-inner {
   display: flex;
   align-items: stretch;
-  justify-content: center;
-  flex-wrap: wrap;
+  justify-content: flex-start;
+  flex-wrap: nowrap;
   overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
   -ms-overflow-style: none;
   max-width: 1400px;
@@ -5552,6 +5553,9 @@ a.nbdesign-button:hover,
   padding: 0 16px;
 }
 .cat-nav-inner::-webkit-scrollbar { display: none; }
+/* centered when everything fits, scrolls from the left edge when it does not */
+.cat-nav-inner > .cat-nav-item:first-child { margin-left: auto; }
+.cat-nav-inner > .cat-nav-item:last-child { margin-right: auto; }
 .cat-nav-item {
   display: inline-flex;
   flex-direction: column;
@@ -5611,6 +5615,24 @@ a.nbdesign-button:hover,
   border-radius: 3px;
   text-transform: uppercase;
   pointer-events: none;
+}
+/* Empty product category: "Coming soon" block */
+.giga-coming-soon {
+  text-align: center;
+  padding: 64px 16px;
+  max-width: 560px;
+  margin: 0 auto;
+}
+.giga-coming-soon__title {
+  font-size: 28px; font-weight: 800; color: var(--nbd-mb-ink);
+  margin: 0 0 12px;
+}
+.giga-coming-soon__text {
+  font-size: 16px; line-height: 1.6; color: var(--nbd-mb-text-soft);
+  margin: 0 0 24px;
+}
+.giga-coming-soon__actions {
+  display: flex; flex-wrap: wrap; gap: 12px; justify-content: center;
 }
 @media (max-width: 768px) {
   .cat-nav-item { padding: 7px 12px 6px; font-size: 10px; }

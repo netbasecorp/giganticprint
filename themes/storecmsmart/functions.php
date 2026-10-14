@@ -829,3 +829,28 @@ add_action( 'wp_footer', function () {
     <?php
 }, 99 );
 
+/* ---------------------------------------------------------------
+   EMPTY PRODUCT CATEGORY: friendly "Coming soon" block instead of
+   the default "No products were found matching your selection".
+--------------------------------------------------------------- */
+add_action( 'wp', function () {
+	if ( function_exists( 'is_product_category' ) && is_product_category() ) {
+		remove_action( 'woocommerce_no_products_found', 'wc_no_products_found' );
+		add_action( 'woocommerce_no_products_found', 'giga_category_coming_soon' );
+	}
+} );
+
+function giga_category_coming_soon() {
+	$shop_url = function_exists( 'wc_get_page_id' ) ? get_permalink( wc_get_page_id( 'shop' ) ) : home_url( '/' );
+	?>
+	<div class="giga-coming-soon">
+		<h2 class="giga-coming-soon__title"><?php esc_html_e( 'Coming soon', 'storecmsmart' ); ?></h2>
+		<p class="giga-coming-soon__text"><?php esc_html_e( 'Products in this category are on the way. Meanwhile browse our other categories or contact us.', 'storecmsmart' ); ?></p>
+		<div class="giga-coming-soon__actions">
+			<a class="btn-primary" href="<?php echo esc_url( $shop_url ); ?>"><?php esc_html_e( 'Browse the shop', 'storecmsmart' ); ?></a>
+			<a class="btn-secondary" href="<?php echo esc_url( home_url( '/contact/' ) ); ?>"><?php esc_html_e( 'Contact us', 'storecmsmart' ); ?></a>
+		</div>
+	</div>
+	<?php
+}
+

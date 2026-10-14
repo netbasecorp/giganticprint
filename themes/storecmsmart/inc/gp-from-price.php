@@ -84,6 +84,12 @@ function gp_from_price_compute( $product ) {
 				if ( isset( $field['nbd_type'] ) && 'dimension' === $field['nbd_type'] ) {
 					$w = isset( $g['default_width'] ) && '' !== $g['default_width'] ? $g['default_width'] : ( isset( $g['min_width'] ) ? $g['min_width'] : 0 );
 					$h = isset( $g['default_height'] ) && '' !== $g['default_height'] ? $g['default_height'] : ( isset( $g['min_height'] ) ? $g['min_height'] : 0 );
+					// Sets with a minimum chargeable area (acrylic): quote the minimum size, which is the real lowest price.
+					$min_area = isset( $g['mesure_min_area'] ) ? (float) $g['mesure_min_area'] : 0.0;
+					if ( $min_area > 0 && (float) $w * (float) $h > $min_area ) {
+						$w = round( sqrt( $min_area ), 4 );
+						$h = $w;
+					}
 					$fields[ $fid ] = $w . 'x' . $h;
 				} elseif ( 'i' === $data_type ) {
 					$input_type = isset( $g['input_type'] ) ? $g['input_type'] : '';

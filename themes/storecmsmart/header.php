@@ -185,7 +185,7 @@ if ( ! $_hide_catnav && function_exists( 'get_terms' ) ) :
     if ( $_cnav_default ) $_cnav_exclude[] = $_cnav_default;
     $_cnav_cats = get_terms( [
         'taxonomy'   => 'product_cat',
-        'hide_empty' => true,
+        'hide_empty' => false,
         'parent'     => 0,
         'orderby'    => 'menu_order',
         'order'      => 'ASC',
@@ -197,8 +197,6 @@ if ( ! $_hide_catnav && function_exists( 'get_terms' ) ) :
 <nav class="cat-nav-bar" aria-label="<?php esc_attr_e( 'Browse by category', 'storecmsmart' ); ?>">
   <div class="cat-nav-inner">
     <?php
-    // Find newest category (highest term_id) to show "NEW" badge
-    $_cnav_max_id = max( array_map( function( $c ) { return $c->term_id; }, $_cnav_cats ) );
     foreach ( $_cnav_cats as $_cnav_cat ) :
         $_cnav_tid      = $_cnav_cat->term_id;
         $_cnav_thumb_id = get_term_meta( $_cnav_tid, 'thumbnail_id', true );
@@ -211,13 +209,9 @@ if ( ! $_hide_catnav && function_exists( 'get_terms' ) ) :
             get_queried_object_id() === $_cnav_tid ||
             in_array( $_cnav_tid, get_ancestors( get_queried_object_id(), 'product_cat' ), true )
         );
-        $_cnav_is_new = ( $_cnav_tid === $_cnav_max_id );
     ?>
     <a href="<?php echo esc_url( get_term_link( $_cnav_cat ) ); ?>"
-       class="cat-nav-item<?php echo $_cnav_active ? ' cat-nav-active' : ''; ?><?php echo $_cnav_is_new ? ' cat-nav-is-new' : ''; ?>">
-      <?php if ( $_cnav_is_new ) : ?>
-        <span class="cat-nav-new-badge">NEW</span>
-      <?php endif; ?>
+       class="cat-nav-item<?php echo $_cnav_active ? ' cat-nav-active' : ''; ?>">
       <?php if ( $_cnav_img ) : ?>
         <img src="<?php echo esc_url( $_cnav_img ); ?>" alt="" class="cat-nav-icon" width="28" height="28" loading="lazy">
       <?php else : ?>

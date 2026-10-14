@@ -5542,9 +5542,10 @@ a.nbdesign-button:hover,
 .cat-nav-inner {
   display: flex;
   align-items: stretch;
-  justify-content: center;
-  flex-wrap: wrap;
+  justify-content: flex-start;
+  flex-wrap: nowrap;
   overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
   -ms-overflow-style: none;
   max-width: 1400px;
@@ -5552,6 +5553,9 @@ a.nbdesign-button:hover,
   padding: 0 16px;
 }
 .cat-nav-inner::-webkit-scrollbar { display: none; }
+/* centered when everything fits, scrolls from the left edge when it does not */
+.cat-nav-inner > .cat-nav-item:first-child { margin-left: auto; }
+.cat-nav-inner > .cat-nav-item:last-child { margin-right: auto; }
 .cat-nav-item {
   display: inline-flex;
   flex-direction: column;

@@ -72,18 +72,6 @@ function sg_dui_inject_category_data() {
         );
     }
 
-    // Mark the most recently created category (highest term_id) as "new"
-    if ( ! empty( $data ) ) {
-        $max_id = max( array_column( $data, 'id' ) );
-        foreach ( $data as &$cat_item ) {
-            if ( $cat_item['id'] === $max_id ) {
-                $cat_item['is_new'] = true;
-                break;
-            }
-        }
-        unset( $cat_item );
-    }
-
     // Determine which category IDs match the current product (for active highlight).
     $product_id      = isset( $_GET['product_id'] ) ? absint( $_GET['product_id'] ) : 0;
     $current_cat_ids = array();

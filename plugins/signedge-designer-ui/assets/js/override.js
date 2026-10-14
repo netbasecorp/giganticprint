@@ -3049,11 +3049,12 @@
                     '<div class="sg-b2b-benefits">' +
                         '<p class="sg-b2b-benefits-title">What you\'ll get</p>' +
                         '<ul>' +
-                            '<li><span class="sg-b2b-check">&#10003;</span> Tiered discounts up to 24% off retail prices</li>' +
-                            '<li><span class="sg-b2b-check">&#10003;</span> Net-30 / Net-60 payment terms after approval</li>' +
-                            '<li><span class="sg-b2b-check">&#10003;</span> Private template library &amp; asset storage</li>' +
-                            '<li><span class="sg-b2b-check">&#10003;</span> 1-click reorders &amp; smart reorder reminders</li>' +
-                            '<li><span class="sg-b2b-check">&#10003;</span> Dedicated account manager for VIP tier</li>' +
+                            '<li><span class="sg-b2b-check">&#10003;</span> Tier discount on every order (B2B 10%, Reseller 20%)</li>' +
+                            '<li><span class="sg-b2b-check">&#10003;</span> Company portal: orders, team members and quotes</li>' +
+                            '<li><span class="sg-b2b-check">&#10003;</span> Company Image Zone for your logos and artwork</li>' +
+                            '<li><span class="sg-b2b-check">&#10003;</span> Private company templates</li>' +
+                            '<li><span class="sg-b2b-check">&#10003;</span> Products reserved for your company</li>' +
+                            '<li><span class="sg-b2b-check">&#10003;</span> One-click reorder with your original art</li>' +
                         '</ul>' +
                     '</div>' +
                 '</div>' +

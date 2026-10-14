@@ -95,7 +95,7 @@ $status      = $has_applied ? $store->status : '';
       <div style="font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;opacity:.8;margin-bottom:6px;">Business Account</div>
       <h2 style="color:#fff;font-size:22px;font-weight:800;margin:0 0 8px;">Apply for B2B membership</h2>
       <p style="opacity:.92;font-size:13px;line-height:1.5;margin:0;">
-        Unlock volume discounts, Net payment terms, team workspaces, and brand store features.
+        Get a tier discount on every order, a company portal with team members and quotes, and a private Image Zone and templates.
         Takes 2 minutes · Reviewed within 24 hours.
       </p>
     </div>
@@ -122,25 +122,17 @@ $status      = $has_applied ? $store->status : '';
         foreach ( $b2b_tiers as $tid => $tdef ) :
           $s = PCS_DB::get_tier_style( $tid );
           $discount = (int) $tdef['discount'];
-          $pt_map   = array( 'prepay' => 'Pre-pay', 'net15' => 'Net-15', 'net30' => 'Net-30', 'net60' => 'Net-60' );
-          $pt_label = isset( $pt_map[ $tdef['payment_terms'] ] ) ? $pt_map[ $tdef['payment_terms'] ] : $tdef['payment_terms'];
         ?>
         <div class="pcs-tier-display-card" style="--tier-bg:<?php echo esc_attr( $s['bg'] ); ?>;--tier-color:<?php echo esc_attr( $s['color'] ); ?>;">
           <div class="pcs-tier-display-label"><?php echo esc_html( $tdef['label'] ); ?></div>
           <div class="pcs-tier-display-discount"><?php echo $discount; ?>%</div>
           <ul class="pcs-tier-display-perks">
             <li>off all products</li>
-            <?php if ( $pt_label ) : ?>
-            <li><?php echo esc_html( $pt_label ); ?> terms</li>
-            <?php endif; ?>
-            <?php if ( $discount >= 15 ) : ?>
-            <li>Free shipping always</li>
-            <?php elseif ( $discount >= 10 ) : ?>
-            <li>Free shipping over $150</li>
-            <?php endif; ?>
-            <?php if ( $discount >= 20 ) : ?>
-            <li>Team workspace</li>
-            <?php endif; ?>
+            <li>Company portal: orders, team members and quotes</li>
+            <li>Company Image Zone for your logos and artwork</li>
+            <li>Private company templates</li>
+            <li>Products reserved for your company</li>
+            <li>One-click reorder with your original art</li>
           </ul>
         </div>
         <?php endforeach; ?>

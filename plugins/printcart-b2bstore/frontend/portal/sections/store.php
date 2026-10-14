@@ -45,12 +45,6 @@ $total_spent = (float) wc_get_customer_total_spent( $user_id );
             'Email'     => $store->contact_email,
             'Phone'     => $store->contact_phone,
             'Website'   => $store->website,
-            'Payment'   => ( function() use ( $store, $tier_def ) {
-                $pt_map = array( 'prepay' => 'Prepay', 'net15' => 'Net-15', 'net30' => 'Net-30' );
-                $src    = ! empty( $tier_def['payment_terms'] ) ? $tier_def['payment_terms'] : $store->payment_terms;
-                return isset( $pt_map[ $src ] ) ? $pt_map[ $src ] : ucfirst( $src );
-            } )(),
-            'Credit limit' => $store->credit_limit > 0 ? wc_price( $store->credit_limit ) : '',
           ) as $label => $val ) :
             if ( empty( $val ) ) continue;
           ?>
@@ -136,16 +130,11 @@ $total_spent = (float) wc_get_customer_total_spent( $user_id );
       <div class="pcs-pcard-body">
         <ul class="pcs-benefit-list">
           <li><?php echo (int) $tier_def['discount']; ?>% off all products</li>
-          <?php
-          /* Use tier's payment_terms as primary; fall back to store's */
-          $pt_source = ! empty( $tier_def['payment_terms'] ) ? $tier_def['payment_terms'] : $store->payment_terms;
-          $pt_map    = array( 'prepay' => 'Prepay', 'net15' => 'Net-15', 'net30' => 'Net-30' );
-          $pt_label  = isset( $pt_map[ $pt_source ] ) ? $pt_map[ $pt_source ] : ucfirst( $pt_source );
-          if ( $pt_label ) : ?>
-          <li><?php echo esc_html( $pt_label ); ?> payment terms</li>
-          <?php endif; ?>
-          <li>Team workspace</li>
-          <li>Priority support</li>
+          <li>Company portal: orders, team members and quotes</li>
+          <li>Company Image Zone for your logos and artwork</li>
+          <li>Private company templates</li>
+          <li>Products reserved for your company</li>
+          <li>One-click reorder with your original art</li>
         </ul>
       </div>
     </div>

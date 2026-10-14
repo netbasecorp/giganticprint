@@ -109,7 +109,7 @@ else :
       <div class="pcs-ph-info">
         <div class="pcs-ph-eyebrow">Business Account</div>
         <h1 class="pcs-ph-title">Apply for B2B membership</h1>
-        <p class="pcs-ph-sub">Unlock volume discounts, Net payment terms, team workspaces, and brand store features. Takes 2 minutes · Reviewed within 24 hours.</p>
+        <p class="pcs-ph-sub">Get a tier discount on every order, a company portal with team members and quotes, and a private Image Zone and templates. Takes 2 minutes · Reviewed within 24 hours.</p>
       </div>
     </div>
   </div>
@@ -136,8 +136,6 @@ else :
         } );
         foreach ( $b2b_only as $tid => $tdef ) :
           $s = PCS_DB::get_tier_style( $tid );
-          $pt_map = array( 'prepay' => 'Pre-pay', 'net15' => 'Net-15', 'net30' => 'Net-30' );
-          $pt = isset( $pt_map[ $tdef['payment_terms'] ] ) ? $pt_map[ $tdef['payment_terms'] ] : ( $tdef['payment_terms'] ?? '' );
           $disc = (int) $tdef['discount'];
         ?>
         <div class="pcs-tier-display-card" style="--tier-bg:<?php echo esc_attr( $s['bg'] ); ?>;--tier-color:<?php echo esc_attr( $s['color'] ); ?>;">
@@ -145,9 +143,11 @@ else :
           <div class="pcs-tier-display-discount"><?php echo $disc; ?></div>
           <ul class="pcs-tier-display-perks">
             <li>off all products</li>
-            <?php if ( $pt ) : ?><li><?php echo esc_html( $pt ); ?> terms</li><?php endif; ?>
-            <?php if ( $disc >= 20 ) : ?><li>Free shipping always</li><?php elseif ( $disc >= 10 ) : ?><li>Free shipping over $150</li><?php endif; ?>
-            <?php if ( $disc >= 20 ) : ?><li>Team workspace</li><?php endif; ?>
+            <li>Company portal: orders, team members and quotes</li>
+            <li>Company Image Zone for your logos and artwork</li>
+            <li>Private company templates</li>
+            <li>Products reserved for your company</li>
+            <li>One-click reorder with your original art</li>
           </ul>
         </div>
         <?php endforeach; ?>

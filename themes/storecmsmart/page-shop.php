@@ -420,7 +420,7 @@ if ( ! function_exists( 'giga_shop_price_from' ) ) {
         <div class="shop-b2b-text">
           <div class="shop-b2b-label"><?php esc_html_e( 'B2B / Wholesale', 'storecmsmart' ); ?></div>
           <h3><?php echo wp_kses_post( giga_option( 'giga_shop_b2b_title', 'Print resellers &amp; agencies — you belong here.' ) ); ?></h3>
-          <p><?php echo esc_html( giga_option( 'giga_shop_b2b_desc', 'Volume pricing, NET-30 terms, dedicated rep, and blind shipping.' ) ); ?></p>
+          <p><?php echo esc_html( giga_option( 'giga_shop_b2b_desc', 'Tier discount on every order, company portal, Image Zone, private templates and one-click reorder.' ) ); ?></p>
         </div>
         <div class="shop-b2b-actions">
           <a href="<?php echo esc_url( $b2b_url ); ?>" class="btn-primary">

@@ -475,15 +475,21 @@
     // the NBO options scope, which can still be empty for a moment after
     // the tab DOM itself already exists.
     function decideDefaultPhotosTab(attempt) {
+        // B5: upload-first for EVERY product. The Photos tab is our upload tab (upload tile, company Image Zone,
+        // company templates); art that is uploaded sets the product size itself (auto-size from pixels/dpi), so
+        // there is no reason to make the customer configure the size first. The decision used to depend on
+        // hasDimensionField(), which is false while the options AJAX is still loading (4-10 s on this host):
+        // after the retries ran out the tab flipped to Photos for some products and stayed on Printing for
+        // others, depending on timing. Now: wait (up to ~45 s) until the options are ready, then always open
+        // Photos/Upload; if the options never arrive, still open it (nothing else can be done on that page).
         var nboScope = getNboScope();
-        var ready = nboScope && Array.isArray(nboScope.fields) && nboScope.fields.length > 0;
-        if (!ready && (attempt || 0) < 20) {
-            setTimeout(function () { decideDefaultPhotosTab((attempt || 0) + 1); }, 300);
+        var ready = nboScope && Array.isArray(nboScope.fields) && nboScope.fields.length > 0 &&
+            nboScope.nbd_fields && Object.keys(nboScope.nbd_fields).length > 0 && window.nbOption && window.nbOption.initialed;
+        if (!ready && (attempt || 0) < 90) {
+            setTimeout(function () { decideDefaultPhotosTab((attempt || 0) + 1); }, 500);
             return;
         }
-        if (!hasDimensionField()) {
-            tryOpenPhotosTabDefault();
-        }
+        tryOpenPhotosTabDefault();
     }
 
     // Separated from initPhotosTabFirst because the click has to actually
@@ -3043,11 +3049,12 @@
                     '<div class="sg-b2b-benefits">' +
                         '<p class="sg-b2b-benefits-title">What you\'ll get</p>' +
                         '<ul>' +
-                            '<li><span class="sg-b2b-check">&#10003;</span> Tiered discounts up to 24% off retail prices</li>' +
-                            '<li><span class="sg-b2b-check">&#10003;</span> Net-30 / Net-60 payment terms after approval</li>' +
-                            '<li><span class="sg-b2b-check">&#10003;</span> Private template library &amp; asset storage</li>' +
-                            '<li><span class="sg-b2b-check">&#10003;</span> 1-click reorders &amp; smart reorder reminders</li>' +
-                            '<li><span class="sg-b2b-check">&#10003;</span> Dedicated account manager for VIP tier</li>' +
+                            '<li><span class="sg-b2b-check">&#10003;</span> Tier discount on every order (B2B 10%, Reseller 20%)</li>' +
+                            '<li><span class="sg-b2b-check">&#10003;</span> Company portal: orders, team members and quotes</li>' +
+                            '<li><span class="sg-b2b-check">&#10003;</span> Company Image Zone for your logos and artwork</li>' +
+                            '<li><span class="sg-b2b-check">&#10003;</span> Private company templates</li>' +
+                            '<li><span class="sg-b2b-check">&#10003;</span> Products reserved for your company</li>' +
+                            '<li><span class="sg-b2b-check">&#10003;</span> One-click reorder with your original art</li>' +
                         '</ul>' +
                     '</div>' +
                 '</div>' +

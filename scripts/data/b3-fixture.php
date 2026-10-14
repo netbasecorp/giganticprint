@@ -2,11 +2,13 @@
 /**
  * B3 test fixture (company store, member, sent quote) for the e2e suite + invitation self test.
  *   scripts/data/run.sh b3-fixture.php create            -> prints a line "FIXTURE {json}" (ids)
+ * Roles (B5): gp_test_b2c = retail only, NOT a member of any company; gp_test_b2b = owner of the company 'Demo Signs Co';
+ * gp_test_staff = retail account that is a MEMBER of 'Demo Signs Co'; gp_test_reseller = owner of its own company 'Demo Reseller Co'.
  *   scripts/data/run.sh b3-fixture.php status            -> prints "STATUS {json}" (store / quote status, member discounts)
  *   scripts/data/run.sh b3-fixture.php selftest-invite   -> invitation takeover self test (creates and removes its own rows)
  *   scripts/data/run.sh b3-fixture.php clear-ratelimit   -> removes login rate-limit counters/locks
  *   scripts/data/run.sh b3-fixture.php cleanup           -> removes everything this script created
- * Only touches rows it created itself (company 'GP Test Company', quote title 'GP test quote', @example.test e-mails).
+ * Only touches rows it created itself (companies 'Demo Signs Co' and 'Demo Reseller Co', quote title 'GP test quote', @example.test e-mails).
  * No backup JSON is written (throw-away test rows); mail is suppressed by the bootstrap.
  */
 require __DIR__ . '/_lib.php';
@@ -16,14 +18,15 @@ global $wpdb;
 
 function gp_fx_say( $label, $data ) { echo $label . ' ' . wp_json_encode( $data ) . "\n"; }
 function gp_fx_user( $login ) { $u = get_user_by( 'login', $login ); if ( ! $u ) { echo "missing user $login (run scripts/test-users.sh create)\n"; exit( 1 ); } return $u; }
-function gp_fx_find_store() { global $wpdb; return $wpdb->get_row( "SELECT * FROM {$wpdb->prefix}pcs_b2b_stores WHERE company_name = 'GP Test Company' ORDER BY id DESC LIMIT 1" ); }
+function gp_fx_find_store() { global $wpdb; return $wpdb->get_row( "SELECT * FROM {$wpdb->prefix}pcs_b2b_stores WHERE company_name = 'Demo Signs Co' ORDER BY id DESC LIMIT 1" ); }
+function gp_fx_find_reseller_store() { global $wpdb; return $wpdb->get_row( "SELECT * FROM {$wpdb->prefix}pcs_b2b_stores WHERE company_name = 'Demo Reseller Co' ORDER BY id DESC LIMIT 1" ); }
 
 if ( 'create' === $mode ) {
-	$b2b = gp_fx_user( 'gp_test_b2b' ); $b2c = gp_fx_user( 'gp_test_b2c' );
+	$b2b = gp_fx_user( 'gp_test_b2b' ); $b2c = gp_fx_user( 'gp_test_staff' ); $res = gp_fx_user( 'gp_test_reseller' );
 	$store = gp_fx_find_store();
 	if ( ! $store ) {
 		$sid = PCS_DB::save_store( array(
-			'user_id' => $b2b->ID, 'company_name' => 'GP Test Company', 'company_slug' => 'gp-test-company', 'contact_name' => 'GP Test',
+			'user_id' => $b2b->ID, 'company_name' => 'Demo Signs Co', 'company_slug' => 'demo-signs-co', 'contact_name' => 'GP Test',
 			'contact_email' => $b2b->user_email, 'tier' => 'b2b_a', 'status' => 'pending',
 		) );
 		PCS_DB::add_member( $sid, $b2b->ID, 'admin', 0 );
@@ -31,20 +34,28 @@ if ( 'create' === $mode ) {
 		$store = PCS_DB::get_store( $sid );
 	}
 	$sid = (int) $store->id;
+	if ( ! gp_fx_find_reseller_store() ) {
+		$rid = PCS_DB::save_store( array(
+			'user_id' => $res->ID, 'company_name' => 'Demo Reseller Co', 'company_slug' => 'demo-reseller-co', 'contact_name' => 'GP Test',
+			'contact_email' => $res->user_email, 'tier' => 'reseller', 'status' => 'pending',
+		) );
+		PCS_DB::add_member( $rid, $res->ID, 'admin', 0 );
+		PCS_B2B_Stores::approve_store( $rid, array( 'tier' => 'reseller', 'team_size' => 3 ) );
+	}
 	if ( ! PCS_DB::get_member_by_user( $sid, $b2c->ID ) ) { PCS_DB::add_member( $sid, $b2c->ID, 'member', 0 ); }
 	$qid = (int) $wpdb->get_var( "SELECT id FROM {$wpdb->prefix}pcs_quotes WHERE title = 'GP test quote' ORDER BY id DESC LIMIT 1" );
 	if ( ! $qid ) {
 		$qid = (int) PCS_Quotes::create( array( 'user_id' => $b2b->ID, 'store_id' => $sid, 'title' => 'GP test quote', 'message' => 'e2e fixture' ) );
 	}
 	PCS_Quotes::update( $qid, array( 'status' => 'sent', 'subtotal' => 50, 'total' => 50, 'valid_until' => gmdate( 'Y-m-d', time() + 10 * DAY_IN_SECONDS ), 'sent_at' => current_time( 'mysql' ), 'responded_at' => null, 'wc_order_id' => null ) );
-	gp_fx_say( 'FIXTURE', array( 'store' => $sid, 'quote' => $qid, 'owner' => $b2b->ID, 'member' => $b2c->ID ) );
+	gp_fx_say( 'FIXTURE', array( 'store' => $sid, 'quote' => $qid, 'owner' => $b2b->ID, 'member' => $b2c->ID, 'reseller_store' => (int) gp_fx_find_reseller_store()->id ) );
 	exit( 0 );
 }
 
 if ( 'status' === $mode ) {
 	$store = gp_fx_find_store();
 	$q = $wpdb->get_row( "SELECT id, status, wc_order_id FROM {$wpdb->prefix}pcs_quotes WHERE title = 'GP test quote' ORDER BY id DESC LIMIT 1" );
-	$b2c = get_user_by( 'login', 'gp_test_b2c' );
+	$b2c = get_user_by( 'login', 'gp_test_staff' );
 	gp_fx_say( 'STATUS', array(
 		'store' => $store ? $store->status : null,
 		'quote' => $q ? $q->status : null,
@@ -79,14 +90,14 @@ if ( 'cleanup' === $mode ) {
 		PCS_Quotes::delete( (int) $qid ); echo "deleted quote $qid\n";
 	}
 	// orders created for the fixture users by the e2e quote acceptance (staging has no real orders)
-	foreach ( array( 'gp_test_b2c', 'gp_test_b2b', 'gp_test_reseller' ) as $login ) {
+	foreach ( array( 'gp_test_b2c', 'gp_test_b2b', 'gp_test_reseller', 'gp_test_staff' ) as $login ) {
 		$u = get_user_by( 'login', $login );
 		if ( ! $u ) { continue; }
 		foreach ( wc_get_orders( array( 'customer_id' => $u->ID, 'limit' => -1, 'status' => 'any' ) ) as $o ) { $oid = $o->get_id(); $o->delete( true ); echo "deleted order $oid of $login
 "; }
 	}
-	$store = gp_fx_find_store();
-	if ( $store ) {
+	foreach ( array( gp_fx_find_store(), gp_fx_find_reseller_store() ) as $store ) {
+		if ( ! $store ) { continue; }
 		if ( class_exists( 'PCS_Private_Products' ) ) { PCS_Private_Products::unassign( (int) $store->id, 1263 ); }
 		// B4 company data of the fixture store: images (rows + private files), templates, private product assignments
 		foreach ( array( 'pcs_company_images', 'pcs_company_templates', 'pcs_store_products' ) as $t ) {

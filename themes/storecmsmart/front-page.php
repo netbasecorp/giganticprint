@@ -441,7 +441,7 @@ if ( class_exists( 'PCS_B2B_Portal' ) ) {
     <div class="b2b-strip">
       <div class="b2b-strip-content">
         <div class="b2b-eyebrow"><?php esc_html_e( 'B2B / Wholesale', 'storecmsmart' ); ?></div>
-        <h3><?php esc_html_e( 'Print buyer? Get up to 24% off retail.', 'storecmsmart' ); ?></h3>
+        <h3><?php esc_html_e( 'Print buyer? Get up to 20% off retail.', 'storecmsmart' ); ?></h3>
         <p><?php esc_html_e( 'Print shops, marketing agencies, event companies, and high-volume buyers — apply for a B2B account to unlock tiered pricing, private templates, Image Zone storage, and 1-click reorder.', 'storecmsmart' ); ?></p>
       </div>
       <div class="b2b-actions">

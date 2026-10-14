@@ -65,14 +65,14 @@ class Cmsmart_UI_Override {
             'cmsmart-ui-override',
             CMSMART_UI_OVERRIDE_URL . 'assets/css/override.css',
             array( 'cui-google-fonts' ),
-            '1.5.3'
+            '1.5.5'
         );
 
         wp_enqueue_script(
             'cmsmart-ui-override',
             CMSMART_UI_OVERRIDE_URL . 'assets/js/override.js',
             array( 'jquery' ),
-            '1.5.3',
+            '1.5.5',
             true
         );
 
@@ -291,8 +291,11 @@ class Cmsmart_UI_Override {
                 }
                 $per_key[ $key ] = array( 'price' => $price );
             }
+            $is_linear = class_exists( 'GP_Linear_Pricing' ) && isset( $field['general']['title'] )
+                && '' !== GP_Linear_Pricing::kind_for_title( $field['general']['title'], GP_Linear_Pricing::rules() );
             $this->swatch_prices[ $field['id'] ] = array(
                 't'    => $dtype,  // 's' = swatch card, 'l' = label chip
+                'lin'  => $is_linear ? 1 : 0, // pole pocket / rope: badge is written by gp-linear-pricing.js
                 'opts' => $per_key,
             );
         }
@@ -351,6 +354,7 @@ class Cmsmart_UI_Override {
             function inject() {
                 $.each(data, function(fid, field) {
                     var opts = field.opts;
+                    if (field.lin) return; // stale flat prices: gp-linear-pricing.js labels these
                     if (field.t === 's') {
                         // Swatch card: inject price block into .nbd-swatch-description
                         $('[data-id="' + fid + '"]').find('.nbd-swatch-label-wrap').each(function() {
@@ -522,6 +526,8 @@ new Cmsmart_UI_Override();
 define( 'GP_LINEAR_PRICING_VERSION', '1.0.0' );
 require_once CMSMART_UI_OVERRIDE_PATH . 'includes/class-gp-linear-pricing.php';
 add_action( 'plugins_loaded', array( 'GP_Linear_Pricing', 'init' ) );
+require_once CMSMART_UI_OVERRIDE_PATH . 'includes/class-gp-linear-admin.php';
+add_action( 'plugins_loaded', array( 'GP_Linear_Admin', 'init' ) );
 
 // Login rate limiting + user enumeration hardening.
 require_once CMSMART_UI_OVERRIDE_PATH . 'includes/class-gp-hardening.php';

@@ -136,7 +136,8 @@ test('per-client products: visible to the company, hidden (404) for everybody el
     } finally { await ctx.close(); }
   };
   await check('gp_test_b2b', true);    // company owner
-  await check('gp_test_b2c', true);    // company member
+  await check('gp_test_staff', true);  // company member (retail account)
+  await check('gp_test_b2c', false);   // retail account, not a member
   await check('gp_test_reseller', false);
   await check(null, false);
 });
@@ -144,7 +145,7 @@ test('per-client products: visible to the company, hidden (404) for everybody el
 test('Image Zone: company members upload / list / use / delete, strangers see nothing', async ({ browser }) => {
   test.skip(!FX, 'fixture missing');
   const mk = async (login) => login ? G.loginContext(browser, login, { viewport: { width: 1440, height: 900 } }) : browser.newContext({ viewport: { width: 1440, height: 900 } });
-  const owner = await mk('gp_test_b2b'), member = await mk('gp_test_b2c'), stranger = await mk('gp_test_reseller'), guest = await mk(null);
+  const owner = await mk('gp_test_b2b'), member = await mk('gp_test_staff'), stranger = await mk('gp_test_reseller'), guest = await mk(null);
   try {
     // owner uploads through the portal
     const po = await owner.newPage();
@@ -203,7 +204,7 @@ test('company templates: save from the designer, list / rename / clone / delete 
   test.skip(!FX, 'fixture missing');
   test.setTimeout(420000);
   const mk = async (login) => G.loginContext(browser, login, { viewport: { width: 1440, height: 900 } });
-  const owner = await mk('gp_test_b2b'), member = await mk('gp_test_b2c'), stranger = await mk('gp_test_reseller');
+  const owner = await mk('gp_test_b2b'), member = await mk('gp_test_staff'), stranger = await mk('gp_test_reseller');
   const NAME = 'GP e2e template ' + Date.now();
   try {
     const pd = await owner.newPage();

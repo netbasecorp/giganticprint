@@ -398,6 +398,107 @@
         } catch (e) { return ''; }
     }
 
+    /* Off-screen thumbnail: cross-origin art (files.printcart.com sends no CORS headers) taints the live
+     * canvas, so render a copy where those images come from the same-origin gp_img_thumb proxy.
+     * cb(dataUrl) is called exactly once; '' means "no thumbnail". */
+    var THUMB_TIMEOUT = 12000;
+
+    function sameOrigin(src) {
+        try { return new URL(src, window.location.href).origin === window.location.origin; }
+        catch (e) { return false; }
+    }
+
+    function proxyUrl(src) {
+        return T.ajaxUrl + (T.ajaxUrl.indexOf('?') === -1 ? '?' : '&') + 'action=gp_img_thumb&_nonce=' + encodeURIComponent(T.nonce) +
+            '&store_id=' + encodeURIComponent(T.storeId) + '&u=' + encodeURIComponent(src);
+    }
+
+    function collectImages(o, list) {
+        if (!o || typeof o !== 'object') { return; }
+        if (o.type === 'image' && typeof o.src === 'string') { list.push(o); }
+        if (o.objects && o.objects.length) { for (var i = 0; i < o.objects.length; i++) { collectImages(o.objects[i], list); } }
+    }
+
+    function buildThumbAsync(scope, cb) {
+        var finished = false, timer = null, sc = null;
+        function done(url) {
+            if (finished) { return; }
+            finished = true;
+            if (timer) { clearTimeout(timer); }
+            try { if (sc) { sc.dispose(); } } catch (e) { /* ignore */ }
+            cb(url || '');
+        }
+        function fallback() { done(buildThumb(scope)); }
+        timer = setTimeout(function () { done(''); }, THUMB_TIMEOUT);
+        try {
+            var c = scope.stages[0] && scope.stages[0].canvas;
+            if (!c || typeof c.toJSON !== 'function' || !window.fabric || !window.fabric.StaticCanvas) { fallback(); return; }
+            var json = JSON.parse(JSON.stringify(c.toJSON(exportProps(scope))));
+            var imgs = [];
+            collectImages({ objects: json.objects || [] }, imgs);
+            if (json.backgroundImage) { collectImages(json.backgroundImage, imgs); }
+            if (json.overlayImage) { collectImages(json.overlayImage, imgs); }
+
+            var zoom = (typeof c.getZoom === 'function' && c.getZoom()) || 1;
+            var W = (c.getWidth ? c.getWidth() : c.width) / zoom;
+            var H = (c.getHeight ? c.getHeight() : c.height) / zoom;
+            if (!(W > 0) || !(H > 0)) { fallback(); return; }
+
+            var pending = 0, failed = false;
+            function render() {
+                if (finished) { return; }
+                if (failed) { fallback(); return; }
+                var el2 = document.createElement('canvas');
+                sc = new window.fabric.StaticCanvas(el2, { width: W, height: H, renderOnAddRemove: false });
+                json.background = json.background || '#ffffff';
+                sc.loadFromJSON(json, function () {
+                    if (finished) { return; }
+                    try {
+                        sc.renderAll();
+                        var mult = Math.min(1, THUMB_MAX / Math.max(W, H, 1));
+                        var q = 0.6, url = '';
+                        for (var n = 0; n < 5; n++) {
+                            url = sc.toDataURL({ format: 'jpeg', quality: q, multiplier: mult });
+                            if (url && url.length <= THUMB_BYTES) { done(url); return; }
+                            mult *= 0.8;
+                            q = Math.max(0.4, q - 0.05);
+                        }
+                        done('');
+                    } catch (e) { fallback(); }
+                });
+            }
+            function oneDone() { pending--; if (pending <= 0) { render(); } }
+
+            pending = 1; // guard while the loop runs
+            imgs.forEach(function (o) {
+                o.crossOrigin = 'anonymous';
+                var src = o.src;
+                if (src.indexOf('data:') === 0 || src.indexOf('blob:') === 0 || sameOrigin(src)) { return; }
+                var pu = proxyUrl(src);
+                pending++;
+                var im = new Image();
+                im.crossOrigin = 'anonymous';
+                im.onload = function () {
+                    var nw = im.naturalWidth, nh = im.naturalHeight;
+                    if (nw > 0 && nh > 0 && o.width > 0 && o.height > 0) {
+                        var rx = o.width / nw, ry = o.height / nh;
+                        o.scaleX = (o.scaleX === undefined ? 1 : o.scaleX) * rx;
+                        o.scaleY = (o.scaleY === undefined ? 1 : o.scaleY) * ry;
+                        if (o.cropX) { o.cropX = o.cropX / rx; }
+                        if (o.cropY) { o.cropY = o.cropY / ry; }
+                        o.width = nw;
+                        o.height = nh;
+                        o.src = pu;
+                    } else { failed = true; }
+                    oneDone();
+                };
+                im.onerror = function () { failed = true; oneDone(); };
+                im.src = pu;
+            });
+            oneDone();
+        } catch (e) { fallback(); }
+    }
+
     /* ---- save ---- */
     function save() {
         if (busy) { return; }
@@ -418,12 +519,14 @@
         busy = true;
         saveBtn.disabled = true;
         setMsg('Saving template...', false);
-        request('gp_tpl_save', { name: name, product_id: pid, config: cfg, thumb: buildThumb(scope) }, function (err) {
-            busy = false;
-            saveBtn.disabled = false;
-            if (err) { setMsg(err, true); return; }
-            setMsg('Template "' + name + '" saved.', false);
-            loadList();
+        buildThumbAsync(scope, function (thumb) {
+            request('gp_tpl_save', { name: name, product_id: pid, config: cfg, thumb: thumb }, function (err) {
+                busy = false;
+                saveBtn.disabled = false;
+                if (err) { setMsg(err, true); return; }
+                setMsg('Template "' + name + '" saved.', false);
+                loadList();
+            });
         });
     }
 

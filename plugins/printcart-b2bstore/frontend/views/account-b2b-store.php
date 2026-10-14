@@ -83,18 +83,6 @@ foreach ( $orders_90d as $oid ) {
               <span><?php echo esc_html( $store->address ); ?></span>
             </div>
             <?php endif; ?>
-            <?php if ( $store->payment_terms ) : ?>
-            <div style="display:flex;gap:10px;">
-              <span style="color:var(--pfe-text-soft);min-width:130px;">Payment terms</span>
-              <span><?php echo esc_html( ucwords( str_replace( 'net', 'Net-', $store->payment_terms ) ) ); ?></span>
-            </div>
-            <?php endif; ?>
-            <?php if ( $store->credit_limit > 0 ) : ?>
-            <div style="display:flex;gap:10px;">
-              <span style="color:var(--pfe-text-soft);min-width:130px;">Credit limit</span>
-              <span><?php echo wp_kses_post( wc_price( $store->credit_limit ) ); ?></span>
-            </div>
-            <?php endif; ?>
           </div>
         </div>
       </div>
@@ -162,14 +150,11 @@ foreach ( $orders_90d as $oid ) {
         <div class="pcs-card-body">
           <ul class="pcs-benefits">
             <li><?php echo (int) $tier_def['discount']; ?>% off all products</li>
-            <?php if ( ! empty( $store->payment_terms ) ) : ?>
-            <li><?php echo esc_html( ucwords( str_replace( 'net', 'Net-', $store->payment_terms ) ) ); ?> payment terms</li>
-            <?php endif; ?>
-            <?php if ( $store->credit_limit > 0 ) : ?>
-            <li><?php echo wp_kses_post( wc_price( $store->credit_limit ) ); ?> credit limit</li>
-            <?php endif; ?>
-            <li>Team workspace</li>
-            <li>Priority support</li>
+            <li>Company portal: orders, team members and quotes</li>
+            <li>Company Image Zone for your logos and artwork</li>
+            <li>Private company templates</li>
+            <li>Products reserved for your company</li>
+            <li>One-click reorder with your original art</li>
           </ul>
           <a href="<?php echo esc_url( wc_get_page_permalink( 'shop' ) ); ?>" class="pcs-btn pcs-btn-primary" style="width:100%;justify-content:center;margin-top:14px;">
             Shop with <?php echo (int) $tier_def['discount']; ?>% off →

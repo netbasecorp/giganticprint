@@ -197,18 +197,18 @@ $initials      = PCS_Customers::get_initials( $user->display_name );
           <ul class="pcs-benefits">
             <?php if ( $is_b2b ) : ?>
               <li><?php echo $tier_discount; ?>% off all products</li>
-              <li>Net-<?php echo isset( $tier_def['payment_terms'] ) && strpos( $tier_def['payment_terms'], '15' ) !== false ? '15' : '30'; ?> payment terms</li>
-              <li>Team workspace with role-based access</li>
-              <li>Procurement approval workflow</li>
-              <li>Brand store with locked templates</li>
-              <li>Dedicated account support</li>
+              <li>Company portal: orders, team members and quotes</li>
+              <li>Company Image Zone for your logos and artwork</li>
+              <li>Private company templates</li>
+              <li>Products reserved for your company</li>
+              <li>One-click reorder with your original art</li>
             <?php else : ?>
               <li>Free file pre-press review</li>
               <li>Saved templates & design history</li>
               <li>Reorder past prints in 1 click</li>
-              <li class="locked">B2B tier discount (10–24% off)</li>
-              <li class="locked">Team workspace & roles</li>
-              <li class="locked">Procurement approval workflow</li>
+              <li class="locked">Tier discount on every order (B2B 10%, Reseller 20%)</li>
+              <li class="locked">Company portal: orders, team members and quotes</li>
+              <li class="locked">Company Image Zone for your logos and artwork</li>
             <?php endif; ?>
           </ul>
         </div>

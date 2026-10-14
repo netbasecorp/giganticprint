@@ -1,0 +1,3241 @@
+/*
+ * Signedge Designer UI — override.css
+ * Transforms pc-designer-web-to-print from dark theme to clean white layout.
+ * All rules scoped to .nbd-mode-modern so they only affect the designer page.
+ * Heavy use of !important is intentional — this is a skin override plugin.
+ */
+
+/* ============================================================
+   CSS CUSTOM PROPERTIES (scoped to the designer body)
+   ============================================================ */
+.nbd-mode-modern {
+    --sg-primary:        #2563eb;
+    --sg-primary-hover:  #1d4ed8;
+    --sg-primary-soft:   rgba(37, 99, 235, 0.08);
+    --sg-success:        #16a34a;
+    --sg-bg:             #ffffff;
+    --sg-bg-soft:        #f9fafb;
+    --sg-bg-canvas:      #f3f4f6;
+    --sg-border:         #e5e7eb;
+    --sg-text:           #1f2937;
+    --sg-text-soft:      #6b7280;
+    --sg-text-muted:     #9ca3af;
+    --sg-topbar-h:       68px;
+    --sg-toolbar-h:      52px;   /* contextual toolbar (Roboto / B / I row) */
+    --sg-tabnav-w:       64px;
+    --sg-panel-w:        320px;
+    --sg-summary-w:      320px;
+    --sg-radius:         8px;
+    --sg-shadow-sm:      0 1px 3px rgba(0,0,0,.08);
+    --sg-shadow-md:      0 4px 16px rgba(0,0,0,.10);
+}
+
+/* ============================================================
+   ALL RULES BELOW ARE DESKTOP-ONLY (min-width: 768px)
+   On mobile the original plugin CSS applies unchanged.
+   ============================================================ */
+@media screen and (min-width: 768px) {
+
+/* ============================================================
+   BODY / BASE
+   ============================================================ */
+.nbd-mode-modern,
+.nbd-mode-modern body {
+    background: var(--sg-bg-canvas) !important;
+    color: var(--sg-text) !important;
+}
+
+/* ============================================================
+   TOP BAR  — .nbd-navigations > .nbd-main-bar
+   ============================================================ */
+.nbd-mode-modern .nbd-navigations {
+    position: relative !important;
+    z-index: 200 !important;
+    flex: 0 0 auto !important;
+}
+
+.nbd-mode-modern .nbd-main-bar {
+    background: var(--sg-bg) !important;
+    border-bottom: 1px solid var(--sg-border) !important;
+    box-shadow: var(--sg-shadow-sm) !important;
+    height: var(--sg-topbar-h) !important;
+    min-height: var(--sg-topbar-h) !important;
+    max-height: var(--sg-topbar-h) !important;
+    padding: 0 16px !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 4px !important;
+    overflow: visible !important;
+}
+
+/* Logo */
+.nbd-mode-modern .nbd-main-bar .logo {
+    display: flex !important;
+    align-items: center !important;
+    text-decoration: none !important;
+    color: var(--sg-text) !important;
+    font-weight: 700 !important;
+    font-size: 15px !important;
+    white-space: nowrap !important;
+    margin-right: 8px !important;
+    flex-shrink: 0 !important;
+}
+.nbd-mode-modern .nbd-main-bar .logo img {
+    max-height: 36px !important;
+    width: auto !important;
+}
+
+/* Mobile hamburger */
+.nbd-mode-modern .nbd-main-bar .menu-mobile {
+    color: var(--sg-text) !important;
+}
+
+/* ----- LEFT MENU (File / Edit / View) ----- */
+.nbd-mode-modern .nbd-main-bar .menu-left {
+    display: flex !important;
+    align-items: center !important;
+    gap: 2px !important;
+    flex: 0 0 auto !important;   /* don't stretch — keep items compact */
+    list-style: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+
+.nbd-mode-modern .nbd-main-bar .menu-left > .menu-item {
+    position: relative !important;
+}
+
+.nbd-mode-modern .nbd-main-bar .menu-left > .menu-item > span {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 4px !important;
+    color: var(--sg-text-soft) !important;
+    font-size: 13px !important;
+    font-weight: 500 !important;
+    padding: 6px 10px !important;
+    border-radius: 6px !important;
+    cursor: pointer !important;
+    transition: background .12s, color .12s !important;
+    user-select: none !important;
+}
+.nbd-mode-modern .nbd-main-bar .menu-left > .menu-item:hover > span,
+.nbd-mode-modern .nbd-main-bar .menu-left > .menu-item.open > span {
+    background: var(--sg-bg-soft) !important;
+    color: var(--sg-text) !important;
+}
+
+/* Sub-menus */
+.nbd-mode-modern .nbd-main-bar .sub-menu {
+    background: var(--sg-bg) !important;
+    border: 1px solid var(--sg-border) !important;
+    box-shadow: var(--sg-shadow-md) !important;
+    border-radius: var(--sg-radius) !important;
+    overflow: hidden !important;
+    min-width: 200px !important;
+}
+.nbd-mode-modern .nbd-main-bar .sub-menu-item,
+.nbd-mode-modern .nbd-main-bar .sub-menu li {
+    color: var(--sg-text) !important;
+    font-size: 13px !important;
+}
+.nbd-mode-modern .nbd-main-bar .sub-menu-item:hover,
+.nbd-mode-modern .nbd-main-bar .sub-menu li:hover {
+    background: var(--sg-bg-soft) !important;
+    color: var(--sg-text) !important;
+}
+.nbd-mode-modern .nbd-main-bar .sub-menu-item small {
+    color: var(--sg-text-muted) !important;
+    font-size: 11px !important;
+}
+
+/* Tour help "?" button */
+.nbd-mode-modern .nbd-main-bar .tour_start > span {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 26px !important;
+    height: 26px !important;
+    border-radius: 50% !important;
+    background: var(--sg-bg-soft) !important;
+    border: 1px solid var(--sg-border) !important;
+    color: var(--sg-text-soft) !important;
+    font-size: 12px !important;
+    font-weight: 700 !important;
+    cursor: pointer !important;
+}
+.nbd-mode-modern .nbd-main-bar .tour_start > span:hover {
+    background: var(--sg-border) !important;
+    color: var(--sg-text) !important;
+}
+
+/* Options menu item */
+.nbd-mode-modern .nbd-main-bar .item-nbo-options > span {
+    color: var(--sg-primary) !important;
+    background: var(--sg-primary-soft) !important;
+    border-radius: 6px !important;
+    font-weight: 600 !important;
+}
+
+/* ----- CENTER MENU (Undo / Redo) ----- */
+.nbd-mode-modern .nbd-main-bar .menu-center {
+    display: flex !important;
+    align-items: center !important;
+    gap: 2px !important;
+    flex-shrink: 0 !important;
+    list-style: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+.nbd-mode-modern .nbd-main-bar .menu-center .undo-redo {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 2px !important;
+    width: 48px !important;
+    min-height: 44px !important;
+    padding: 6px 4px !important;
+    border-radius: 6px !important;
+    cursor: pointer !important;
+    color: var(--sg-text-soft) !important;
+    background: transparent !important;
+    transition: background .12s, color .12s !important;
+}
+.nbd-mode-modern .nbd-main-bar .menu-center .undo-redo i {
+    font-size: 18px !important;
+    color: inherit !important;
+    line-height: 1 !important;
+}
+.nbd-mode-modern .nbd-main-bar .menu-center .undo-redo span {
+    font-size: 10px !important;
+    color: inherit !important;
+    line-height: 1 !important;
+}
+.nbd-mode-modern .nbd-main-bar .menu-center .undo-redo.in,
+.nbd-mode-modern .nbd-main-bar .menu-center .undo-redo:hover {
+    background: var(--sg-bg-soft) !important;
+    color: var(--sg-text) !important;
+}
+.nbd-mode-modern .nbd-main-bar .menu-center .undo-redo.nbd-disabled {
+    opacity: .35 !important;
+    cursor: not-allowed !important;
+    pointer-events: none !important;
+}
+
+/* ----- RIGHT MENU (title, actions, Process) ----- */
+.nbd-mode-modern .nbd-main-bar .menu-right {
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    flex-shrink: 0 !important;
+    margin-left: auto !important;
+    list-style: none !important;
+    padding: 0 !important;
+    margin-right: 0 !important;
+}
+
+/* Title input — hidden (redundant with side switcher in right panel) */
+.nbd-mode-modern .nbd-main-bar .item-title {
+    display: none !important;
+}
+.nbd-mode-modern .nbd-main-bar .item-title input.title {
+    background: var(--sg-bg-soft) !important;
+    border: 1px solid var(--sg-border) !important;
+    border-radius: 6px !important;
+    color: var(--sg-text) !important;
+    padding: 6px 12px !important;
+    font-size: 13px !important;
+    height: 36px !important;
+    width: 160px !important;
+    transition: border-color .15s !important;
+}
+.nbd-mode-modern .nbd-main-bar .item-title input.title:focus {
+    border-color: var(--sg-primary) !important;
+    outline: none !important;
+    box-shadow: 0 0 0 3px rgba(37,99,235,.12) !important;
+}
+
+/* Action icon buttons (share, 3D, change product) */
+.nbd-mode-modern .nbd-main-bar .main-menu-action,
+.nbd-mode-modern .nbd-main-bar .item-share {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    color: var(--sg-text-soft) !important;
+    padding: 6px !important;
+    border-radius: 6px !important;
+    cursor: pointer !important;
+    transition: background .12s, color .12s !important;
+}
+.nbd-mode-modern .nbd-main-bar .main-menu-action:hover,
+.nbd-mode-modern .nbd-main-bar .item-share:hover {
+    background: var(--sg-bg-soft) !important;
+    color: var(--sg-text) !important;
+}
+.nbd-mode-modern .nbd-main-bar .main-menu-action svg path,
+.nbd-mode-modern .nbd-main-bar .main-menu-action .nbd-svg-icon svg {
+    fill: currentColor !important;
+}
+
+/* PROCESS button — hidden (still in DOM so right-panel CTA can call scope.saveData()) */
+.nbd-mode-modern .nbd-main-bar .item-process {
+    display: none !important;
+}
+
+/* Login / My Account button (injected by JS) */
+.sg-login-btn {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    height: 36px !important;
+    padding: 0 14px !important;
+    border: 1.5px solid var(--sg-border) !important;
+    border-radius: var(--sg-radius) !important;
+    background: var(--sg-bg) !important;
+    color: var(--sg-text) !important;
+    font-size: 13px !important;
+    font-weight: 600 !important;
+    text-decoration: none !important;
+    white-space: nowrap !important;
+    flex-shrink: 0 !important;
+    transition: border-color .12s, background .12s !important;
+    cursor: pointer !important;
+}
+.sg-login-btn:hover {
+    border-color: var(--sg-primary) !important;
+    color: var(--sg-primary) !important;
+    background: var(--sg-primary-soft) !important;
+}
+.sg-login-btn svg {
+    width: 16px !important;
+    height: 16px !important;
+    flex-shrink: 0 !important;
+    stroke: currentColor !important;
+    fill: none !important;
+    pointer-events: none !important;
+}
+
+/* Logged-in user account pill (avatar + name) */
+.sg-account-pill {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 7px !important;
+    height: 34px !important;
+    padding: 0 12px 0 4px !important;
+    border: 1.5px solid var(--sg-border) !important;
+    border-radius: 999px !important;
+    background: var(--sg-bg) !important;
+    color: var(--sg-text) !important;
+    font-size: 13px !important;
+    font-weight: 500 !important;
+    text-decoration: none !important;
+    white-space: nowrap !important;
+    flex-shrink: 0 !important;
+    cursor: pointer !important;
+    transition: border-color .12s, background .12s !important;
+    max-width: 180px !important;
+}
+.sg-account-pill:hover {
+    border-color: var(--sg-primary) !important;
+    background: var(--sg-primary-soft) !important;
+    color: var(--sg-primary) !important;
+}
+.sg-account-avatar {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 26px !important;
+    height: 26px !important;
+    border-radius: 50% !important;
+    background: var(--sg-primary) !important;
+    color: #fff !important;
+    font-size: 11px !important;
+    font-weight: 700 !important;
+    flex-shrink: 0 !important;
+    letter-spacing: 0 !important;
+}
+.sg-account-name {
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    max-width: 120px !important;
+}
+
+/* WooCommerce cart icon button (injected by JS into .menu-right) */
+.sg-cart-btn {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    position: relative !important;
+    width: 44px !important;
+    height: 40px !important;
+    border-radius: var(--sg-radius) !important;
+    color: var(--sg-text-soft) !important;
+    text-decoration: none !important;
+    flex-shrink: 0 !important;
+    transition: background .12s, color .12s !important;
+}
+.sg-cart-btn:hover {
+    background: var(--sg-bg-soft) !important;
+    color: var(--sg-text) !important;
+}
+.sg-cart-btn svg {
+    width: 22px !important;
+    height: 22px !important;
+    display: block !important;
+    pointer-events: none !important;
+    stroke: currentColor !important;
+    fill: none !important;
+}
+/* Red count badge */
+.sg-cart-count {
+    position: absolute !important;
+    top: 3px !important;
+    right: 3px !important;
+    min-width: 16px !important;
+    height: 16px !important;
+    background: #ef4444 !important;
+    color: #fff !important;
+    border-radius: 8px !important;
+    font-size: 10px !important;
+    font-weight: 700 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 0 4px !important;
+    line-height: 1 !important;
+    pointer-events: none !important;
+    box-sizing: border-box !important;
+}
+
+/* ============================================================
+   PAGE LAYOUT — full viewport chain
+   ============================================================ */
+
+/* Ensure the ng-controller wrapper and design-container fill the viewport */
+.nbd-mode-modern,
+.nbd-mode-modern [ng-controller],
+.nbd-mode-modern #design-container {
+    width: 100% !important;
+    height: 100% !important;
+    overflow: hidden !important;
+}
+
+/* Bootstrap container-fluid padding reset inside the editor */
+.nbd-mode-modern .container-fluid {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    max-width: none !important;
+}
+
+/* ============================================================
+   PAGE LAYOUT — designer-controller > nbd-workspace
+   ============================================================ */
+.nbd-mode-modern #designer-controller {
+    display: flex !important;
+    flex-direction: column !important;
+    height: 100vh !important;
+    overflow: hidden !important;
+    background: var(--sg-bg-canvas) !important;
+}
+
+.nbd-mode-modern .nbd-workspace {
+    flex: 1 1 auto !important;
+    display: flex !important;
+    flex-direction: row !important;
+    overflow: hidden !important;
+    height: calc(100vh - var(--sg-topbar-h)) !important;
+    background: var(--sg-bg-canvas) !important;
+    margin-top: 0 !important;   /* modern.css hardcodes 54px for original topbar height — reset here */
+}
+
+/* ============================================================
+   SIDEBAR — .nbd-sidebar (wraps tab-nav + tab-content)
+   ============================================================ */
+.nbd-mode-modern .nbd-sidebar {
+    display: flex !important;
+    flex-direction: row !important;
+    flex: 0 0 auto !important;
+    /* Explicit width = icon-rail + content-panel — prevents grey gap if original CSS
+       sets a different sidebar width that doesn't match our children's widths */
+    width: calc(var(--sg-tabnav-w) + var(--sg-panel-w)) !important;
+    min-width: calc(var(--sg-tabnav-w) + var(--sg-panel-w)) !important;
+    max-width: calc(var(--sg-tabnav-w) + var(--sg-panel-w)) !important;
+    height: 100% !important;
+    overflow: hidden !important;
+    background: var(--sg-bg) !important;
+    border-right: none !important;
+    z-index: 10 !important;
+}
+
+/* ============================================================
+   TAB NAV — icon rail (64 px)
+   ============================================================ */
+.nbd-mode-modern .tabs-nav {
+    width: var(--sg-tabnav-w) !important;
+    min-width: var(--sg-tabnav-w) !important;
+    max-width: var(--sg-tabnav-w) !important;
+    background: var(--sg-bg) !important;
+    border-right: 1px solid var(--sg-border) !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    padding: 8px 0 !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    height: 100% !important;
+    scrollbar-width: none !important;
+}
+.nbd-mode-modern .tabs-nav::-webkit-scrollbar { display: none !important; }
+
+.nbd-mode-modern .tabs-nav .main-tabs {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    gap: 2px !important;
+    width: 100% !important;
+    padding: 0 6px !important;
+    list-style: none !important;
+    margin: 0 !important;
+}
+
+/* Hide the animated indicator element */
+.nbd-mode-modern .tabs-nav #selectedTab { display: none !important; }
+
+/* Individual tab items */
+.nbd-mode-modern .tabs-nav .main-tabs .tab {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 4px !important;
+    width: 52px !important;
+    min-height: 52px !important;
+    padding: 8px 4px !important;
+    border-radius: var(--sg-radius) !important;
+    cursor: pointer !important;
+    color: var(--sg-text-soft) !important;
+    background: transparent !important;
+    transition: background .15s, color .15s !important;
+    text-decoration: none !important;
+    position: relative !important;
+}
+.nbd-mode-modern .tabs-nav .main-tabs .tab:hover {
+    background: rgba(37,99,235,.07) !important;
+    color: var(--sg-primary) !important;
+}
+.nbd-mode-modern .tabs-nav .main-tabs .tab.active {
+    background: rgba(37,99,235,.12) !important;
+    color: var(--sg-primary) !important;
+}
+
+/* Tab icons */
+.nbd-mode-modern .tabs-nav .main-tabs .tab i[class*="icon-nbd"] {
+    font-size: 20px !important;
+    line-height: 1 !important;
+    color: inherit !important;
+}
+.nbd-mode-modern .tabs-nav .main-tabs .tab svg {
+    width: 22px !important;
+    height: 22px !important;
+    fill: currentColor !important;
+    flex-shrink: 0 !important;
+}
+
+/* Rename "Product" tab label → "Printing" without touching plugin PHP */
+.nbd-mode-modern .tabs-nav .main-tabs .tab .icon-nbd-package + span {
+    font-size: 0 !important;
+    line-height: 0 !important;
+}
+.nbd-mode-modern .tabs-nav .main-tabs .tab .icon-nbd-package + span::after {
+    content: 'Printing' !important;
+    font-size: 9px !important;
+    font-weight: 600 !important;
+    line-height: 1.2 !important;
+    display: block !important;
+    text-align: center !important;
+}
+
+/* Tab labels */
+.nbd-mode-modern .tabs-nav .main-tabs .tab > span {
+    font-size: 9px !important;
+    font-weight: 600 !important;
+    color: inherit !important;
+    text-align: center !important;
+    line-height: 1.2 !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    max-width: 54px !important;
+    text-transform: uppercase !important;
+    letter-spacing: .03em !important;
+}
+
+/* Hide the invisible end-tab spacer */
+.nbd-mode-modern .tabs-nav .main-tabs .tab-end {
+    display: none !important;
+}
+
+/* Bottom area of tab-nav */
+.nbd-mode-modern .tabs-nav .keyboard-shortcuts {
+    margin-top: auto !important;
+    padding: 8px !important;
+    color: var(--sg-text-muted) !important;
+    cursor: pointer !important;
+}
+.nbd-mode-modern .tabs-nav .keyboard-shortcuts:hover {
+    color: var(--sg-text-soft) !important;
+}
+.nbd-mode-modern .tabs-nav .nbd-sidebar-close {
+    display: none !important;
+}
+
+/* ============================================================
+   TAB CONTENT PANEL — 240 px
+   ============================================================ */
+.nbd-mode-modern .tabs-content {
+    width: var(--sg-panel-w) !important;
+    min-width: var(--sg-panel-w) !important;
+    max-width: var(--sg-panel-w) !important;
+    background: var(--sg-bg) !important;
+    border-right: 1px solid var(--sg-border) !important;
+    /* Only .tab-main.tab-scroll (below) scrolls. Keeping this container
+       scrollable too produced two visible scrollbars stacked at the
+       panel/canvas boundary. */
+    overflow: hidden !important;
+    height: 100% !important;
+}
+
+/* Tab panels: hide all, show active */
+.nbd-mode-modern .tabs-content > .tab {
+    display: none !important;
+    padding: 0 !important;
+    background: var(--sg-bg) !important;
+}
+.nbd-mode-modern .tabs-content > .tab.active {
+    display: flex !important;
+    flex-direction: column !important;
+    width: 100% !important;
+    min-height: 100% !important;
+    background: var(--sg-bg) !important;
+}
+
+/* Ensure all inner wrappers fill full panel width */
+.nbd-mode-modern .tabs-content .tab-main,
+.nbd-mode-modern .tabs-content .tab-scroll,
+.nbd-mode-modern .tabs-content .tab-content-inner {
+    width: 100% !important;
+    background: var(--sg-bg) !important;
+}
+
+/* Panel scroll wrapper — this element carries PerfectScrollbar's own
+   classes (.ps.ps--theme_default.ps--active-y) and draws its own custom
+   rail/thumb (.ps__scrollbar-y) that fades in on hover. Hide the native
+   browser scrollbar here so it isn't shown *in addition to* PS's rail. */
+.nbd-mode-modern .tabs-content .tab-main.tab-scroll {
+    height: 100% !important;
+    flex: 1 1 auto !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    scrollbar-width: none !important;
+    -ms-overflow-style: none !important;
+}
+.nbd-mode-modern .tabs-content .tab-main.tab-scroll::-webkit-scrollbar {
+    display: none !important;
+    width: 0 !important;
+    height: 0 !important;
+}
+
+/* Any leftover grey backgrounds from original plugin within the panel */
+.nbd-mode-modern .nbd-sidebar *,
+.nbd-mode-modern .tabs-content * {
+    box-sizing: border-box !important;
+}
+
+/* ============================================================
+   FIX: Angular ngAnimate stacks items with position:absolute
+   and collapses containers to a fixed height.
+   Affects ALL tabs: Text (li), Photos (div.item), Elements (div.item), Cliparts, Layers.
+   CSS !important overrides inline styles set by Angular's $animate.
+   JS ($animate.enabled(sidebar, false)) prevents re-application on tab switch.
+   ============================================================ */
+
+/* Kill the slideInDown / animate200 / animate600 / animate700 animations everywhere in the panel */
+.nbd-mode-modern .tabs-content .animated,
+.nbd-mode-modern .tabs-content .slideInDown,
+.nbd-mode-modern .tabs-content [class*="animate2"],
+.nbd-mode-modern .tabs-content [class*="animate4"],
+.nbd-mode-modern .tabs-content [class*="animate6"],
+.nbd-mode-modern .tabs-content [class*="animate7"] {
+    animation: none !important;
+    -webkit-animation: none !important;
+    animation-duration: 0s !important;
+    -webkit-animation-duration: 0s !important;
+    transition: none !important;
+    opacity: 1 !important;
+}
+
+/* Fix collapsed list containers (ul with height:0) */
+.nbd-mode-modern .tabs-content ul,
+.nbd-mode-modern .tabs-content ol {
+    height: auto !important;
+    min-height: 0 !important;
+}
+
+/* Fix items in li-based panels (Text/Typography tab) */
+.nbd-mode-modern .tabs-content li {
+    position: relative !important;
+    left: auto !important;
+    top: auto !important;
+    right: auto !important;
+    bottom: auto !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+}
+
+/* Fix collapsed div containers (Photos/Elements use div.main-items with height:40px) */
+.nbd-mode-modern .tabs-content .nbd-items-dropdown,
+.nbd-mode-modern .tabs-content .main-items,
+.nbd-mode-modern .tabs-content .items {
+    height: auto !important;
+    min-height: 0 !important;
+    position: static !important;
+    overflow: visible !important;
+}
+
+/* Fix div.item.ng-scope in Photos/Elements/Cliparts tabs (Angular sets position:absolute left:0 top:0) */
+.nbd-mode-modern .tabs-content .item,
+.nbd-mode-modern .tabs-content .nbd-items-dropdown .item,
+.nbd-mode-modern .tabs-content div[class*="item"].ng-scope {
+    position: relative !important;
+    left: auto !important;
+    top: auto !important;
+    right: auto !important;
+    bottom: auto !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+}
+
+/* Items container — flex wrap so items flow naturally */
+.nbd-mode-modern .tabs-content .items {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 4px !important;
+    padding: 4px !important;
+}
+
+/* Elements + Photos tab — .item nav cards fill exactly 2 columns */
+.nbd-mode-modern #tab-element .items .item,
+.nbd-mode-modern #tab-photo .items .item {
+    flex: 0 0 calc(50% - 2px) !important;
+    width: calc(50% - 2px) !important;
+    box-sizing: border-box !important;
+}
+
+/* When the last nav item is alone in the left column (odd total count),
+   span it full-width to eliminate the empty right cell */
+.nbd-mode-modern #tab-element .items .item:last-child:nth-child(odd),
+.nbd-mode-modern #tab-photo .items .item:last-child:nth-child(odd) {
+    flex: 0 0 100% !important;
+    width: 100% !important;
+}
+
+/* Nav item cards — default state: subtle border + shadow so they're
+   visible against the white panel background */
+.nbd-mode-modern #tab-element .items .item .main-item,
+.nbd-mode-modern #tab-photo .items .item .main-item {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 16px 8px 12px !important;
+    border-radius: var(--sg-radius) !important;
+    border: 1px solid var(--sg-border) !important;
+    background: var(--sg-bg) !important;
+    box-shadow: var(--sg-shadow-sm) !important;
+    cursor: pointer !important;
+    transition: border-color .15s, box-shadow .15s, background .15s !important;
+    text-align: center !important;
+    gap: 6px !important;
+}
+.nbd-mode-modern #tab-element .items .item:hover .main-item,
+.nbd-mode-modern #tab-photo .items .item:hover .main-item {
+    border-color: var(--sg-primary) !important;
+    box-shadow: 0 2px 8px rgba(37,99,235,.14) !important;
+    background: var(--sg-primary-soft) !important;
+}
+
+/* Icon area */
+.nbd-mode-modern #tab-element .items .item .item-icon,
+.nbd-mode-modern #tab-photo .items .item .item-icon {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 48px !important;
+    height: 48px !important;
+    font-size: 28px !important;
+    color: var(--sg-text-soft) !important;
+}
+.nbd-mode-modern #tab-element .items .item:hover .item-icon,
+.nbd-mode-modern #tab-photo .items .item:hover .item-icon {
+    color: var(--sg-primary) !important;
+}
+
+/* SVG icons inside item-icon (Grid Frame, Photo Frame, etc.) have hardcoded
+   width="24" height="24" attributes — override to match font-icon size */
+.nbd-mode-modern #tab-element .items .item .item-icon svg,
+.nbd-mode-modern #tab-photo .items .item .item-icon svg {
+    width: 36px !important;
+    height: 36px !important;
+    display: block !important;
+    flex-shrink: 0 !important;
+}
+/* i.icon-vcard wrapper that holds those SVGs */
+.nbd-mode-modern #tab-element .items .item .item-icon .icon-vcard,
+.nbd-mode-modern #tab-photo .items .item .item-icon .icon-vcard {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-size: 0 !important;   /* suppress any text node gap */
+}
+
+/* Label */
+.nbd-mode-modern #tab-element .items .item .item-name,
+.nbd-mode-modern #tab-photo .items .item .item-name {
+    font-size: 11px !important;
+    font-weight: 600 !important;
+    color: var(--sg-text-soft) !important;
+    line-height: 1.3 !important;
+    word-break: break-word !important;
+}
+.nbd-mode-modern #tab-element .items .item:hover .item-name,
+.nbd-mode-modern #tab-photo .items .item:hover .item-name {
+    color: var(--sg-primary) !important;
+}
+
+/* ============================================================
+   CLIPARTS TAB — 2-column grid
+   Cliparts use div.clipart-wrap > div.clipart-item (NOT .items/.item)
+   so need their own flex grid rules.
+   ============================================================ */
+.nbd-mode-modern #tab-svg .clipart-wrap {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 4px !important;
+    padding: 4px !important;
+    height: auto !important;
+}
+.nbd-mode-modern #tab-svg .clipart-item {
+    flex: 0 0 calc(50% - 2px) !important;
+    width: calc(50% - 2px) !important;
+    position: relative !important;
+    left: auto !important;
+    top: auto !important;
+    opacity: 1 !important;
+    overflow: hidden !important;
+    border-radius: 6px !important;
+    cursor: pointer !important;
+    background: var(--sg-bg-soft) !important;
+}
+.nbd-mode-modern #tab-svg .clipart-item img {
+    width: 100% !important;
+    height: auto !important;
+    display: block !important;
+    object-fit: contain !important;
+    padding: 6px !important;
+}
+
+/* TEXT TAB — heading quick-add buttons */
+.nbd-mode-modern #tab-typography .typography-head {
+    padding: 14px 12px 10px !important;
+}
+.nbd-mode-modern #tab-typography .text-guide {
+    display: block !important;
+    font-size: 10px !important;
+    font-weight: 600 !important;
+    color: var(--sg-text-soft) !important;
+    text-transform: uppercase !important;
+    letter-spacing: .06em !important;
+    margin-bottom: 10px !important;
+}
+.nbd-mode-modern #tab-typography .head-main {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 4px !important;
+}
+/* Each quick-add button styled as a compact clickable row */
+.nbd-mode-modern #tab-typography .head-main span {
+    display: block !important;
+    width: 100% !important;
+    padding: 8px 10px !important;
+    border-radius: 6px !important;
+    cursor: pointer !important;
+    color: var(--sg-text) !important;
+    background: var(--sg-bg-soft) !important;
+    border: 1px solid transparent !important;
+    transition: border-color .15s, background .15s !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    line-height: 1.3 !important;
+}
+.nbd-mode-modern #tab-typography .head-main span:hover {
+    border-color: var(--sg-primary) !important;
+    background: rgba(37,99,235,.05) !important;
+    color: var(--sg-primary) !important;
+}
+.nbd-mode-modern #tab-typography .text-heading {
+    font-size: 18px !important;
+    font-weight: 700 !important;
+}
+.nbd-mode-modern #tab-typography .text-sub-heading {
+    font-size: 13px !important;
+    font-weight: 600 !important;
+}
+.nbd-mode-modern #tab-typography .text-body {
+    font-size: 12px !important;
+    font-weight: 400 !important;
+}
+.nbd-mode-modern #tab-typography .seperate {
+    border: none !important;
+    border-top: 1px solid var(--sg-border) !important;
+    margin: 10px 0 !important;
+}
+
+/* Typography panel — two-column grid of font template thumbnails */
+.nbd-mode-modern .tabs-content .typography-body {
+    display: block !important;
+    width: 100% !important;
+}
+.nbd-mode-modern .tabs-content ul.typography-items {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    height: auto !important;
+    position: static !important;
+    list-style: none !important;
+    padding: 4px !important;
+    margin: 0 !important;
+    gap: 4px !important;
+}
+.nbd-mode-modern .tabs-content ul.typography-items li.typography-item {
+    position: relative !important;
+    left: auto !important;
+    top: auto !important;
+    width: calc(50% - 2px) !important;
+    flex: 0 0 calc(50% - 2px) !important;
+    opacity: 1 !important;
+    border-radius: 6px !important;
+    overflow: hidden !important;
+    background: var(--sg-bg-soft) !important;
+    border: 1px solid var(--sg-border) !important;
+    cursor: pointer !important;
+}
+.nbd-mode-modern .tabs-content ul.typography-items li.typography-item img {
+    width: 100% !important;
+    height: auto !important;
+    display: block !important;
+    object-fit: contain !important;
+}
+.nbd-mode-modern .tabs-content ul.typography-items li.typography-item:hover {
+    border-color: var(--sg-primary) !important;
+}
+
+/* ============================================================
+   MAIN CANVAS AREA — .main (inside .nbd-workspace)
+   modern.css gốc có: left:420px; width:calc(100vw-420px); position:relative
+   Cần override để tránh .main shift đè lên summary panel.
+   flex-basis:0% + width:auto + left:0 là fix đúng.
+   ============================================================ */
+.nbd-mode-modern .nbd-workspace .main {
+    flex: 1 1 0% !important;        /* basis=0 → flex-grow fills remaining space */
+    width: auto !important;         /* override calc(100vw - 420px) from modern.css */
+    left: 0 !important;             /* override left:420px that shifts .main over summary */
+    padding-top: var(--sg-toolbar-h) !important;
+    top: auto !important;
+    /* Dot-grid canvas background — matches printcart mockup:
+       light neutral base + subtle 1px grid lines every 24px */
+    background-color: #f0f1f2 !important;
+    background-image:
+        linear-gradient(rgba(0,0,0,.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,0,0,.05) 1px, transparent 1px) !important;
+    background-size: 24px 24px !important;
+    background-position: 0 0 !important;
+    overflow: hidden !important;
+    display: flex !important;
+    flex-direction: column !important;
+    position: relative !important;
+    min-width: 0 !important;
+    height: 100% !important;
+}
+
+/* Canvas stage — scrollable host; .stage is centered by JS (override.js centerCanvas).
+   JS measures availableW/H vs canvasW/H and sets exact inline padding (with !important)
+   so the canvas always has ≥30 px breathing room on every side.
+   KEY: .stage has class "ps ps--active-y" — PerfectScrollbar sets overflow:hidden on it.
+   We override that with overflow:visible so the stage can grow and .nbd-stages scrolls. */
+.nbd-mode-modern .nbd-stages {
+    flex: 1 1 0% !important;
+    min-height: 0 !important;
+    scrollbar-width: thin !important;
+    scrollbar-color: #d1d5db transparent !important;
+}
+.nbd-mode-modern .nbd-stages::-webkit-scrollbar { width: 6px; height: 6px; }
+.nbd-mode-modern .nbd-stages::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 3px; }
+/* .stages-inner is a flex column container for VERTICAL centering of the active .stage.
+   height:100% gives a definite height so margin:auto on .stage resolves correctly.
+   Horizontal centering is handled by JS (margin-left on .stage-main-wrap).
+   Hidden and leaving stages are positioned absolutely (out of flow) so only the
+   entering/active stage participates in the flex layout. */
+.nbd-mode-modern .stages-inner {
+    display: flex !important;
+    flex-direction: column !important;
+    height: 100% !important;               /* definite height so margin:auto resolves */
+    position: relative !important;           /* positioning context for out-of-flow stages */
+    box-sizing: border-box !important;
+}
+.nbd-mode-modern .nbd-stages .stage {
+    /* Original plugin: position:absolute; top:0; left:0; width:100%
+       Override: put the active stage back in flex flow for CSS vertical centering. */
+    position: relative !important;
+    top: auto !important;
+    left: auto !important;
+    width: 100% !important;                /* full width so JS margin-left on wrap works */
+    padding: 16px 32px !important;
+    min-height: 0 !important;
+    height: auto !important;
+    margin-top: auto !important;           /* flex auto margins = vertical centering */
+    margin-bottom: auto !important;
+    flex-shrink: 0 !important;
+    box-sizing: border-box !important;
+    display: block !important;
+    overflow: visible !important;
+}
+/* Hidden stages (_nbd_hidden = static resting state of non-active sides):
+   original plugin CSS keeps these in flow with transform:translate3d(0,-100%,0)
+   which still occupies layout height and pushes the active canvas upward.
+   Fix: position:absolute + zero size removes them from flex flow entirely. */
+.nbd-mode-modern .nbd-stages .stage._nbd_hidden {
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 0 !important;
+    height: 0 !important;
+    min-height: 0 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    overflow: hidden !important;
+    pointer-events: none !important;
+    z-index: 0 !important;
+}
+/* Leaving stage during animation: same out-of-flow treatment so the
+   fadeOut animation plays visually while not affecting flex layout. */
+.nbd-mode-modern .nbd-stages .stage.fadeOutDown,
+.nbd-mode-modern .nbd-stages .stage.fadeOutUp {
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    min-height: 0 !important;
+    margin: 0 !important;
+    pointer-events: none !important;
+    z-index: 0 !important;
+}
+/* Hide PS scrollbar rails (PS controls .stage but we override overflow) */
+.nbd-mode-modern .nbd-stages .stage > .ps__rail-x,
+.nbd-mode-modern .nbd-stages .stage > .ps__rail-y { display: none !important; }
+
+.nbd-mode-modern .nbd-stages .stage > .ps__scrollbar-x-rail,
+.nbd-mode-modern .nbd-stages .stage > .ps__scrollbar-y-rail {
+    display: none !important;
+}
+
+
+
+.nbd-mode-modern .nbd-stages .stage .stage-main-wrap {
+    /* inline-block shrinks to canvas width → text-align:center on parent centres it.
+       text-align:left restores normal text flow inside the canvas. */
+    display: inline-block !important;
+    vertical-align: top !important;
+    text-align: left !important;
+}
+
+/* ============================================================
+   CONTEXTUAL TOOLBAR — fixed bar below topbar, full viewport width.
+   .main gets padding-top:var(--sg-toolbar-h) so canvas isn't hidden under it.
+   ============================================================ */
+.nbd-mode-modern .nbd-toolbar {
+    position: fixed !important;
+    top: var(--sg-topbar-h) !important;
+    left: calc(var(--sg-tabnav-w) + var(--sg-panel-w)) !important;
+    right: 0 !important;
+    z-index: 100 !important;
+    min-height: var(--sg-toolbar-h) !important;
+    padding: 0 16px !important;
+    display: flex !important;
+    align-items: center !important;
+    background: var(--sg-bg) !important;
+    border-bottom: 1px solid var(--sg-border) !important;
+    box-shadow: 0 1px 0 rgba(0,0,0,.06) !important;
+}
+/* Ensure toolbar children don't wrap and are vertically centred */
+.nbd-mode-modern .nbd-toolbar > * {
+    flex-shrink: 0 !important;
+}
+.nbd-mode-modern .nbd-toolbar .menu-item {
+    color: var(--sg-text-soft) !important;
+}
+.nbd-mode-modern .nbd-toolbar .menu-item i {
+    color: var(--sg-text-soft) !important;
+}
+.nbd-mode-modern .nbd-toolbar .menu-item.active,
+.nbd-mode-modern .nbd-toolbar .menu-item:hover {
+    background: var(--sg-bg-soft) !important;
+    color: var(--sg-text) !important;
+}
+.nbd-mode-modern .nbd-toolbar .menu-item.active i,
+.nbd-mode-modern .nbd-toolbar .menu-item:hover i {
+    color: var(--sg-text) !important;
+}
+/* Toolbar separator */
+.nbd-mode-modern .nbd-toolbar .nbd-toolbar-separator {
+    background: var(--sg-border) !important;
+}
+/* Toolbar inputs */
+.nbd-mode-modern .nbd-toolbar input[type="text"],
+.nbd-mode-modern .nbd-toolbar input[type="number"] {
+    background: var(--sg-bg-soft) !important;
+    border: 1px solid var(--sg-border) !important;
+    border-radius: 4px !important;
+    color: var(--sg-text) !important;
+    padding: 3px 8px !important;
+}
+.nbd-mode-modern .nbd-toolbar select {
+    background: var(--sg-bg-soft) !important;
+    border: 1px solid var(--sg-border) !important;
+    border-radius: 4px !important;
+    color: var(--sg-text) !important;
+    padding: 3px 8px !important;
+}
+/* Font size / family displays */
+.nbd-mode-modern .nbd-toolbar .nbd-font-preview {
+    color: var(--sg-text) !important;
+    border-bottom: 1px solid var(--sg-border) !important;
+}
+
+/* ============================================================
+   ZOOM TOOLBAR
+   ============================================================ */
+.nbd-mode-modern .nbd-toolbar-zoom .zoomer-toolbar {
+    background: var(--sg-bg) !important;
+    border: 1px solid var(--sg-border) !important;
+    border-radius: var(--sg-radius) !important;
+    box-shadow: var(--sg-shadow-sm) !important;
+}
+.nbd-mode-modern .nbd-toolbar-zoom .menu-item {
+    color: var(--sg-text-soft) !important;
+}
+.nbd-mode-modern .nbd-toolbar-zoom .menu-item:hover {
+    color: var(--sg-text) !important;
+}
+
+/* ============================================================
+   STAGE NAV (page switcher at bottom of canvas)
+   The original plugin hides the nav via bottom:-40px, relying on the
+   parent's overflow:hidden to clip it.  We changed the parent to
+   overflow:auto, which now exposes it.  Fix: keep bottom:0 (no extra
+   scroll area) and use transform to slide it down instead.
+   ============================================================ */
+/* Bottom "Side 1" nav bar — redundant with the right-side page switcher, hide entirely */
+.nbd-mode-modern .nbd-stages-nav {
+    display: none !important;
+}
+
+/* Page toolbar inside stage — transparent so it blends into the canvas background */
+.nbd-mode-modern .page-toolbar {
+    background: transparent !important;
+    box-shadow: none !important;
+    border: none !important;
+    border-radius: 6px !important;
+}
+.nbd-mode-modern .page-toolbar li {
+    color: var(--sg-text-soft) !important;
+}
+.nbd-mode-modern .page-toolbar li:hover {
+    color: var(--sg-primary) !important;
+    background: rgba(37,99,235,.08) !important;
+    border-radius: 4px !important;
+}
+
+/* Guidelines notice */
+.nbd-mode-modern .nbd-guidelines-notice {
+    background: transparent !important;
+}
+.nbd-mode-modern .nbd-guideline-bleedline,
+.nbd-mode-modern .nbd-guideline-safezone {
+    background: rgba(255,255,255,.9) !important;
+    border: 1px solid var(--sg-border) !important;
+    color: var(--sg-text-soft) !important;
+    border-radius: 4px !important;
+}
+
+/* ============================================================
+   PRODUCT OPTIONS in #nbo-options-wrap
+   Options are rendered by Angular from the NBO option builder.
+   HTML classes: .nbd-option-field, .nbd-field-radio-wrap,
+                 .nbd-field-header label, .nbd-radio, .nbd-group-wrap etc.
+   ============================================================ */
+.nbd-mode-modern #nbo-options-wrap {
+    padding: 0 !important;
+    background: var(--sg-bg) !important;
+}
+
+/* Loading spinner area */
+.nbd-mode-modern .nbd-products .loaded {
+    color: var(--sg-text-muted) !important;
+}
+
+/* Group containers */
+.nbd-mode-modern #nbo-options-wrap .nbo-group-wrap {
+    background: var(--sg-bg) !important;
+    border: 1px solid var(--sg-border) !important;
+    border-radius: var(--sg-radius) !important;
+    margin-bottom: 12px !important;
+    overflow: hidden !important;
+}
+.nbd-mode-modern #nbo-options-wrap .nbo-group-header {
+    background: var(--sg-bg-soft) !important;
+    padding: 10px 14px !important;
+    border-bottom: 1px solid var(--sg-border) !important;
+}
+.nbd-mode-modern #nbo-options-wrap .nbo-group-header .group-title {
+    font-size: 12px !important;
+    font-weight: 700 !important;
+    color: var(--sg-text) !important;
+    text-transform: uppercase !important;
+    letter-spacing: .04em !important;
+}
+.nbd-mode-modern #nbo-options-wrap .nbo-group-body {
+    padding: 12px !important;
+}
+
+/* Individual option field */
+.nbd-mode-modern #nbo-options-wrap .nbd-option-field {
+    margin-bottom: 14px !important;
+}
+.nbd-mode-modern #nbo-options-wrap .nbd-field-header {
+    margin-bottom: 8px !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+}
+.nbd-mode-modern #nbo-options-wrap .nbd-field-header label {
+    display: block !important;
+    font-size: 11px !important;
+    font-weight: 700 !important;
+    color: var(--sg-text-soft) !important;
+    text-transform: uppercase !important;
+    letter-spacing: .05em !important;
+    margin-bottom: 0 !important;
+}
+.nbd-mode-modern #nbo-options-wrap .nbd-required {
+    color: #ef4444 !important;
+}
+
+/* Radio button container */
+.nbd-mode-modern #nbo-options-wrap .nbd-radio.__nbd-radio-wrap {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 6px !important;
+}
+
+/* Hide the actual radio/checkbox inputs visually */
+.nbd-mode-modern #nbo-options-wrap input[type="radio"],
+.nbd-mode-modern #nbo-options-wrap input[type="checkbox"] {
+    position: absolute !important;
+    opacity: 0 !important;
+    width: 1px !important;
+    height: 1px !important;
+    pointer-events: none !important;
+}
+
+/* Style the labels as option cards */
+.nbd-mode-modern #nbo-options-wrap .nbd-radio label,
+.nbd-mode-modern #nbo-options-wrap .nbd-field-content label {
+    display: flex !important;
+    align-items: flex-start !important;  /* top-align when text wraps to 2 lines */
+    gap: 8px !important;
+    padding: 8px 12px !important;
+    border: 1.5px solid var(--sg-border) !important;
+    border-radius: 7px !important;
+    cursor: pointer !important;
+    font-size: 12px !important;
+    font-weight: 500 !important;
+    line-height: 1.4 !important;
+    color: var(--sg-text) !important;
+    background: var(--sg-bg) !important;
+    transition: border-color .15s, background .15s !important;
+    user-select: none !important;
+    text-transform: none !important;
+    letter-spacing: 0 !important;
+    white-space: normal !important;     /* allow text to wrap */
+    word-break: break-word !important;
+    height: auto !important;
+    min-height: 36px !important;
+    overflow: visible !important;
+}
+.nbd-mode-modern #nbo-options-wrap .nbd-radio label:hover,
+.nbd-mode-modern #nbo-options-wrap .nbd-field-content label:hover {
+    border-color: var(--sg-primary) !important;
+    background: rgba(37,99,235,.04) !important;
+}
+
+/* Checked state — Angular adds class OR input:checked companion */
+.nbd-mode-modern #nbo-options-wrap input[type="radio"]:checked + label,
+.nbd-mode-modern #nbo-options-wrap input[type="checkbox"]:checked + label,
+.nbd-mode-modern #nbo-options-wrap .nbd-radio label.selected,
+.nbd-mode-modern #nbo-options-wrap .nbd-radio label.active {
+    border-color: var(--sg-primary) !important;
+    background: rgba(37,99,235,.08) !important;
+    color: var(--sg-primary) !important;
+    font-weight: 600 !important;
+}
+
+/* Price badge inside option label */
+.nbd-mode-modern #nbo-options-wrap .nbo-price,
+.nbd-mode-modern #nbo-options-wrap .nbo-option-price,
+.nbd-mode-modern #nbo-options-wrap label .price {
+    margin-left: auto !important;
+    font-size: 11px !important;
+    color: var(--sg-text-soft) !important;
+    font-weight: 400 !important;
+    flex-shrink: 0 !important;
+}
+
+/* Select / dropdown fields */
+.nbd-mode-modern #nbo-options-wrap select {
+    width: 100% !important;
+    background: var(--sg-bg) !important;
+    border: 1.5px solid var(--sg-border) !important;
+    border-radius: 7px !important;
+    color: var(--sg-text) !important;
+    padding: 8px 12px !important;
+    font-size: 13px !important;
+    cursor: pointer !important;
+    transition: border-color .15s !important;
+}
+.nbd-mode-modern #nbo-options-wrap select:focus {
+    border-color: var(--sg-primary) !important;
+    outline: none !important;
+}
+
+/* Text / textarea inputs */
+.nbd-mode-modern #nbo-options-wrap input[type="text"],
+.nbd-mode-modern #nbo-options-wrap textarea {
+    width: 100% !important;
+    background: var(--sg-bg) !important;
+    border: 1.5px solid var(--sg-border) !important;
+    border-radius: 7px !important;
+    color: var(--sg-text) !important;
+    padding: 8px 12px !important;
+    font-size: 13px !important;
+    transition: border-color .15s !important;
+    box-sizing: border-box !important;
+}
+.nbd-mode-modern #nbo-options-wrap input[type="text"]:focus,
+.nbd-mode-modern #nbo-options-wrap textarea:focus {
+    border-color: var(--sg-primary) !important;
+    outline: none !important;
+}
+
+/* ============================================================
+   CUSTOM SIZE (DIMENSION) FIELD — WIDTH/HEIGHT STEPPER
+   Core (options-builder/input-2.php) renders this as plain unstyled
+   inline-block <span>s + <br>s inside the field's <td> — the one field
+   type left unstyled next to the polished option-card list around it.
+   Its "Width"/"Height" <label> elements also unintentionally inherited
+   the option-card look above (border/padding/min-height meant for
+   radio choices), since ".nbd-field-content label" matches them too.
+
+   Tried pure CSS first (:has() to scope a flex layout onto the existing
+   markup) across several rounds — kept producing a crooked, staircase-like
+   result live (Width/Height blocks landing at different, cascading Y
+   positions instead of a clean row) that never fully resolved and got
+   worse with each nudge. override.js (restyleDimensionField) now
+   physically moves the Width span, Height span, and shared unit span into
+   one new wrapper div (.sg-dimension-row) once, at init — a real flex
+   container we fully control, instead of coercing core's ad-hoc inline
+   spans + <br>s via selector tricks. The min/max hint <small>s and the
+   invalid-notice span are left where they are (still direct children of
+   the field's <td>), which is why they don't need any special flex-basis
+   handling below — they just fall on their own line under the row.
+   ============================================================ */
+.nbd-mode-modern #nbo-options-wrap .sg-dimension-row {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    align-items: flex-end !important;
+    gap: 10px !important;
+    margin-bottom: 6px !important;
+}
+.nbd-mode-modern #nbo-options-wrap .sg-dimension-row > span[style*="inline-block"] {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 4px !important;
+    margin-bottom: 0 !important;
+}
+/* Extra ".nbd-field-content" + "label" here on purpose: the option-card
+   rule above (".nbd-field-content label") this needs to override has the
+   same ancestor + one extra type selector, so matching that shape exactly
+   is what makes THIS rule win regardless of source order — a plain
+   ".nbo-dimension-label" selector is LESS specific and silently loses
+   (confirmed live: the reset never took effect without this). */
+.nbd-mode-modern #nbo-options-wrap .nbd-field-content label.nbo-dimension-label {
+    display: block !important;
+    padding: 0 !important;
+    border: 0 !important;
+    min-height: 0 !important;
+    background: transparent !important;
+    font-size: 11px !important;
+    font-weight: 700 !important;
+    color: var(--sg-text-soft) !important;
+    text-transform: uppercase !important;
+    letter-spacing: .05em !important;
+    cursor: default !important;
+}
+.nbd-mode-modern #nbo-options-wrap .nbo-dimension-wrap {
+    display: flex !important;
+    align-items: stretch !important;
+    border: 1.5px solid var(--sg-border) !important;
+    border-radius: 7px !important;
+    overflow: hidden !important;
+    background: var(--sg-bg) !important;
+    width: fit-content !important;
+    box-sizing: border-box !important;
+}
+.nbd-mode-modern #nbo-options-wrap .nbo-updown-dimension {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 24px !important;
+    flex-shrink: 0 !important;
+    font-size: 14px !important;
+    font-weight: 600 !important;
+    color: var(--sg-text-soft) !important;
+    background: var(--sg-bg-soft) !important;
+    cursor: pointer !important;
+    user-select: none !important;
+    box-sizing: border-box !important;
+    padding: 5px 0 !important;
+    transition: background .12s, color .12s !important;
+}
+.nbd-mode-modern #nbo-options-wrap .nbo-updown-dimension:hover {
+    background: var(--sg-primary) !important;
+    color: #fff !important;
+}
+.nbd-mode-modern #nbo-options-wrap .nbo-dimension {
+    width: 44px !important;
+    border: 0 !important;
+    border-left: 1px solid var(--sg-border) !important;
+    border-right: 1px solid var(--sg-border) !important;
+    text-align: center !important;
+    font-size: 12px !important;
+    font-weight: 600 !important;
+    color: var(--sg-text) !important;
+    background: var(--sg-bg) !important;
+    padding: 5px 2px !important;
+    box-sizing: border-box !important;
+}
+.nbd-mode-modern #nbo-options-wrap .nbo-dimension:focus {
+    outline: none !important;
+}
+.nbd-mode-modern #nbo-options-wrap .nbo-dimension::-webkit-outer-spin-button,
+.nbd-mode-modern #nbo-options-wrap .nbo-dimension::-webkit-inner-spin-button {
+    -webkit-appearance: none !important;
+    margin: 0 !important;
+}
+.nbd-mode-modern #nbo-options-wrap .nbo-dimension-width {
+    display: block !important;
+    font-size: 11px !important;
+    color: var(--sg-text-muted) !important;
+    font-style: normal !important;
+}
+/* The shared unit label ("in"/"cm") — confirmed live it actually carries
+   class "nbo-dimension-unit" (template source read earlier suggested a
+   class-less span; this site's build differs). Targeting the real class
+   directly instead of a sibling-adjacency guess. */
+.nbd-mode-modern #nbo-options-wrap .nbo-dimension-unit {
+    font-size: 12px !important;
+    color: var(--sg-text-soft) !important;
+}
+.nbd-mode-modern #nbo-options-wrap .nbd-field-content .nbd-invalid-notice {
+    font-size: 11px !important;
+}
+
+/* Invalid option warning */
+.nbd-mode-modern #nbo-options-wrap .nbo-invalid-option {
+    color: #ef4444 !important;
+    font-size: 12px !important;
+    margin-top: 4px !important;
+}
+
+/* Hide NBO's own "Total Price" widget — we show the price in the right summary panel */
+.nbd-mode-modern .cui-pre-field {
+    display: none !important;
+}
+
+/* Hide the core "Apply options" / "Clear selection" buttons at the
+   bottom of the Printing options panel — redundant with the "Add to
+   Cart" flow (option-builder.php's .nbo-clear-option-wrap). */
+.nbd-mode-modern #nbo-options-wrap .nbo-clear-option-wrap {
+    display: none !important;
+}
+
+/* Hide NBO's own "Total Price" widget — we show the price in the right summary panel */
+.nbd-mode-modern .cui-pre-field {
+    display: none !important;
+}
+
+/* Total price area */
+.nbd-mode-modern #nbo-options-wrap .nbo-total-price-wrap,
+.nbd-mode-modern #nbo-options-wrap .nbo-total-price {
+    background: var(--sg-bg-soft) !important;
+    border: 1px solid var(--sg-border) !important;
+    border-radius: var(--sg-radius) !important;
+    padding: 12px !important;
+    margin-top: 16px !important;
+    font-size: 14px !important;
+    font-weight: 700 !important;
+    color: var(--sg-text) !important;
+}
+
+/* ============================================================
+   LAYERS TAB
+   ============================================================ */
+.nbd-mode-modern #tab-layer .menu-layer {
+    list-style: none !important;
+    padding: 8px !important;
+    margin: 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 3px !important;
+}
+.nbd-mode-modern #tab-layer li.item-layer-text {
+    border: 1px solid var(--sg-border) !important;
+    border-radius: 8px !important;
+    background: var(--sg-bg) !important;
+    cursor: pointer !important;
+    transition: border-color .15s, background .15s !important;
+    overflow: hidden !important;
+}
+.nbd-mode-modern #tab-layer li.item-layer-text:hover {
+    border-color: var(--sg-primary) !important;
+    background: rgba(37,99,235,.04) !important;
+}
+.nbd-mode-modern #tab-layer li.item-layer-text.active {
+    border-color: var(--sg-primary) !important;
+    background: rgba(37,99,235,.06) !important;
+}
+.nbd-mode-modern #tab-layer .item-layer-inner {
+    display: flex !important;
+    align-items: center !important;
+    padding: 8px 10px !important;
+    gap: 8px !important;
+    min-height: 38px !important;
+}
+.nbd-mode-modern #tab-layer .item-layer-inner .item-left {
+    font-size: 14px !important;
+    color: var(--sg-text-soft) !important;
+    flex-shrink: 0 !important;
+}
+/* Layer thumbnail image */
+.nbd-mode-modern #tab-layer .item-layer-inner > img {
+    width: 28px !important;
+    height: 28px !important;
+    object-fit: cover !important;
+    border-radius: 4px !important;
+    flex-shrink: 0 !important;
+}
+/* Layer name input */
+.nbd-mode-modern #tab-layer .item-center { flex: 1 !important; min-width: 0 !important; }
+.nbd-mode-modern #tab-layer .item-layer-inner .text-layer input,
+.nbd-mode-modern #tab-layer .item-layer-inner input[type="text"] {
+    width: 100% !important;
+    border: none !important;
+    background: transparent !important;
+    font-size: 12px !important;
+    font-weight: 500 !important;
+    color: var(--sg-text) !important;
+    padding: 0 !important;
+    outline: none !important;
+    cursor: default !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+}
+.nbd-mode-modern #tab-layer li.active .item-layer-inner input[type="text"] { cursor: text !important; }
+/* Action icons on the right */
+.nbd-mode-modern #tab-layer .item-right {
+    display: flex !important;
+    align-items: center !important;
+    gap: 2px !important;
+    flex-shrink: 0 !important;
+}
+.nbd-mode-modern #tab-layer .item-right .icon-nbd {
+    font-size: 14px !important;
+    color: var(--sg-text-soft) !important;
+    padding: 3px !important;
+    border-radius: 4px !important;
+    cursor: pointer !important;
+    transition: color .15s, background .15s !important;
+}
+.nbd-mode-modern #tab-layer .item-right .icon-nbd:hover {
+    color: var(--sg-primary) !important;
+    background: rgba(37,99,235,.08) !important;
+}
+.nbd-mode-modern #tab-layer .item-right .icon-close:hover {
+    color: #ef4444 !important;
+    background: rgba(239,68,68,.08) !important;
+}
+
+/* ============================================================
+   HIDE DESIGN TAB (user request — tab has no useful content)
+   ============================================================ */
+
+/* Hide the Design tab nav item */
+.nbd-mode-modern .tabs-nav #design-tab {
+    display: none !important;
+}
+
+/* Hide the Design tab panel (color palette) */
+.nbd-mode-modern .tabs-content .product-options,
+.nbd-mode-modern .tabs-content .tab-product-option {
+    display: none !important;
+}
+
+/* Hide the close/collapse controls inside the panel header */
+.nbd-mode-modern .tabs-content > i.fa,
+.nbd-mode-modern .tabs-content > .hide-tablet {
+    display: none !important;
+}
+
+/* ============================================================
+   DESIGN TAB — Color Palette (.product-options)
+   Kept for possible future use — currently hidden via block above
+   ============================================================ */
+.nbd-mode-modern .product-options {
+    padding: 12px !important;
+    background: var(--sg-bg) !important;
+}
+.nbd-mode-modern .color-palette-label {
+    display: block !important;
+    font-size: 11px !important;
+    font-weight: 700 !important;
+    color: var(--sg-text-soft) !important;
+    text-transform: uppercase !important;
+    letter-spacing: .05em !important;
+    margin-bottom: 8px !important;
+}
+.nbd-mode-modern .main-color-palette {
+    gap: 5px !important;
+}
+.nbd-mode-modern .color-palette-item {
+    width: 22px !important;
+    height: 22px !important;
+    border-radius: 5px !important;
+    border: 1.5px solid rgba(0,0,0,.10) !important;
+    transition: transform .1s !important;
+    cursor: pointer !important;
+}
+.nbd-mode-modern .color-palette-item:hover {
+    transform: scale(1.25) !important;
+}
+.nbd-mode-modern .color-palette-add {
+    width: 22px !important;
+    height: 22px !important;
+    border-radius: 5px !important;
+    border: 2px dashed var(--sg-border) !important;
+    cursor: pointer !important;
+    transition: border-color .15s !important;
+}
+.nbd-mode-modern .color-palette-add:hover {
+    border-color: var(--sg-primary) !important;
+}
+
+/* ============================================================
+   BUTTONS (generic .nbd-button)
+   ============================================================ */
+.nbd-mode-modern .nbd-button {
+    background: var(--sg-primary) !important;
+    color: #fff !important;
+    border: none !important;
+    border-radius: 6px !important;
+    padding: 7px 16px !important;
+    font-size: 13px !important;
+    font-weight: 600 !important;
+    cursor: pointer !important;
+    transition: background .15s !important;
+}
+.nbd-mode-modern .nbd-button:hover {
+    background: var(--sg-primary-hover) !important;
+}
+
+/* ============================================================
+   POPUPS / MODALS
+   ============================================================ */
+.nbd-mode-modern .nbd-popup {
+    background: var(--sg-bg) !important;
+    border-radius: 12px !important;
+    box-shadow: 0 20px 60px rgba(0,0,0,.15) !important;
+    border: 1px solid var(--sg-border) !important;
+}
+.nbd-mode-modern .nbd-popup-header {
+    border-bottom: 1px solid var(--sg-border) !important;
+    color: var(--sg-text) !important;
+    background: var(--sg-bg) !important;
+}
+.nbd-mode-modern .nbd-popup-body {
+    color: var(--sg-text) !important;
+    background: var(--sg-bg) !important;
+}
+.nbd-mode-modern .nbd-popup-footer {
+    border-top: 1px solid var(--sg-border) !important;
+    background: var(--sg-bg-soft) !important;
+}
+.nbd-mode-modern .nbd-overlay,
+.nbd-mode-modern #nbd-overlay {
+    background: rgba(0,0,0,.4) !important;
+}
+
+/* ============================================================
+   LOADING PAGE
+   ============================================================ */
+.nbd-mode-modern #nbd-loading-page {
+    background: var(--sg-bg) !important;
+}
+.nbd-mode-modern #nbd-loading-page .nbd-loading-logo {
+    filter: none !important;
+}
+
+/* ============================================================
+   TOAST MESSAGES
+   ============================================================ */
+.nbd-mode-modern .nbd-toast {
+    background: var(--sg-text) !important;
+    color: #fff !important;
+    border-radius: var(--sg-radius) !important;
+    box-shadow: var(--sg-shadow-md) !important;
+}
+
+/* ============================================================
+   AWAITING PRINT OPTIONS
+   ============================================================ */
+.nbd-mode-modern .nbd-await-for-print-options {
+    background: var(--sg-bg) !important;
+    color: var(--sg-text) !important;
+    border-left: 1px solid var(--sg-border) !important;
+}
+
+/* ============================================================
+   AI TOOLS BUTTON (injected by JS)
+   ============================================================ */
+.sg-ai-tools-btn {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    padding: 5px 11px !important;
+    background: #f0fdf4 !important;
+    border: 1px solid #86efac !important;
+    border-radius: 20px !important;
+    cursor: default !important;
+    font-size: 12px !important;
+    font-weight: 600 !important;
+    color: #16a34a !important;
+    white-space: nowrap !important;
+    text-decoration: none !important;
+    user-select: none !important;
+}
+.sg-ai-tools-badge {
+    display: inline-block !important;
+    font-size: 9px !important;
+    font-weight: 700 !important;
+    background: #16a34a !important;
+    color: #fff !important;
+    padding: 1px 6px !important;
+    border-radius: 10px !important;
+    text-transform: uppercase !important;
+    letter-spacing: .05em !important;
+    line-height: 1.4 !important;
+}
+
+/* ============================================================
+   RIGHT SUMMARY PANEL (injected by JS into .nbd-workspace)
+   ============================================================ */
+.sg-summary {
+    width: var(--sg-summary-w, 320px) !important;
+    min-width: var(--sg-summary-w, 320px) !important;
+    max-width: var(--sg-summary-w, 320px) !important;
+    background: #ffffff !important;
+    border-left: 1px solid #e5e7eb !important;
+    display: flex !important;
+    flex-direction: column !important;
+    height: 100% !important;
+    overflow: hidden !important;
+    flex-shrink: 0 !important;
+    font-family: inherit !important;
+    font-size: 14px !important;
+    color: #1f2937 !important;
+}
+
+.sg-summary-scroll {
+    flex: 1 1 auto !important;
+    overflow-y: auto !important;
+    padding: 20px 16px 12px !important;
+    scrollbar-width: thin !important;
+    scrollbar-color: #e5e7eb transparent !important;
+}
+.sg-summary-scroll::-webkit-scrollbar { width: 4px !important; }
+.sg-summary-scroll::-webkit-scrollbar-thumb {
+    background: #e5e7eb !important;
+    border-radius: 2px !important;
+}
+
+/* Product info header */
+.sg-summary-header {
+    padding-bottom: 14px !important;
+    border-bottom: 1px solid #e5e7eb !important;
+    margin-bottom: 14px !important;
+}
+.sg-summary-product-name {
+    font-size: 22px !important;
+    font-weight: 700 !important;
+    color: #1f2937 !important;
+    margin: 0 !important;
+    line-height: 1.25 !important;
+    word-break: break-word !important;
+    letter-spacing: -.01em !important;
+}
+.sg-summary-product-sku {
+    font-size: 12px !important;
+    color: #6b7280 !important;
+    margin: 0 !important;
+}
+
+/* Header: product name + B2B badge on same row */
+.sg-summary-header-top {
+    display: flex !important;
+    align-items: flex-start !important;
+    justify-content: space-between !important;
+    gap: 10px !important;
+}
+
+/* B2B tier badge */
+.sg-b2b-badge {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 4px !important;
+    padding: 3px 9px !important;
+    border-radius: 20px !important;
+    font-size: 11px !important;
+    font-weight: 600 !important;
+    white-space: nowrap !important;
+    text-decoration: none !important;
+    flex-shrink: 0 !important;
+    margin-top: 5px !important;
+    cursor: pointer !important;
+    transition: opacity .12s !important;
+    line-height: 1.5 !important;
+}
+.sg-b2b-badge:not(.sg-b2b-static):hover { opacity: .75 !important; }
+.sg-b2b-badge.sg-b2b-static {
+    cursor: default !important;
+    pointer-events: none !important;
+}
+.sg-b2b-badge.sg-b2b-retail {
+    background: #f3f4f6 !important;
+    color: #6b7280 !important;
+    border: 1px solid #e5e7eb !important;
+}
+.sg-b2b-badge.sg-b2b-tier {
+    background: #f0fdf4 !important;
+    color: #15803d !important;
+    border: 1px solid #bbf7d0 !important;
+}
+.sg-b2b-dot {
+    font-size: 7px !important;
+    line-height: 1 !important;
+    vertical-align: middle !important;
+}
+
+/* B2B discount row — smaller font, all text green */
+#sg-b2b-disc-row {
+    font-size: 11px !important;
+    color: #16a34a !important;
+}
+#sg-b2b-disc-label {
+    color: #16a34a !important;
+}
+.sg-b2b-disc-val {
+    color: #16a34a !important;
+    font-weight: 600 !important;
+}
+
+/* Section titles */
+.sg-summary-section-title {
+    font-size: 10px !important;
+    font-weight: 700 !important;
+    text-transform: uppercase !important;
+    letter-spacing: .07em !important;
+    color: #9ca3af !important;
+    margin: 0 0 8px !important;
+}
+
+/* Options mirror list */
+.sg-summary-options-list {
+    list-style: none !important;
+    margin: 0 0 20px !important;
+    padding: 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 4px !important;
+}
+
+/* Placeholder: JS sets style="display:none" but CSS !important would win — override it back */
+#sg-opts-placeholder[style*="display: none"],
+#sg-opts-placeholder[style*="display:none"] {
+    display: none !important;
+}
+
+/* Each option row — vertical stack: label on top, value below */
+.sg-summary-option-item {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 1px !important;
+    padding: 7px 10px !important;
+    background: #f9fafb !important;
+    border-radius: 7px !important;
+    border: 1px solid #f3f4f6 !important;
+}
+.sg-summary-option-label {
+    font-size: 10px !important;
+    font-weight: 500 !important;
+    color: #9ca3af !important;
+    text-transform: uppercase !important;
+    letter-spacing: .04em !important;
+    line-height: 1.3 !important;
+    white-space: normal !important;
+}
+.sg-summary-option-row {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: baseline !important;
+    gap: 6px !important;
+    margin-top: 1px !important;
+}
+.sg-summary-option-value {
+    font-size: 12px !important;
+    font-weight: 600 !important;
+    color: #1f2937 !important;
+    line-height: 1.4 !important;
+    text-align: left !important;
+    flex: 1 1 auto !important;
+    min-width: 0 !important;
+}
+.sg-summary-option-price {
+    font-size: 12px !important;
+    font-weight: 700 !important;
+    color: #374151 !important;
+    white-space: nowrap !important;
+    flex-shrink: 0 !important;
+}
+.sg-summary-option-price.sg-opt-free {
+    font-size: 10px !important;
+    font-weight: 600 !important;
+    color: #16a34a !important;
+    background: #f0fdf4 !important;
+    border: 1px solid #bbf7d0 !important;
+    border-radius: 4px !important;
+    padding: 1px 6px !important;
+    line-height: 1.5 !important;
+}
+
+/* Price breakdown box */
+.sg-summary-price-box {
+    background: #f9fafb !important;
+    border: 1px solid #e5e7eb !important;
+    border-radius: 10px !important;
+    padding: 14px !important;
+    margin-bottom: 0 !important;
+}
+.sg-price-row {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    font-size: 13px !important;
+    color: #6b7280 !important;
+    margin-bottom: 8px !important;
+}
+.sg-price-divider {
+    border: none !important;
+    border-top: 1px solid #e5e7eb !important;
+    margin: 10px 0 !important;
+}
+.sg-price-total-row {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+}
+.sg-price-total-label {
+    font-size: 14px !important;
+    font-weight: 600 !important;
+    color: #1f2937 !important;
+}
+.sg-price-total-value {
+    font-size: 22px !important;
+    font-weight: 700 !important;
+    color: #1f2937 !important;
+    line-height: 1.2 !important;
+}
+.sg-price-per-unit {
+    font-size: 11px !important;
+    color: #9ca3af !important;
+    text-align: right !important;
+    margin-top: 1px !important;
+}
+
+/* Footer with CTA */
+.sg-summary-footer {
+    flex: 0 0 auto !important;
+    padding: 14px 16px !important;
+    border-top: 1px solid #e5e7eb !important;
+    background: #ffffff !important;
+}
+.sg-btn-add-to-cart {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    width: 100% !important;
+    background: #2563eb !important;
+    color: #ffffff !important;
+    border: none !important;
+    border-radius: 10px !important;
+    padding: 14px 18px !important;
+    cursor: pointer !important;
+    transition: background .15s !important;
+    box-sizing: border-box !important;
+}
+.sg-btn-add-to-cart:hover { background: #1d4ed8 !important; }
+.sg-btn-add-to-cart:active { background: #1e40af !important; }
+.sg-btn-inner {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 1px !important;
+    text-align: left !important;
+}
+.sg-btn-label {
+    font-size: 15px !important;
+    font-weight: 600 !important;
+    color: #ffffff !important;
+    opacity: .92 !important;
+    line-height: 1.3 !important;
+}
+.sg-btn-price-val {
+    font-size: 22px !important;
+    font-weight: 700 !important;
+    color: #ffffff !important;
+    line-height: 1.2 !important;
+    letter-spacing: -.01em !important;
+}
+.sg-btn-arrow {
+    font-size: 26px !important;
+    font-weight: 400 !important;
+    color: #ffffff !important;
+    line-height: 1 !important;
+    flex-shrink: 0 !important;
+    margin-left: 8px !important;
+}
+.sg-summary-note {
+    text-align: center !important;
+    font-size: 11px !important;
+    color: #9ca3af !important;
+    margin: 8px 0 0 !important;
+    line-height: 1.4 !important;
+}
+
+/* ============================================================
+   PRODUCT TAB — hide name / price / description / summaries
+   (already shown in the right summary panel)
+   ============================================================ */
+
+/* Product title & price header at top of product tab */
+.nbd-mode-modern .nbd-product-tab .quick-view-title,
+.nbd-mode-modern .nbd-product-tab h1.product_title,
+.nbd-mode-modern .nbd-product-tab .product_title { display: none !important; }
+
+/* p.price is a direct child of .product inside .woocommerce.quick-view */
+.nbd-mode-modern .nbd-product-tab p.price { display: none !important; }
+
+/* WooCommerce quantity widget at the bottom of the cart form */
+.nbd-mode-modern .nbd-product-tab form.cart div.quantity { display: none !important; }
+
+/* Product short description */
+.nbd-mode-modern .nbd-product-tab .woocommerce-product-details__short-description { display: none !important; }
+
+/* "Summary options" collapsible + "Table pricing" collapsible */
+.nbd-mode-modern .nbd-product-tab .nbo-table-summary-wrap,
+.nbd-mode-modern .nbd-product-tab .nbo-table-pricing-wrap { display: none !important; }
+
+/* Bulk quantity table at the bottom */
+.nbd-mode-modern .nbd-product-tab .nbo-bulk-variation-wrap,
+.nbd-mode-modern .nbd-product-tab .nbo-bulk-title { display: none !important; }
+
+/* ============================================================
+   CATEGORY NAV — inline inside .nbd-main-bar
+   JS injects .sg-cat-nav-inline between .menu-center and .menu-right,
+   filling the empty center area of the existing top bar.
+   ============================================================ */
+/* .nbd-main-bar needs position:relative so we can absolutely-center the cat nav */
+.nbd-mode-modern.sg-has-catnav .nbd-main-bar {
+    position: relative !important;
+}
+.sg-cat-nav-inline {
+    display: flex !important;
+    align-items: stretch !important;
+    position: absolute !important;
+    top: 0 !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    justify-content: center !important;
+    gap: 0 !important;
+    overflow: hidden !important;
+    padding: 0 !important;
+    height: 100% !important;
+    pointer-events: auto !important;
+}
+.nbd-mode-modern.sg-has-catnav .nbd-main-bar .menu-right {
+    margin-left: auto !important;
+}
+
+/* Category tab — vertical layout: icon top, label below (signs365 style) */
+.sg-cat-item {
+    display: inline-flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 4px !important;
+    padding: 8px 14px 6px !important;
+    border-radius: 0 !important;
+    text-decoration: none !important;
+    color: var(--sg-text-soft) !important;
+    white-space: nowrap !important;
+    flex-shrink: 0 !important;
+    transition: color .12s !important;
+    cursor: pointer !important;
+    font-family: inherit !important;
+    position: relative !important;
+    min-width: 56px !important;
+    height: 100% !important;
+    border-bottom: 2px solid transparent !important;
+}
+.sg-cat-item:hover {
+    color: var(--sg-text) !important;
+    border-bottom-color: var(--sg-border) !important;
+}
+.sg-cat-item.sg-cat-active {
+    color: var(--sg-primary) !important;
+    border-bottom-color: var(--sg-primary) !important;
+}
+
+/* Icon: thumbnail or initial letter */
+.sg-cat-icon {
+    width: 40px !important;
+    height: 40px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex-shrink: 0 !important;
+    border-radius: 5px !important;
+    overflow: hidden !important;
+}
+.sg-cat-icon img {
+    width: 40px !important;
+    height: 40px !important;
+    object-fit: cover !important;
+    display: block !important;
+}
+.sg-cat-icon-letter {
+    width: 26px !important;
+    height: 26px !important;
+    border-radius: 5px !important;
+    background: var(--sg-bg-soft) !important;
+    border: 1px solid var(--sg-border) !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-size: 12px !important;
+    font-weight: 700 !important;
+    color: var(--sg-text-soft) !important;
+    line-height: 1 !important;
+}
+.sg-cat-item.sg-cat-active .sg-cat-icon-letter {
+    background: var(--sg-primary-soft) !important;
+    border-color: var(--sg-primary) !important;
+    color: var(--sg-primary) !important;
+}
+
+/* "NEW" badge — sits above the icon, centred */
+.sg-cat-new-badge {
+    position: absolute !important;
+    top: 4px !important;
+    right: 6px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    font-size: 7px !important;
+    font-weight: 700 !important;
+    background: #16a34a !important;
+    color: #fff !important;
+    padding: 1px 4px !important;
+    border-radius: 4px !important;
+    text-transform: uppercase !important;
+    letter-spacing: .04em !important;
+    line-height: 1.5 !important;
+}
+
+/* Label */
+.sg-cat-label {
+    font-size: 10px !important;
+    font-weight: 600 !important;
+    color: inherit !important;
+    line-height: 1.2 !important;
+    text-transform: uppercase !important;
+    letter-spacing: .04em !important;
+}
+.sg-cat-item.sg-cat-active .sg-cat-label {
+    font-weight: 700 !important;
+}
+
+} /* end @media (min-width: 768px) */
+
+/* ============================================================
+   B2B APPLY MODAL
+   Injected into <body> by override.js — outside .nbd-mode-modern
+   so it sits above all designer layers (z-index: 9000).
+   NOT scoped to @media (min-width:768px) so it works on all viewports.
+   ============================================================ */
+.sg-b2b-modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, .55);
+    z-index: 9000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    box-sizing: border-box;
+}
+
+.sg-b2b-modal-card {
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 24px 80px rgba(0, 0, 0, .22);
+    width: 100%;
+    max-width: 480px;
+    max-height: calc(100vh - 32px);
+    overflow-y: auto;
+    padding: 32px 28px 24px;
+    box-sizing: border-box;
+    position: relative;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    color: #1f2937;
+}
+
+.sg-b2b-modal-close {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    width: 32px;
+    height: 32px;
+    border: none;
+    background: #f3f4f6;
+    border-radius: 50%;
+    font-size: 18px;
+    line-height: 1;
+    cursor: pointer;
+    color: #6b7280;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background .12s, color .12s;
+}
+.sg-b2b-modal-close:hover {
+    background: #e5e7eb;
+    color: #1f2937;
+}
+
+/* Header */
+.sg-b2b-modal-head {
+    text-align: center;
+    margin-bottom: 24px;
+}
+.sg-b2b-modal-icon {
+    width: 52px;
+    height: 52px;
+    background: #eff6ff;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 14px;
+    color: #2563eb;
+}
+.sg-b2b-modal-icon svg {
+    width: 26px;
+    height: 26px;
+}
+.sg-b2b-modal-head h2 {
+    font-size: 20px;
+    font-weight: 700;
+    color: #1f2937;
+    margin: 0 0 6px;
+    line-height: 1.25;
+}
+.sg-b2b-modal-head p {
+    font-size: 13px;
+    color: #6b7280;
+    margin: 0;
+    line-height: 1.5;
+}
+
+/* Stepper */
+.sg-b2b-stepper {
+    display: flex;
+    align-items: center;
+    margin-bottom: 24px;
+}
+.sg-b2b-step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    flex: 0 0 auto;
+}
+.sg-b2b-step-num {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: 2px solid #d1d5db;
+    background: #fff;
+    color: #9ca3af;
+    font-size: 12px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all .2s;
+}
+.sg-b2b-step span {
+    font-size: 10px;
+    font-weight: 600;
+    color: #9ca3af;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+    white-space: nowrap;
+    transition: color .2s;
+}
+.sg-b2b-step.sg-b2b-step-active .sg-b2b-step-num {
+    border-color: #2563eb;
+    background: #2563eb;
+    color: #fff;
+}
+.sg-b2b-step.sg-b2b-step-active span { color: #2563eb; }
+.sg-b2b-step.sg-b2b-step-done .sg-b2b-step-num {
+    border-color: #16a34a;
+    background: #16a34a;
+    color: #fff;
+}
+.sg-b2b-step.sg-b2b-step-done .sg-b2b-step-num::after {
+    content: '✓';
+    font-size: 11px;
+}
+.sg-b2b-step.sg-b2b-step-done span { color: #16a34a; }
+.sg-b2b-step-line {
+    flex: 1;
+    height: 2px;
+    background: #e5e7eb;
+    margin: 0 6px 14px;
+}
+
+/* Form pages */
+.sg-b2b-page {
+    margin-bottom: 4px;
+}
+
+/* Fields */
+.sg-b2b-field {
+    margin-bottom: 14px;
+}
+.sg-b2b-field label {
+    display: block;
+    font-size: 12px;
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 5px;
+}
+.sg-b2b-req {
+    color: #ef4444;
+    margin-left: 1px;
+}
+.sg-b2b-field input,
+.sg-b2b-field select {
+    width: 100%;
+    padding: 9px 12px;
+    border: 1.5px solid #d1d5db;
+    border-radius: 8px;
+    font-size: 13px;
+    color: #1f2937;
+    background: #fff;
+    box-sizing: border-box;
+    transition: border-color .15s, box-shadow .15s;
+    outline: none;
+    font-family: inherit;
+}
+.sg-b2b-field input:focus,
+.sg-b2b-field select:focus {
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, .12);
+}
+.sg-b2b-field input::placeholder { color: #9ca3af; }
+
+/* Review summary */
+.sg-b2b-review {
+    background: #f9fafb;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    padding: 14px 16px;
+    margin-bottom: 16px;
+}
+.sg-b2b-review-list {
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 5px 12px;
+}
+.sg-b2b-review-list dt {
+    font-size: 11px;
+    font-weight: 600;
+    color: #9ca3af;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+    white-space: nowrap;
+    line-height: 1.5;
+}
+.sg-b2b-review-list dd {
+    font-size: 13px;
+    font-weight: 500;
+    color: #1f2937;
+    margin: 0;
+    line-height: 1.5;
+    word-break: break-word;
+}
+
+/* Benefits */
+.sg-b2b-benefits {
+    padding: 4px 0 0;
+}
+.sg-b2b-benefits-title {
+    font-size: 11px;
+    font-weight: 700;
+    color: #6b7280;
+    text-transform: uppercase;
+    letter-spacing: .05em;
+    margin: 0 0 8px;
+}
+.sg-b2b-benefits ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+.sg-b2b-benefits li {
+    font-size: 12px;
+    color: #374151;
+    display: flex;
+    align-items: flex-start;
+    gap: 6px;
+    line-height: 1.5;
+}
+.sg-b2b-check {
+    color: #16a34a;
+    font-weight: 700;
+    flex-shrink: 0;
+    margin-top: 1px;
+}
+
+/* Success state */
+.sg-b2b-success {
+    text-align: center;
+    padding: 12px 0 24px;
+}
+.sg-b2b-success-icon {
+    width: 60px;
+    height: 60px;
+    background: #f0fdf4;
+    border: 2px solid #bbf7d0;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 26px;
+    color: #16a34a;
+    margin: 0 auto 16px;
+}
+.sg-b2b-success h3 {
+    font-size: 20px;
+    font-weight: 700;
+    color: #1f2937;
+    margin: 0 0 8px;
+}
+.sg-b2b-success p {
+    font-size: 13px;
+    color: #6b7280;
+    margin: 0;
+    line-height: 1.6;
+}
+
+/* Error */
+.sg-b2b-error {
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    border-radius: 8px;
+    color: #dc2626;
+    font-size: 13px;
+    padding: 10px 14px;
+    margin-top: 12px;
+}
+
+/* Actions */
+.sg-b2b-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+}
+.sg-b2b-btn-secondary {
+    flex: 0 0 auto;
+    padding: 10px 18px;
+    border: 1.5px solid #d1d5db;
+    border-radius: 8px;
+    background: #fff;
+    color: #374151;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: border-color .12s, background .12s;
+    font-family: inherit;
+}
+.sg-b2b-btn-secondary:hover {
+    border-color: #9ca3af;
+    background: #f9fafb;
+}
+.sg-b2b-btn-primary {
+    flex: 1;
+    padding: 11px 18px;
+    border: none;
+    border-radius: 8px;
+    background: #2563eb;
+    color: #fff;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background .12s;
+    font-family: inherit;
+}
+.sg-b2b-btn-primary:hover { background: #1d4ed8; }
+.sg-b2b-btn-primary:disabled {
+    background: #93c5fd;
+    cursor: not-allowed;
+}
+.sg-b2b-btn-submit {
+    background: #16a34a;
+}
+.sg-b2b-btn-submit:hover { background: #15803d; }
+.sg-b2b-btn-submit:disabled { background: #86efac; }
+
+/* ============================================================
+   LOGIN MODAL
+   ============================================================ */
+.sg-login-modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, .55);
+    z-index: 9000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    box-sizing: border-box;
+}
+
+.sg-login-modal-card {
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 24px 80px rgba(0, 0, 0, .22);
+    width: 100%;
+    max-width: 400px;
+    padding: 32px 28px 28px;
+    box-sizing: border-box;
+    position: relative;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    color: #1f2937;
+}
+
+.sg-login-modal-close {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    width: 32px;
+    height: 32px;
+    border: none;
+    background: #f3f4f6;
+    border-radius: 50%;
+    font-size: 18px;
+    cursor: pointer;
+    color: #6b7280;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background .12s, color .12s;
+}
+.sg-login-modal-close:hover { background: #e5e7eb; color: #1f2937; }
+
+.sg-login-modal-head {
+    text-align: center;
+    margin-bottom: 24px;
+}
+.sg-login-modal-icon {
+    width: 52px;
+    height: 52px;
+    background: #eff6ff;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 14px;
+    color: #2563eb;
+}
+.sg-login-modal-icon svg { width: 26px; height: 26px; }
+.sg-login-modal-head h2 {
+    font-size: 20px;
+    font-weight: 700;
+    color: #1f2937;
+    margin: 0 0 6px;
+}
+.sg-login-modal-head p {
+    font-size: 13px;
+    color: #6b7280;
+    margin: 0;
+}
+
+.sg-login-field {
+    margin-bottom: 14px;
+}
+.sg-login-field label {
+    display: block;
+    font-size: 12px;
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 5px;
+}
+.sg-login-field input {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1.5px solid #d1d5db;
+    border-radius: 8px;
+    font-size: 13px;
+    color: #1f2937;
+    background: #fff;
+    box-sizing: border-box;
+    outline: none;
+    font-family: inherit;
+    transition: border-color .15s, box-shadow .15s;
+}
+.sg-login-field input:focus {
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, .12);
+}
+.sg-login-field input::placeholder { color: #9ca3af; }
+
+.sg-login-pw-wrap { position: relative; }
+.sg-login-pw-wrap input { padding-right: 40px; }
+.sg-login-pw-toggle {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    border: none;
+    background: none;
+    cursor: pointer;
+    color: #9ca3af;
+    padding: 4px;
+    display: flex;
+    align-items: center;
+}
+.sg-login-pw-toggle:hover { color: #6b7280; }
+.sg-login-pw-toggle svg { width: 16px; height: 16px; }
+
+.sg-login-remember {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+    font-size: 12px;
+    color: #374151;
+}
+.sg-login-remember label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    font-weight: 500;
+}
+.sg-login-remember input[type="checkbox"] {
+    width: 14px;
+    height: 14px;
+    cursor: pointer;
+    accent-color: #2563eb;
+}
+.sg-login-forgot {
+    color: #2563eb;
+    text-decoration: none;
+    font-weight: 500;
+}
+.sg-login-forgot:hover { text-decoration: underline; }
+
+.sg-login-error {
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    border-radius: 8px;
+    color: #dc2626;
+    font-size: 13px;
+    padding: 10px 14px;
+    margin-bottom: 14px;
+}
+
+.sg-login-submit {
+    width: 100%;
+    padding: 12px;
+    border: none;
+    border-radius: 8px;
+    background: #2563eb;
+    color: #fff;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    transition: background .12s;
+}
+.sg-login-submit:hover { background: #1d4ed8; }
+.sg-login-submit:disabled { background: #93c5fd; cursor: not-allowed; }
+
+/* ============================================================
+   EMPTY-CANVAS "CLICK TO UPLOAD" OVERLAY
+   One overlay is injected (by override.js) into each stage's
+   .design-wrap. Visibility is toggled by JS based on that stage's
+   fabric canvas object count — no CSS :empty selector can see
+   into a <canvas>, so JS must drive .is-visible directly.
+   Clicking it opens the Photos tab → Upload picker, so first-time
+   customers aren't stuck hunting for the sidebar (mirrors the
+   signs365.com "click to select an image" onboarding pattern).
+   Reverted here from a two-button "Upload your photo" card
+   (v1.10.80-83) back to this single whole-box click design, closer to
+   signs365 per explicit request — but openPhotoUpload() itself keeps
+   its fix (clicking the real hidden <input type=file>, not the
+   source-picker tile), since that bug was independent of which overlay
+   design is used.
+   ============================================================ */
+.nbd-mode-modern .design-wrap .sg-empty-canvas-overlay {
+    position: absolute !important;
+    inset: 0 !important;
+    display: none !important;
+    align-items: center !important;
+    justify-content: center !important;
+    z-index: 5 !important;
+    pointer-events: none !important;
+}
+.nbd-mode-modern .design-wrap .sg-empty-canvas-overlay.is-visible {
+    display: flex !important;
+    pointer-events: auto !important;
+}
+.sg-empty-canvas-box {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 14px !important;
+    width: calc(100% - 40px) !important;
+    height: calc(100% - 40px) !important;
+    border: 2px dashed #b9c0ca !important;
+    border-radius: 4px !important;
+    background: rgba(255, 255, 255, .55) !important;
+    color: #9aa2ad !important;
+    text-align: center !important;
+    text-transform: uppercase !important;
+    font-weight: 600 !important;
+    letter-spacing: .02em !important;
+    font-size: 14px !important;
+    line-height: 1.6 !important;
+    cursor: pointer !important;
+    padding: 24px !important;
+    box-sizing: border-box !important;
+    transition: border-color .15s, background .15s, color .15s !important;
+}
+.sg-empty-canvas-overlay:hover .sg-empty-canvas-box {
+    border-color: #2563eb !important;
+    color: #2563eb !important;
+    background: rgba(37, 99, 235, .05) !important;
+}
+.sg-empty-canvas-box svg {
+    width: 40px !important;
+    height: 40px !important;
+    stroke: currentColor !important;
+    fill: none !important;
+    flex-shrink: 0 !important;
+}
+@media (max-width: 767px) {
+    .sg-empty-canvas-box { font-size: 12px !important; gap: 10px !important; padding: 14px !important; }
+    .sg-empty-canvas-box svg { width: 28px !important; height: 28px !important; }
+}
+
+.nbd-mode-modern #tab-photo .item.sg-source-hidden {
+    display: none !important;
+}
+
+.nbd-mode-modern #tab-photo .clear-local-images-wrap {
+    display: none !important;
+}
+
+/* ============================================================
+   DIM INACTIVE PHOTO SOURCE TILES
+   markSourceTileActive() (override.js) adds .sg-has-active to .items the
+   first time any tile is known to be active (either clicked, or Upload
+   opened by default on load), and .sg-source-active to that one tile.
+   Only dim once .sg-has-active is present — otherwise every tile would
+   look dimmed on first render, before anything has been marked active.
+   ============================================================ */
+.nbd-mode-modern #tab-photo .items .item {
+    transition: opacity .15s !important;
+}
+.nbd-mode-modern #tab-photo .items.sg-has-active .item:not(.sg-source-active) {
+    opacity: .45 !important;
+}
+.nbd-mode-modern #tab-photo .items.sg-has-active .item.sg-source-active {
+    opacity: 1 !important;
+}
+
+/* ============================================================
+   MASONRY GRID BLANKET FIX (.mansory-wrap / .mansory-item)
+   Core reuses this SAME "masonry" component — items positioned via
+   inline position:absolute + top/left computed from item heights AT
+   THE TIME OF LAYOUT, which goes stale and clumps everything into one
+   column with a big blank gap next to it — across EVERY gallery in the
+   designer: uploaded images (#nbd-upload-wrap, its own more specific
+   card-style override further below still wins there), and under
+   Elements: Shapes, Icons, Flaticon, Storyset/Stories, Line, Photo Frame
+   (all confirmed live in tab-elements.php using the identical
+   .mansory-wrap/.mansory-item markup). Fixing it once here, unscoped,
+   instead of one gallery at a time as each gets reported broken.
+   ============================================================ */
+.nbd-mode-modern .mansory-wrap {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 6px !important;
+    width: 100% !important;
+    height: auto !important;
+    position: static !important;
+}
+.nbd-mode-modern .mansory-item {
+    position: static !important;
+    top: auto !important;
+    left: auto !important;
+    transform: none !important;
+    transition: none !important;
+    animation: none !important;
+    width: calc(33.333% - 4px) !important;
+    height: auto !important;
+    margin: 0 !important;
+    box-sizing: border-box !important;
+}
+/* Descendant (not direct-child) selector — Icons specifically nest their
+   <img> one level deeper in .mansory-item__inner (tab-elements.php), the
+   rest have it as a direct child. */
+.nbd-mode-modern .mansory-item img {
+    display: block !important;
+    width: 100% !important;
+    height: 80px !important;
+    object-fit: cover !important;
+    border-radius: 4px !important;
+    background: var(--sg-bg-soft) !important;
+}
+.nbd-mode-modern .mansory-item__inner {
+    width: 100% !important;
+    height: 100% !important;
+}
+
+/* ============================================================
+   STOCK-PHOTO SEARCH RESULTS (Pixabay/Unsplash/Pexels/Freepik)
+   #nbdesigner-gallery's items are .nbdesigner-item (NOT .mansory-item —
+   a different class than the uploaded-image list below, confirmed via
+   tab-photo.php: "<div ... class="nbdesigner-item" ng-repeat="img in
+   resource.photo.data">"), but positioned the exact same core-JS
+   "masonry" way — inline position:absolute + top/left computed from
+   item heights AT THE TIME OF LAYOUT — with the identical stale-
+   measurement bug already fixed for #nbd-upload-wrap below: items
+   render clumped into one column with a big blank gap next to them
+   (confirmed live on Pexels/Freepik results). Same fix. No metadata
+   card needed here (core only renders a bare <img>, no filename/size/
+   date to show) — just a plain 3-column thumbnail grid.
+   ============================================================ */
+.nbd-mode-modern #nbdesigner-gallery {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 6px !important;
+    width: 100% !important;
+    height: auto !important;
+    position: static !important;
+}
+.nbd-mode-modern #nbdesigner-gallery .nbdesigner-item {
+    position: static !important;
+    top: auto !important;
+    left: auto !important;
+    transform: none !important;
+    transition: none !important;
+    animation: none !important;
+    width: calc(33.333% - 4px) !important;
+    height: auto !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border-radius: 4px !important;
+    overflow: hidden !important;
+    cursor: pointer !important;
+    box-sizing: border-box !important;
+}
+.nbd-mode-modern #nbdesigner-gallery .nbdesigner-item img {
+    display: block !important;
+    width: 100% !important;
+    height: 80px !important;
+    object-fit: cover !important;
+    border-radius: 4px !important;
+    background: var(--sg-bg-soft) !important;
+}
+
+/* ============================================================
+   UPLOADED-IMAGE LIBRARY CARDS
+   Core only renders a bare <img> per uploaded file (.mansory-item
+   inside #nbd-upload-wrap). override.js injects a .sg-upload-meta
+   block (filename / size in inches + DPI / uploaded-at) into each
+   one — this gives that card a readable row layout instead of a
+   bare thumbnail grid, similar to signs365.com's "Image Zone".
+   ============================================================ */
+.nbd-mode-modern #nbd-upload-wrap {
+    /* The core plugin's masonry JS also sets an inline height (and
+       position:relative) on #nbd-upload-wrap ITSELF, not just on
+       .mansory-wrap inside it — same stale-measurement problem as below,
+       one level up. Without this, the outer box stays clipped to its old
+       height and the "Clear all uploaded images" link (a sibling right
+       after #nbd-upload-wrap in the DOM) ends up rendered on top of / in
+       the middle of the overflowing item list instead of below it. */
+    height: auto !important;
+    width: auto !important;
+    position: static !important;
+    padding-bottom: 20px !important;
+}
+.nbd-mode-modern #nbd-upload-wrap .mansory-wrap {
+    display: flex !important;
+    /* Plain forward wrap — newest-first ordering is handled per-item via
+       the `order` property instead (see initUploadThumbnailMeta's
+       reconcile() in override.js). A row-reverse/wrap-reverse trick tried
+       first here mirrored an odd trailing item to the wrong side of its
+       incomplete last row, leaving a visible gap in the 2-column grid. */
+    flex-wrap: wrap !important;
+    gap: 8px !important;
+    width: 100% !important;
+    /* Core plugin's masonry JS sets an inline height on this wrap based on
+       item positions it computed BEFORE our metadata block existed (see
+       .mansory-item override below) — override it so the wrap always sizes
+       to its real (flex) content instead of that stale measurement. */
+    height: auto !important;
+    position: static !important;
+}
+.nbd-mode-modern #nbd-upload-wrap .mansory-item {
+    /* Core plugin's own masonry layout positions each .mansory-item with
+       an inline position:absolute + top/left computed from item heights
+       AT THE TIME OF LAYOUT — which runs before override.js has appended
+       our .sg-upload-meta block, so it measures the wrong (shorter)
+       height and leaves items overlapping/badly spaced until something
+       (e.g. a tab switch) forces a recalculation. Overriding position to
+       static here takes items out of that fragile JS-driven layout
+       entirely — normal flex-column flow (via .mansory-wrap above) is
+       what actually places them, every time, regardless of timing. */
+    position: static !important;
+    top: auto !important;
+    left: auto !important;
+    /* The core plugin also drives its stagger-entrance animation with an
+       inline transform: translate3d(0, Ypx, 0) — Y computed from the same
+       stale (pre-metadata) heights as top/left above. A transform still
+       visually displaces a position:static element, so overriding position
+       alone isn't enough; this has to be neutralized too, or items look
+       scattered the first time the panel renders and only "fix themselves"
+       once something (e.g. a tab switch) re-triggers the animation and its
+       transform happens to resolve to ~0. */
+    transform: none !important;
+    transition: none !important;
+    animation: none !important;
+    /* Vertical card (image full-width on top, meta below) instead of a
+       thumbnail-left/text-right row — a small 56×56 thumbnail read as too
+       small to judge, and the row layout left little width for the size +
+       DPI-quality badge, crowding/truncating them (confirmed live). Matches
+       the printcart customizer reference's card shape too. */
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 0 !important;
+    /* 2 columns: (100% - 1 gap) / 2 */
+    width: calc(50% - 4px) !important;
+    height: auto !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+    border: 1px solid var(--sg-border) !important;
+    border-radius: var(--sg-radius) !important;
+    background: var(--sg-bg) !important;
+    cursor: pointer !important;
+    transition: border-color .15s, box-shadow .15s !important;
+    box-sizing: border-box !important;
+}
+.nbd-mode-modern #nbd-upload-wrap .mansory-item:hover {
+    border-color: var(--sg-primary) !important;
+    box-shadow: var(--sg-shadow-sm) !important;
+}
+.nbd-mode-modern #nbd-upload-wrap .mansory-item > img {
+    width: 100% !important;
+    height: 90px !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    object-fit: cover !important;
+    border-radius: 0 !important;
+    border: 0 !important;
+    border-bottom: 1px solid var(--sg-border) !important;
+    background: var(--sg-bg-soft) !important;
+}
+.nbd-mode-modern #nbd-upload-wrap .sg-upload-meta {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 3px !important;
+    min-width: 0 !important;
+    flex: 1 1 auto !important;
+    padding: 10px !important;
+    box-sizing: border-box !important;
+}
+.nbd-mode-modern #nbd-upload-wrap .sg-upload-meta-name {
+    font-size: 12px !important;
+    font-weight: 600 !important;
+    color: var(--sg-text) !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    max-width: 100% !important;
+}
+.nbd-mode-modern #nbd-upload-wrap .sg-upload-meta-sizerow {
+    display: flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    min-width: 0 !important;
+}
+.nbd-mode-modern #nbd-upload-wrap .sg-upload-meta-size,
+.nbd-mode-modern #nbd-upload-wrap .sg-upload-meta-date {
+    font-size: 11px !important;
+    color: var(--sg-text-soft) !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    max-width: 100% !important;
+}
+.nbd-mode-modern #nbd-upload-wrap .sg-upload-meta-date {
+    color: var(--sg-text-muted) !important;
+}
+/* Restored/history items have no real upload time (see override.js —
+   only a genuine this-session capture sets this text) — collapse the
+   empty row instead of leaving a blank gap. */
+.nbd-mode-modern #nbd-upload-wrap .sg-upload-meta-date:empty {
+    display: none !important;
+}
+/* DPI quality badge (signs365/printcart-style "LOW"/"GOOD" tag) — set by
+   renderSize() in override.js, comparing the file's actual resolution
+   against the product's own configured target DPI. */
+.nbd-mode-modern #nbd-upload-wrap .sg-upload-meta-quality {
+    flex-shrink: 0 !important;
+    font-size: 9.5px !important;
+    font-weight: 700 !important;
+    text-transform: uppercase !important;
+    letter-spacing: .03em !important;
+    padding: 2px 6px !important;
+    border-radius: 4px !important;
+    white-space: nowrap !important;
+}
+.nbd-mode-modern #nbd-upload-wrap .sg-upload-meta-quality:empty {
+    display: none !important;
+}
+.nbd-mode-modern #nbd-upload-wrap .sg-quality-low {
+    background: rgba(239, 68, 68, .12) !important;
+    color: #dc2626 !important;
+}
+
+/* ============================================================
+   UPLOAD DROP-ZONE + FILE-REQUIREMENTS CARD
+   Core (tab-photo.php) renders these as plain unstyled blocks — a
+   .form-upload drag-drop target and an .allow-size list of file-type/
+   size limits — restyled here into distinct cards matching the
+   uploaded-item cards above (printcart customizer reference).
+   ============================================================ */
+.nbd-mode-modern #tab-photo .form-upload {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 8px !important;
+    text-align: center !important;
+    border: 1.5px dashed var(--sg-primary) !important;
+    border-radius: var(--sg-radius) !important;
+    background: rgba(37, 99, 235, .04) !important;
+    padding: 24px 16px !important;
+    margin-bottom: 14px !important;
+    box-sizing: border-box !important;
+}
+.nbd-mode-modern #tab-photo .form-upload i {
+    font-size: 26px !important;
+    color: var(--sg-primary) !important;
+}
+.nbd-mode-modern #tab-photo .form-upload span {
+    font-size: 13px !important;
+    font-weight: 700 !important;
+    color: var(--sg-text) !important;
+}
+.nbd-mode-modern #tab-photo .allow-size {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 6px !important;
+    border: 1px solid var(--sg-border) !important;
+    border-radius: var(--sg-radius) !important;
+    background: var(--sg-bg) !important;
+    padding: 12px 14px !important;
+    margin-bottom: 14px !important;
+}
+.nbd-mode-modern #tab-photo .allow-size span {
+    display: block !important;
+    font-size: 11.5px !important;
+    color: var(--sg-text-soft) !important;
+}
+.nbd-mode-modern #tab-photo .allow-size strong {
+    color: var(--sg-text) !important;
+    font-weight: 600 !important;
+}
+
+/* ============================================================
+   FLOATING "FIT" / "CENTER" MENU
+   A small vertical menu to the LEFT of the selected image on canvas
+   (printcart/signs365-style — they show a fixed side panel; we don't
+   have that layout, so tying it to the current selection is the closest
+   equivalent that still works with our multi-layer canvas, where "which
+   image" isn't implicit like it is on a single-image product). Started
+   as a horizontal pill floating ABOVE the image, but that overlapped the
+   "Show dimensions" ruler labels near the canvas top edge — moved to the
+   side instead. Falls back to the right side of the image if there's not
+   enough room on the left (image flush against the sidebar). Light
+   theme (var(--sg-*)) to match the rest of this skin, not a dark pill.
+   Position is recalculated on a poll in override.js
+   (initFitCenterFloatingToolbar) since the fabric canvas instance itself
+   gets replaced whenever dimension options change — see project memory
+   on why this codebase avoids relying on one-time event bindings here.
+   ============================================================ */
+.sg-fit-center-toolbar {
+    position: fixed !important;
+    /* top/left are NOT !important — they're set dynamically via inline
+       style from override.js (positionFitCenterToolbar) on every poll
+       tick. An !important rule here would always win over that inline
+       style and freeze the toolbar at a fixed spot (confirmed live: it
+       rendered pinned to the top-left corner regardless of the computed
+       position actually being correct). */
+    top: 0;
+    left: 0;
+    display: none !important;
+    flex-direction: column !important;
+    gap: 2px !important;
+    background: var(--sg-bg) !important;
+    border: 1px solid var(--sg-border) !important;
+    border-radius: var(--sg-radius) !important;
+    padding: 4px !important;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, .16) !important;
+    z-index: 400 !important;
+    min-width: 92px !important;
+    /* Right edge of the menu lands 10px before the image's left edge. */
+    transform: translate(calc(-100% - 10px), 0) !important;
+}
+.sg-fit-center-toolbar.is-visible {
+    display: flex !important;
+}
+.sg-fit-center-toolbar.sg-right {
+    /* Left edge of the menu starts 10px after the image's right edge. */
+    transform: translate(10px, 0) !important;
+}
+.sg-fit-center-sep {
+    height: 1px !important;
+    width: auto !important;
+    background: var(--sg-border) !important;
+    margin: 1px 4px !important;
+}
+.sg-fit-center-btn {
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    border: 0 !important;
+    background: transparent !important;
+    color: var(--sg-text) !important;
+    font-size: 12px !important;
+    font-weight: 600 !important;
+    text-transform: none !important;
+    letter-spacing: 0 !important;
+    padding: 8px 10px !important;
+    border-radius: 6px !important;
+    cursor: pointer !important;
+    white-space: nowrap !important;
+    transition: background .12s, color .12s !important;
+}
+.sg-fit-center-btn:hover {
+    background: var(--sg-bg-soft) !important;
+    color: var(--sg-primary) !important;
+}
+.sg-fit-center-btn:active {
+    background: rgba(37, 99, 235, .12) !important;
+}
+.sg-fit-center-btn span {
+    color: inherit !important;
+    line-height: 1 !important;
+}
+.sg-fit-center-btn svg {
+    width: 16px !important;
+    height: 16px !important;
+    fill: currentColor !important;
+    flex-shrink: 0 !important;
+    color: var(--sg-text-soft) !important;
+}
+
+.nbd-mode-modern .nbd-load-page .loader {
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    margin: auto !important;
+}
+
+

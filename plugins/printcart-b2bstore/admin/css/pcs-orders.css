@@ -1,0 +1,205 @@
+/* ============================================================
+   B2B Portal — Orders section styles
+   ============================================================ */
+
+/* ---- Filter tabs ---- */
+.pcs-orders-tabs {
+  display: flex;
+  gap: 0;
+  border-bottom: 1px solid #e5e7eb;
+  margin-bottom: 16px;
+  overflow-x: auto;
+}
+.pcs-orders-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 16px;
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  font-size: 14px;
+  font-weight: 600;
+  color: #6b7280;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all .12s;
+  margin-bottom: -1px;
+  white-space: nowrap;
+}
+.pcs-orders-tab:hover { color: #2563eb; text-decoration: none; }
+.pcs-orders-tab.active { color: #2563eb; border-bottom-color: #2563eb; }
+.pcs-orders-tab-count {
+  background: #f3f4f6;
+  color: #6b7280;
+  padding: 1px 6px;
+  border-radius: 9999px;
+  font-size: 11px;
+  font-weight: 700;
+}
+.pcs-orders-tab.active .pcs-orders-tab-count {
+  background: #dbeafe;
+  color: #2563eb;
+}
+
+/* ---- Table wrapper with horizontal scroll on mobile ---- */
+.pcs-orders-table-wrap {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* ---- Orders table ---- */
+.pcs-orders-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+.pcs-orders-table thead th {
+  padding: 10px 16px;
+  background: #f9fafb;
+  text-align: left;
+  font-size: 11px;
+  font-weight: 700;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: .05em;
+  border-bottom: 1px solid #e5e7eb;
+  white-space: nowrap;
+}
+.pcs-orders-table tbody td {
+  padding: 14px 16px;
+  border-bottom: 1px solid #f3f4f6;
+  vertical-align: middle;
+}
+.pcs-orders-table tbody tr:last-child td { border-bottom: none; }
+.pcs-orders-row {
+  cursor: pointer;
+  transition: background .12s;
+}
+.pcs-orders-row:hover { background: #f9fafb; }
+
+/* Order number */
+.pcs-orders-num {
+  font-weight: 700;
+  color: #2563eb;
+  font-size: 14px;
+}
+
+/* Product cell */
+.pcs-orders-product {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.pcs-orders-thumb {
+  width: 44px;
+  height: 44px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #2b3a8a, #1a1547);
+  display: grid;
+  place-items: center;
+  color: #fbbf24;
+  font-size: 9px;
+  font-weight: 800;
+  flex-shrink: 0;
+  text-align: center;
+  line-height: 1.2;
+}
+.pcs-orders-product-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: #1f2937;
+  line-height: 1.3;
+  max-width: 220px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.pcs-orders-product-meta {
+  font-size: 11px;
+  color: #9ca3af;
+  margin-top: 2px;
+}
+
+/* Status badge */
+.pcs-orders-status {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  border-radius: 9999px;
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* Action buttons */
+.pcs-orders-invoice-btn {
+  font-size: 12px;
+  font-weight: 500;
+  color: #2563eb;
+  text-decoration: none;
+  padding: 4px 8px;
+  border-radius: 6px;
+  transition: background .12s;
+  white-space: nowrap;
+}
+.pcs-orders-invoice-btn:hover {
+  background: #dbeafe;
+  text-decoration: none;
+}
+.pcs-orders-reorder-btn {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 6px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #374151;
+  cursor: pointer;
+  transition: all .12s;
+  white-space: nowrap;
+  font-family: inherit;
+}
+.pcs-orders-reorder-btn:hover {
+  background: #2563eb;
+  color: #fff;
+  border-color: #2563eb;
+}
+.pcs-orders-reorder-btn:disabled {
+  opacity: .5;
+  cursor: not-allowed;
+}
+
+/* Pagination */
+.pcs-page-nav-btn {
+  padding: 6px 12px;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #374151;
+  text-decoration: none;
+  transition: all .12s;
+}
+.pcs-page-nav-btn:hover {
+  background: #2563eb;
+  color: #fff;
+  border-color: #2563eb;
+  text-decoration: none;
+}
+
+/* ---- Empty state ---- */
+.pcs-orders-empty {
+  text-align: center;
+  padding: 60px 20px;
+}
+
+/* Mobile tweaks */
+@media (max-width: 768px) {
+  .pcs-orders-tabs { gap: 0; }
+  .pcs-orders-tab  { padding: 8px 10px; font-size: 12px; }
+  .pcs-orders-product-name { max-width: 140px; }
+  .pcs-orders-table thead th:nth-child(4),
+  .pcs-orders-table tbody td:nth-child(4) { display: none; } /* hide invoice col */
+}

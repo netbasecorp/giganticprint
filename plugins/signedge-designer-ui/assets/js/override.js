@@ -391,7 +391,7 @@
         initAutoSizeFromImage();
         initUploadCaptureHook();
         initUploadThumbnailMeta();
-        initFitCenterFloatingToolbar();
+        initArtBar(workspace);
         initPhotosTabFirst();
         initDimensionFieldRestyle();
         initSourceTileActiveState();
@@ -1159,189 +1159,6 @@
     }
 
     /* ----------------------------------------------------------------
-       FLOATING "FIT" / "CENTER" TOOLBAR (signs365-style)
-       For products using a predefined size LIST rather than the
-       free-form Custom dimension field — those don't get the
-       auto-size-from-image flow above, so customers need a manual way
-       to fit/position their uploaded image within the fixed canvas.
-       Core's own "Stretch" context-menu item already does a non-uniform
-       fill (fitToStage() in app-modern.min.js) — "Fit" here is a NEW,
-       aspect-preserving contain-fit; "Center" only repositions, no
-       rescale.
-
-       Originally implemented as two extra right-click context-menu
-       items, but the customer asked for them to be visible without a
-       right-click (closer to signs365, which shows them as a permanent
-       small panel under the selected image) — a small toolbar that
-       floats above the selected image on canvas, shown/positioned by a
-       poll loop rather than one-time event bindings, because the fabric
-       canvas instance itself gets replaced whenever dimension options
-       change (see waitForFreshCanvasThenAdd above / project memory) —
-       anything bound to a specific canvas/object reference would go
-       stale silently.
-    ---------------------------------------------------------------- */
-    function fitImageUniform(item, stage, canvas) {
-        if (!item.width || !item.height) return;
-        var scale = stage.states.scaleRange[stage.states.currentScaleIndex].ratio;
-        var maxW = canvas.width / scale;
-        var maxH = canvas.height / scale;
-        // Math.max (not min): cover the whole canvas like Stretch does — no
-        // blank canvas space left over — while still scaling both axes by
-        // the SAME factor so the image itself isn't distorted. Whichever
-        // axis ends up larger than the canvas just extends past its edges,
-        // same as it would for any other layer positioned off-canvas —
-        // nothing outside the print area shows up in the export.
-        var s = Math.max(maxW / item.width, maxH / item.height);
-        var originX = item.get('originX'), originY = item.get('originY');
-        item.set({
-            left: originX === 'center' ? maxW / 2 : 0,
-            top: originY === 'center' ? maxH / 2 : 0,
-            scaleX: s,
-            scaleY: s
-        });
-        canvas.viewportCenterObjectH(item);
-        canvas.viewportCenterObjectV(item);
-        item.setCoords();
-    }
-
-    function centerImageOnly(item, canvas) {
-        canvas.viewportCenterObjectH(item);
-        canvas.viewportCenterObjectV(item);
-        item.setCoords();
-    }
-
-    var sgFitCenterTarget = null; // {item, stage, canvas} — refreshed every poll tick, read at click time
-
-    function ensureFitCenterToolbar() {
-        var toolbar = document.getElementById('sg-fit-center-toolbar');
-        if (toolbar) return toolbar;
-
-        toolbar = document.createElement('div');
-        toolbar.id = 'sg-fit-center-toolbar';
-        toolbar.className = 'sg-fit-center-toolbar';
-        toolbar.innerHTML =
-            '<button type="button" class="sg-fit-center-btn" id="sg-fit-btn">' +
-                '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9 3H4a1 1 0 0 0-1 1v5h2V5h4V3zm11 1a1 1 0 0 0-1-1h-5v2h4v4h2V4zM5 15H3v5a1 1 0 0 0 1 1h5v-2H5v-4zm14 4h-4v2h5a1 1 0 0 0 1-1v-5h-2v4z"/></svg>' +
-                '<span>' + escHtml('Fit') + '</span>' +
-            '</button>' +
-            '<span class="sg-fit-center-sep"></span>' +
-            '<button type="button" class="sg-fit-center-btn" id="sg-center-btn">' +
-                '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 20c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm0-14c-3.31 0-6 2.69-6 6s2.69 6 6 6 6-2.69 6-6-2.69-6-6-6zm0 8c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2z"/></svg>' +
-                '<span>' + escHtml('Center') + '</span>' +
-            '</button>';
-        // signs365/printcart-style vertical menu in the blank margin to
-        // the left of the CANVAS (not a horizontal pill above the image —
-        // that overlapped the "Show dimensions" ruler labels near the top
-        // of the canvas; and not anchored to the image's own edge either —
-        // that crowded/overlapped the canvas boundary whenever the image
-        // filled most of the canvas width).
-        document.body.appendChild(toolbar);
-
-        toolbar.querySelector('#sg-fit-btn').addEventListener('click', function (e) {
-            e.stopPropagation();
-            runFitCenterAction(fitImageUniform);
-        });
-        toolbar.querySelector('#sg-center-btn').addEventListener('click', function (e) {
-            e.stopPropagation();
-            runFitCenterAction(function (item, stage, canvas) { centerImageOnly(item, canvas); });
-        });
-
-        return toolbar;
-    }
-
-    function runFitCenterAction(fn) {
-        var target = sgFitCenterTarget;
-        if (!target) return;
-        var scope = target.scope, item = target.item, stage = target.stage, canvas = target.canvas;
-
-        function run() {
-            fn(item, stage, canvas);
-            if (typeof scope.updateCorners === 'function') scope.updateCorners();
-            if (typeof scope.renderStage === 'function') scope.renderStage();
-            if (typeof scope.afterObjectModify === 'function') scope.afterObjectModify();
-        }
-        if (scope.$$phase || (scope.$root && scope.$root.$$phase)) {
-            scope.$evalAsync(run);
-        } else {
-            scope.$apply(run);
-        }
-        // Reflect the new position/size immediately instead of waiting for
-        // the next poll tick.
-        setTimeout(positionFitCenterToolbar, 30);
-    }
-
-    function positionFitCenterToolbar() {
-        var toolbar = ensureFitCenterToolbar();
-        try {
-            var stageMEl = findActiveStageMain();
-            var scope = stageMEl && angular.element(stageMEl).scope();
-
-            if (!scope || !scope.stages) {
-                toolbar.classList.remove('is-visible');
-                sgFitCenterTarget = null;
-                return;
-            }
-            var stage = scope.stages[scope.currentStage];
-            var canvas = stage && stage.canvas;
-            var item = canvas && canvas.getActiveObject();
-            // Read the fabric object's own type directly instead of the
-            // Angular stage.states.isImage/isLayer flags — those are only
-            // updated by core's own selection-change handler, and relying
-            // on them adds a second thing that has to be "in sync" for no
-            // real benefit (an image object IS an image regardless of
-            // whether Angular has been notified of the selection yet).
-            var isImage = item && (item.get('type') === 'image' || item.get('type') === 'custom-image');
-
-            if (!item || !isImage || !canvas.upperCanvasEl) {
-                toolbar.classList.remove('is-visible');
-                sgFitCenterTarget = null;
-                return;
-            }
-
-            sgFitCenterTarget = { scope: scope, item: item, stage: stage, canvas: canvas };
-
-            var canvasRect = canvas.upperCanvasEl.getBoundingClientRect();
-            // false = use the same "interactive" (oCoords) coordinate space
-            // fabric itself uses for mouse hit-testing against the rendered
-            // canvas element — i.e. already in on-screen pixels matching
-            // canvasRect, regardless of current zoom. The other mode
-            // (absolute/aCoords) is the zoom-independent logical space
-            // item.left/top/width live in, which would be wrong here at
-            // any zoom level other than 100%.
-            var br = item.getBoundingRect(false, true);
-            // Horizontal position is anchored to the CANVAS edge, not the
-            // image edge — printcart/signs365 keep this menu in the blank
-            // margin outside the design area so it never crowds/overlaps
-            // whatever's on canvas, regardless of how much of the canvas
-            // width the image itself happens to fill. Vertical position
-            // still follows the selected image so it's clear which layer
-            // it applies to when a stage has more than one.
-            var top = canvasRect.top + br.top;
-
-            toolbar.classList.add('is-visible');
-            // ~100px is a safe estimate of the menu's own width; if there's
-            // not enough blank margin to the left of the canvas itself
-            // (canvas flush against the sidebar), fall back to the right
-            // side of the canvas instead.
-            if (canvasRect.left < 100) {
-                toolbar.classList.add('sg-right');
-                toolbar.style.left = canvasRect.right + 'px';
-            } else {
-                toolbar.classList.remove('sg-right');
-                toolbar.style.left = canvasRect.left + 'px';
-            }
-            toolbar.style.top = top + 'px';
-        } catch (err) {
-            toolbar.classList.remove('is-visible');
-            sgFitCenterTarget = null;
-        }
-    }
-
-    function initFitCenterFloatingToolbar() {
-        setInterval(positionFitCenterToolbar, 250);
-    }
-
-    /* ----------------------------------------------------------------
        ART PLACEMENT HELPERS (shared by auto-place, art bar, checks)
        sgArt.mode is the fit mode last applied to the art on the active
        stage: 'stretch' | 'fit' | 'center' (null = placed some other way).
@@ -1542,6 +1359,236 @@
                 sgPlacingEnd();
             }
         }, 0);
+    }
+
+    /* ----------------------------------------------------------------
+       ART BAR (#sg-artbar)
+       Persistent bar above the canvas once the active stage holds an art
+       image: fit modes (stretch / fit / center) and, when the product has
+       an enabled dimension field, a width/height editor that drives the
+       NBO dimension exactly like tryAutoSizeThenAdd's commit() and then
+       re-applies the current fit mode (a dimension change keeps canvas
+       objects but never rescales them). One 300 ms poll drives all of it:
+       the fabric canvas is replaced on every size change, so nothing is
+       bound to a specific canvas/object instance.
+    ---------------------------------------------------------------- */
+    var sgArtBar = {
+        el: null, timer: null, visible: false, lastHeight: 0,
+        sizeTimer: null, errTimer: null, selfChange: false,
+        sig: null, sigStage: -1, reapplyTimer: null
+    };
+
+    function sgFmtInputIn(v) {
+        var n = parseFloat(v);
+        return isFinite(n) ? String(Math.round(n * 100) / 100) : '';
+    }
+
+    function initArtBar(workspace) {
+        if (sgArtBar.timer) return;
+        sgArtBar.timer = setInterval(artBarTick, 300);
+        artBarTick();
+    }
+
+    function ensureArtBar() {
+        if (sgArtBar.el && document.body.contains(sgArtBar.el)) return sgArtBar.el;
+        var stages = document.querySelector('.nbd-workspace .nbd-stages');
+        if (!stages || !stages.parentNode) return null;
+
+        var bar = document.createElement('div');
+        bar.id = 'sg-artbar';
+        bar.className = 'sg-artbar';
+        bar.innerHTML =
+            '<div class="sg-artbar-group sg-artbar-modes" role="group" aria-label="Artwork fit">' +
+                '<button type="button" class="sg-artbar-btn" data-sg-art="stretch">Stretch to fit</button>' +
+                '<button type="button" class="sg-artbar-btn" data-sg-art="fit">Fit (keep ratio)</button>' +
+                '<button type="button" class="sg-artbar-btn" data-sg-art="center">Center</button>' +
+            '</div>' +
+            '<div class="sg-artbar-group sg-artbar-size">' +
+                '<label class="sg-artbar-field">W <input type="number" id="sg-art-w" step="0.01" min="0" inputmode="decimal"></label>' +
+                '<span class="sg-artbar-x">&times;</span>' +
+                '<label class="sg-artbar-field">H <input type="number" id="sg-art-h" step="0.01" min="0" inputmode="decimal"></label>' +
+                '<span class="sg-artbar-unit">in</span>' +
+                '<label class="sg-artbar-lock"><input type="checkbox" id="sg-art-lock" checked> Keep proportions</label>' +
+            '</div>' +
+            '<span class="sg-artbar-actual" id="sg-art-actual"></span>' +
+            '<span class="sg-artbar-err" id="sg-art-err" role="alert"></span>';
+        stages.parentNode.insertBefore(bar, stages);
+        sgArtBar.el = bar;
+
+        bar.addEventListener('click', function (e) {
+            var btn = e.target && e.target.closest ? e.target.closest('[data-sg-art]') : null;
+            if (!btn) return;
+            var scope = getDesignScope();
+            if (scope) applyArtMode(scope, btn.getAttribute('data-sg-art'));
+        });
+        ['sg-art-w', 'sg-art-h'].forEach(function (id) {
+            var input = bar.querySelector('#' + id);
+            input.addEventListener('change', function () { scheduleArtSizeCommit(id === 'sg-art-w' ? 'w' : 'h'); });
+            input.addEventListener('keydown', function (e) {
+                if (e.key === 'Enter' || e.keyCode === 13) scheduleArtSizeCommit(id === 'sg-art-w' ? 'w' : 'h');
+            });
+        });
+        return bar;
+    }
+
+    function showArtBarError(msg) {
+        var errEl = document.getElementById('sg-art-err');
+        if (!errEl) return;
+        errEl.textContent = msg || '';
+        clearTimeout(sgArtBar.errTimer);
+        if (msg) sgArtBar.errTimer = setTimeout(function () { errEl.textContent = ''; }, 4000);
+    }
+
+    function scheduleArtSizeCommit(axis) {
+        clearTimeout(sgArtBar.sizeTimer);
+        sgArtBar.sizeTimer = setTimeout(function () {
+            sgArtBar.sizeTimer = null;
+            commitArtSize(axis);
+        }, 400);
+    }
+
+    function clampDim(v, min, max, label, notes) {
+        min = parseFloat(min) || 0;
+        max = parseFloat(max) || 0;
+        if (v < min) { notes.push(label + ' must be at least ' + fmtIn(min) + ' in'); return min; }
+        if (max > 0 && v > max) { notes.push(label + ' can be at most ' + fmtIn(max) + ' in'); return max; }
+        return v;
+    }
+
+    function commitArtSize(axis) {
+        try {
+            var dim = findDimensionField();
+            var scope = getDesignScope();
+            var bar = sgArtBar.el;
+            if (!dim || !scope || !bar) return;
+            var wIn = bar.querySelector('#sg-art-w'), hIn = bar.querySelector('#sg-art-h');
+            var w = parseFloat(wIn.value), h = parseFloat(hIn.value);
+            if (!(w > 0) || !(h > 0)) {
+                showArtBarError('Enter a width and height greater than 0');
+                syncArtBarInputs(dim, true);
+                return;
+            }
+            var stage = scope.stages[scope.currentStage];
+            var item = stage && getArtItem(stage.canvas);
+            var ar = item && item.width && item.height ? item.width / item.height : w / h;
+            var g = dim.field.general || {};
+            var notes = [];
+            if (bar.querySelector('#sg-art-lock').checked) {
+                if (axis === 'w') {
+                    w = clampDim(w, g.min_width, g.max_width, 'Width', notes);
+                    h = clampDim(w / ar, g.min_height, g.max_height, 'Height', notes);
+                    if (notes.length > 1 || (notes.length && Math.abs(w / h - ar) > 0.01)) w = clampDim(h * ar, g.min_width, g.max_width, 'Width', []);
+                } else {
+                    h = clampDim(h, g.min_height, g.max_height, 'Height', notes);
+                    w = clampDim(h * ar, g.min_width, g.max_width, 'Width', notes);
+                    if (notes.length > 1 || (notes.length && Math.abs(w / h - ar) > 0.01)) h = clampDim(w / ar, g.min_height, g.max_height, 'Height', []);
+                }
+            } else {
+                w = clampDim(w, g.min_width, g.max_width, 'Width', notes);
+                h = clampDim(h, g.min_height, g.max_height, 'Height', notes);
+            }
+            w = Math.round(w * 100) / 100;
+            h = Math.round(h * 100) / 100;
+            wIn.value = sgFmtInputIn(w);
+            hIn.value = sgFmtInputIn(h);
+            showArtBarError(notes.length ? notes[0] + ' (adjusted)' : '');
+            applyArtSize(dim, scope, w, h);
+        } catch (e) {
+            console.warn('[SG-ART] commitArtSize failed', e);
+        }
+    }
+
+    // Same sequence as tryAutoSizeThenAdd's commit(), then wait for the
+    // canvas rebuild and re-apply the current fit mode.
+    function applyArtSize(dim, scope, w, h) {
+        var stage = scope.stages[scope.currentStage];
+        var oldCanvas = stage && stage.canvas;
+        var oldW = oldCanvas ? oldCanvas.width : 0, oldH = oldCanvas ? oldCanvas.height : 0;
+        sgArtBar.selfChange = true;
+        hideStagesForResize();
+        sgRunInScope(dim.nbo, function () {
+            dim.live.width = w;
+            dim.live.height = h;
+            dim.nbo.update_dimensionvalue(dim.field.id, 'width');
+            dim.nbo.update_dimensionvalue(dim.field.id, 'height');
+            dim.nbo.applyOptions();
+        });
+        waitRebuildThenReapply(scope, oldCanvas, oldW, oldH, 0);
+    }
+
+    function waitRebuildThenReapply(scope, oldCanvas, oldW, oldH, attempt) {
+        var stage = scope.stages && scope.stages[scope.currentStage];
+        var c = stage && stage.canvas;
+        var changed = c && (c !== oldCanvas || c.width !== oldW || c.height !== oldH);
+        if ((changed && attempt >= 1) || attempt >= 8) {
+            var mode = sgArt.mode || 'stretch';
+            setTimeout(function () { applyArtMode(scope, mode); }, 150);
+            // second pass: the rebuild can still be settling (zoom, centering)
+            setTimeout(function () {
+                applyArtMode(scope, mode);
+                revealStagesAfterResize();
+                autoZoomToFit();
+                sgArtBar.selfChange = false;
+            }, 700);
+            return;
+        }
+        setTimeout(function () { waitRebuildThenReapply(scope, oldCanvas, oldW, oldH, attempt + 1); }, 200);
+    }
+
+    function syncArtBarInputs(dim, force) {
+        var bar = sgArtBar.el;
+        var wIn = bar.querySelector('#sg-art-w'), hIn = bar.querySelector('#sg-art-h');
+        var active = document.activeElement;
+        if (!force && (active === wIn || active === hIn || sgArtBar.sizeTimer)) return;
+        var w = sgFmtInputIn(dim.live.width), h = sgFmtInputIn(dim.live.height);
+        if (wIn.value !== w) wIn.value = w;
+        if (hIn.value !== h) hIn.value = h;
+    }
+
+    function artBarTick() {
+        try {
+            var bar = ensureArtBar();
+            var scope = getDesignScope();
+            var stage = scope && scope.stages && scope.stages[scope.currentStage];
+            var canvas = stage && stage.canvas;
+            var item = canvas && getArtItem(canvas);
+            if (!bar) return;
+            // keep the last state while art is being (re)placed: the canvas
+            // is rebuilt mid-way and would flicker the bar off and on
+            var show = !!item || (sgArt.placing && sgArtBar.visible);
+            if (show !== sgArtBar.visible) {
+                sgArtBar.visible = show;
+                bar.classList.toggle('is-visible', show);
+                setTimeout(function () { window.dispatchEvent(new Event('resize')); }, 50);
+            }
+            if (!show) return;
+            if (!item) return;
+
+            var dim = findDimensionField();
+            bar.classList.toggle('sg-has-size', !!dim);
+            var area = getPrintAreaInches(scope);
+            var actual = bar.querySelector('#sg-art-actual');
+            var txt = area ? 'Actual size: ' + fmtIn(area.w) + ' x ' + fmtIn(area.h) + ' in' : '';
+            if (actual.textContent !== txt) actual.textContent = txt;
+            if (dim) syncArtBarInputs(dim, false);
+
+            var btns = bar.querySelectorAll('[data-sg-art]');
+            for (var i = 0; i < btns.length; i++) {
+                btns[i].classList.toggle('sg-active', btns[i].getAttribute('data-sg-art') === sgArt.mode);
+            }
+
+            // Size changed from elsewhere (PRINTING tab): the canvas is
+            // rebuilt but the art isn't rescaled, so follow with the mode.
+            var ratio = stage.states.scaleRange[stage.states.currentScaleIndex].ratio;
+            var sig = Math.round(canvas.width / ratio) + 'x' + Math.round(canvas.height / ratio);
+            if (sgArtBar.sigStage === scope.currentStage && sig !== sgArtBar.sig &&
+                !sgArtBar.selfChange && !sgArt.placing && sgArt.mode) {
+                clearTimeout(sgArtBar.reapplyTimer);
+                sgArtBar.reapplyTimer = setTimeout(function () { applyArtMode(scope, sgArt.mode); }, 400);
+            }
+            sgArtBar.sig = sig;
+            sgArtBar.sigStage = scope.currentStage;
+        } catch (e) { /* poll must never throw */ }
     }
 
     /* ----------------------------------------------------------------

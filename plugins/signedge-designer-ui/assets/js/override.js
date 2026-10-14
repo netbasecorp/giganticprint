@@ -1642,6 +1642,77 @@
         }
     }
 
+    /* ----------------------------------------------------------------
+       LOW-RESOLUTION WARNING (#sg-lowres-warning)
+       effective dpi = natural pixel width of the uploaded file / placed
+       physical width in inches. < 100 warns (dismissable; reappears when
+       the rounded dpi changes), 100-149 stays silent.
+    ---------------------------------------------------------------- */
+    var sgLowRes = { cache: {}, dismissed: null, el: null, shownDpi: null };
+
+    // Natural pixel size of the uploaded file; null while the probe loads.
+    function getArtPixelSize(item) {
+        var url = item.origin_url || (typeof item.getSrc === 'function' ? item.getSrc() : '');
+        var fallback = { w: item.origin_width || item.width, h: item.origin_height || item.height };
+        if (!url) return fallback;
+        var c = sgLowRes.cache[url];
+        if (c) return c.pending ? null : c;
+        sgLowRes.cache[url] = { pending: true };
+        var img = new Image();
+        img.onload = function () {
+            sgLowRes.cache[url] = img.naturalWidth ? { w: img.naturalWidth, h: img.naturalHeight } : fallback;
+        };
+        img.onerror = function () { sgLowRes.cache[url] = fallback; };
+        img.src = url;
+        return null;
+    }
+
+    function ensureLowResEl(bar) {
+        if (sgLowRes.el && document.body.contains(sgLowRes.el)) return sgLowRes.el;
+        var el = document.createElement('div');
+        el.id = 'sg-lowres-warning';
+        el.className = 'sg-lowres-warning';
+        el.setAttribute('role', 'alert');
+        el.innerHTML = '<span class="sg-lowres-msg"></span>' +
+            '<button type="button" class="sg-lowres-dismiss" aria-label="Dismiss">Dismiss</button>';
+        bar.parentNode.insertBefore(el, bar.nextSibling);
+        el.querySelector('.sg-lowres-dismiss').addEventListener('click', function () {
+            sgLowRes.dismissed = sgLowRes.shownDpi;
+            el.classList.remove('is-visible');
+        });
+        sgLowRes.el = el;
+        return el;
+    }
+
+    function updateLowResWarning(bar, scope, stage, canvas, item) {
+        var el = ensureLowResEl(bar);
+        var dpi = null, physW = 0, physH = 0;
+        if (item) {
+            var px = getArtPixelSize(item);
+            var area = getPrintAreaInches(scope);
+            if (px && px.w && area && canvas.width) {
+                var ratio = stage.states.scaleRange[stage.states.currentScaleIndex].ratio;
+                var maxW = canvas.width / ratio, maxH = canvas.height / ratio;
+                physW = (item.width * item.scaleX) / maxW * area.w;
+                physH = (item.height * item.scaleY) / maxH * area.h;
+                if (physW > 0) dpi = px.w / physW;
+            }
+        }
+        var key = dpi === null ? null : Math.round(dpi);
+        var show = key !== null && dpi < 100 && sgLowRes.dismissed !== key;
+        if (show) {
+            sgLowRes.shownDpi = key;
+            var msg = 'Low resolution: about ' + key + ' dpi at ' + fmtIn(physW) + ' x ' + fmtIn(physH) +
+                ' in. The print may look soft. Use a larger file or reduce the print size.';
+            var msgEl = el.querySelector('.sg-lowres-msg');
+            if (msgEl.textContent !== msg) msgEl.textContent = msg;
+        }
+        if (show !== el.classList.contains('is-visible')) {
+            el.classList.toggle('is-visible', show);
+            setTimeout(function () { window.dispatchEvent(new Event('resize')); }, 50);
+        }
+    }
+
     function artBarTick() {
         try {
             var bar = ensureArtBar();
@@ -1659,7 +1730,7 @@
                 bar.classList.toggle('is-visible', show);
                 setTimeout(function () { window.dispatchEvent(new Event('resize')); }, 50);
             }
-            if (!show) return;
+            if (!show) { updateLowResWarning(bar, null, null, null, null); return; }
             if (!item) return;
 
             var dim = findDimensionField();
@@ -1669,6 +1740,8 @@
             var txt = area ? 'Actual size: ' + fmtIn(area.w) + ' x ' + fmtIn(area.h) + ' in' : '';
             if (actual.textContent !== txt) actual.textContent = txt;
             if (dim) syncArtBarInputs(dim, false);
+
+            updateLowResWarning(bar, scope, stage, canvas, item);
 
             var btns = bar.querySelectorAll('[data-sg-art]');
             for (var i = 0; i < btns.length; i++) {

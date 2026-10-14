@@ -3311,3 +3311,39 @@ body.sg-options-loading .await-for-options p::after {
 @keyframes sg-up-spin { to { transform: rotate(360deg); } }
 @keyframes sg-up-pulse { 0%, 100% { opacity: 1; } 50% { opacity: .45; } }
 body.sg-upload-busy .loading-workflow { display: none !important; }
+
+/* ============================================================
+   LOW-RESOLUTION WARNING (#sg-lowres-warning) — non-blocking,
+   sits right under the art bar.
+   ============================================================ */
+.sg-lowres-warning {
+    display: none !important;
+    flex: 0 0 auto !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex-wrap: wrap !important;
+    gap: 6px 12px !important;
+    box-sizing: border-box !important;
+    max-width: calc(100% - 16px) !important;
+    margin: 6px auto 0 !important;
+    padding: 6px 12px !important;
+    background: #fffbeb !important;
+    border: 1px solid #f59e0b !important;
+    border-radius: var(--sg-radius) !important;
+    color: #92400e !important;
+    font-size: 13px !important;
+    line-height: 1.35 !important;
+    position: relative !important;
+    z-index: 5 !important;
+}
+.sg-lowres-warning.is-visible { display: flex !important; }
+.sg-lowres-dismiss {
+    padding: 3px 10px !important;
+    background: transparent !important;
+    border: 1px solid #f59e0b !important;
+    border-radius: 6px !important;
+    color: #92400e !important;
+    font-size: 12px !important;
+    cursor: pointer !important;
+}
+.sg-lowres-dismiss:hover { background: #fef3c7 !important; }

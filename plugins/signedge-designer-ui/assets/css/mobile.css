@@ -305,3 +305,15 @@ body.sg-m-adv #sg-m-back.sg-m-btn {
 #sg-m #sg-add-to-cart-btn .sg-btn-price-val,
 #sg-m #sg-add-to-cart-btn .sg-btn-arrow { display: none !important; }
 #sg-m #sg-add-to-cart-btn .sg-btn-inner { width: 100%; text-align: center; }
+
+/* Add to Cart button in the sticky bar: primary colour */
+body.sg-m-on #sg-m-bar #sg-add-to-cart-btn,
+body.sg-m-on #sg-m-bar .sg-btn-add-to-cart {
+  background: #2563eb !important;
+  color: #fff !important;
+  border-color: #1d4ed8 !important;
+}
+body.sg-m-on #sg-m-bar #sg-add-to-cart-btn .sg-btn-label,
+body.sg-m-on #sg-m-bar #sg-add-to-cart-btn span { color: #fff !important; }
+body.sg-m-on #sg-m-bar #sg-add-to-cart-btn.sg-btn-loading,
+body.sg-m-on #sg-m-bar #sg-add-to-cart-btn:disabled { background: #9ca3af !important; border-color: #9ca3af !important; }

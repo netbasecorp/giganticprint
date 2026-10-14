@@ -258,7 +258,7 @@ class SG_Upload {
         if ( ! $h ) {
             return false;
         }
-        $needles = array( 'deletefile', 'renamefile', '%pipe', 'filenameforall', '%os%', '%disk', 'setsafe', 'systemdict' );
+        $needles = array( 'deletefile', 'renamefile', '%pipe', 'filenameforall', '%os%', '%disk' );
         $tail    = '';
         $ok      = true;
         while ( ! feof( $h ) ) {

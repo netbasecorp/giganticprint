@@ -390,6 +390,7 @@
         initEmptyCanvasOverlay();
         initAutoSizeFromImage();
         initUploadCaptureHook();
+        setInterval(sgPatchUploadUi, 1000);
         initUploadThumbnailMeta();
         initArtBar(workspace);
         initPhotosTabFirst();
@@ -1711,7 +1712,7 @@
        can take a minute), then "Placing..." while sgArt.placing. Core
        reports every failure through alert(), which resets the counter.
     ---------------------------------------------------------------- */
-    var sgUpload = { pending: 0, names: [], lastName: '', lastActivity: 0, lastProgress: -1, el: null };
+    var sgUpload = { pending: 0, names: [], lastName: '', lastActivity: 0, lastProgress: -1, el: null, custom: null };
 
     function sgUploadStart(name) {
         sgUpload.pending++;
@@ -1774,7 +1775,12 @@
         if (sgUpload.pending > 0 && Date.now() - sgUpload.lastActivity > 180000) sgUploadReset();
 
         var phase = '';
-        if (sgUpload.pending > 0) phase = progress >= 100 ? 'process' : 'upload';
+        var custom = sgUpload.custom;
+        if (custom && sgUpload.pending > 0) {
+            sgUpload.lastActivity = Date.now(); // converter / chunk code owns the overlay
+            phase = custom.phase;
+        }
+        else if (sgUpload.pending > 0) phase = progress >= 100 ? 'process' : 'upload';
         else if (sgArt.placing) phase = 'place';
 
         if (!phase) {
@@ -1785,10 +1791,12 @@
             return;
         }
         var name = sgUpload.names[0] || sgUpload.lastName || '';
-        var text = phase === 'upload' ? 'Uploading... ' + progress + '%'
+        var useCustom = custom && sgUpload.pending > 0;
+        var text = useCustom ? custom.text
+            : phase === 'upload' ? 'Uploading... ' + progress + '%'
             : phase === 'process' ? 'Processing your file...'
             : 'Placing your artwork on the product...';
-        var pct = phase === 'upload' ? progress : 100;
+        var pct = useCustom ? custom.pct : phase === 'upload' ? progress : 100;
         el.setAttribute('data-phase', phase);
         el.querySelector('.sg-up-name').textContent = name;
         el.querySelector('.sg-up-fill').style.width = pct + '%';
@@ -1968,6 +1976,291 @@
     var sgJustStored = false; // true between storeUploadFile() and core's follow-up addImage()
     var sgUploadCaptureByIndex = {}; // keyed by absolute resource.upload.data index, not push order
 
+    /* ----------------------------------------------------------------
+       EXTRA FILE TYPES + CHUNKED UPLOAD (server: includes/class-sg-upload.php)
+       .ai -> renamed .pdf; .tif/.tiff/.eps -> converted to PNG server-side;
+       files > SG_UPLOAD.directMaxMb go through init/put/finish chunks so no
+       single request exceeds the Cloudflare body cap. All inactive when
+       window.SG_UPLOAD is missing.
+    ---------------------------------------------------------------- */
+    // SG-PURE-BEGIN
+    function sgChunkPlan(size, chunk) {
+        var plan = [], start = 0, i = 0;
+        if (!(chunk > 0)) return plan;
+        while (start < size) {
+            plan.push({ index: i++, start: start, end: Math.min(size, start + chunk) });
+            start += chunk;
+        }
+        return plan;
+    }
+
+    // task(attempt) -> Promise; up to `retries` re-runs, delays[n-1] ms before re-run n.
+    // An error with .fatal is never retried.
+    function sgRetry(task, retries, delays, sleep) {
+        return new Promise(function (resolve, reject) {
+            var failures = 0;
+            function run() {
+                var p;
+                try { p = task(failures); } catch (e) { p = Promise.reject(e); }
+                p.then(resolve, function (err) {
+                    failures++;
+                    if (failures > retries || (err && err.fatal)) { reject(err); return; }
+                    sleep(delays[Math.min(failures, delays.length) - 1]).then(run);
+                });
+            }
+            run();
+        });
+    }
+    // SG-PURE-END
+
+    function sgSleep(ms) {
+        return new Promise(function (resolve) { setTimeout(resolve, ms); });
+    }
+
+    function sgExt(name) {
+        var m = /\.([^.\/\\]+)$/.exec(name || '');
+        return m ? m[1].toLowerCase() : '';
+    }
+
+    function sgInList(list, v) {
+        return !!list && list.indexOf(v) !== -1;
+    }
+
+    function sgUploadErr(msg, status, data) {
+        var e = new Error(msg);
+        e.status = status || 0;
+        e.data = data || null;
+        // client-side mistakes will not fix themselves on retry (409 included)
+        e.fatal = e.status >= 400 && e.status < 500 && e.status !== 408 && e.status !== 429;
+        return e;
+    }
+
+    // POST multipart to admin-ajax. Resolves {status, json, blob, filename}; rejects on
+    // network errors, HTTP >= 400 and {success:false}.
+    function sgPost(fields, fileField, opts) {
+        opts = opts || {};
+        return new Promise(function (resolve, reject) {
+            var xhr = new XMLHttpRequest(), fd = new FormData(), k;
+            for (k in fields) { if (Object.prototype.hasOwnProperty.call(fields, k)) fd.append(k, fields[k]); }
+            if (fileField) fd.append(fileField.name, fileField.blob, fileField.filename);
+            xhr.open('POST', window.SG_UPLOAD.ajaxUrl, true);
+            xhr.responseType = 'blob';
+            if (xhr.upload) {
+                if (opts.onProgress) xhr.upload.onprogress = function (e) { if (e.lengthComputable) opts.onProgress(e.loaded, e.total); };
+                if (opts.onSent) xhr.upload.onload = opts.onSent;
+            }
+            xhr.onerror = xhr.ontimeout = function () {
+                reject(sgUploadErr('Network error while uploading. Please check your connection and try again.', 0));
+            };
+            xhr.onload = function () {
+                var type = xhr.getResponseHeader('Content-Type') || '';
+                var blob = xhr.response;
+                if (xhr.status < 400 && type.indexOf('image/') === 0) {
+                    resolve({ status: xhr.status, blob: blob, json: null, filename: xhr.getResponseHeader('X-GP-Filename') });
+                    return;
+                }
+                var reader = new FileReader();
+                reader.onload = function () {
+                    var json = null;
+                    try { json = JSON.parse(reader.result); } catch (e) { json = null; }
+                    var msg = json && json.data && json.data.message;
+                    if (xhr.status >= 400 || (json && json.success === false)) {
+                        reject(sgUploadErr(msg || ('Upload failed (HTTP ' + xhr.status + ').'), xhr.status || 500, json && json.data));
+                    } else if (!json) {
+                        reject(sgUploadErr('Unexpected response from the server.', 500));
+                    } else {
+                        resolve({ status: xhr.status, json: json });
+                    }
+                };
+                reader.onerror = function () { reject(sgUploadErr('Could not read the server response.', 500)); };
+                reader.readAsText(blob || new Blob([]));
+            };
+            xhr.send(fd);
+        });
+    }
+
+    function sgConvertFile(file, ext, origName) {
+        var label = ext === 'eps' ? 'EPS' : 'TIFF';
+        sgUpload.custom = { phase: 'upload', pct: 0, text: 'Uploading ' + origName + '...' };
+        return sgPost({ action: 'gp_convert_upload', nonce: window.SG_UPLOAD.nonce },
+            { name: 'file', blob: file, filename: file.name }, {
+                onProgress: function (loaded, total) {
+                    if (sgUpload.custom) sgUpload.custom.pct = total ? Math.min(99, Math.floor(loaded / total * 100)) : 0;
+                },
+                onSent: function () {
+                    sgUpload.custom = { phase: 'process', pct: 100, text: 'Converting ' + label + ' to PNG...' };
+                }
+            }).then(function (r) {
+            if (!r.blob) throw sgUploadErr('Unexpected response from the server.', 500);
+            var name = origName.replace(/\.[^.]*$/, '') + '.png';
+            try { if (r.filename) name = decodeURIComponent(r.filename); } catch (e) { /* keep fallback */ }
+            return new File([r.blob], name, { type: 'image/png' });
+        });
+    }
+
+    function sgCopyFiles(files) {
+        var out = [], i, n = files && files.length ? files.length : 0;
+        for (i = 0; i < n; i++) out.push(files[i]);
+        return out;
+    }
+
+    function sgChunkedUpload(scope, files, idx, maskId, entry) {
+        var SG = window.SG_UPLOAD, file = files[idx], total = file.size, done = false;
+        var shortName = entry && entry.name ? entry.name : file.name;
+        var id = '', plan = [];
+
+        function setUi(phase, pct, text) { sgUpload.custom = { phase: phase, pct: pct, text: text }; }
+        function partText(part, pct) {
+            return 'Uploading ' + shortName + ' - part ' + (part.index + 1) + ' of ' + plan.length + ' (' + pct + '%)';
+        }
+        function setBar(pct) {
+            scope.$evalAsync(function () { scope.resource.upload.progressBar = pct.toFixed(0); });
+        }
+        function dropEntry() {
+            var q = sgUploadNameQueue.indexOf(entry);
+            if (q !== -1) sgUploadNameQueue.splice(q, 1);
+        }
+        function fail(err) {
+            if (done) return;
+            done = true;
+            sgUpload.custom = null;
+            dropEntry();
+            var msg = (err && err.message) || 'Upload failed. Please try again.';
+            console.log('[SG-UPLOAD] chunked upload failed:', msg);
+            scope.$evalAsync(function () {
+                try { scope.toggleStageLoading(); } catch (e) { /* ignore */ }
+                jQuery('.nbd-progress-bar').removeClass('active');
+                alert(msg);
+            });
+        }
+        function putChunk(part) {
+            return sgRetry(function () {
+                var p0 = Math.floor(part.start / total * 100);
+                setUi('upload', p0, partText(part, p0));
+                return sgPost({ action: 'gp_chunk_upload', step: 'put', id: id, index: part.index, nonce: SG.nonce },
+                    { name: 'file', blob: file.slice(part.start, part.end), filename: 'chunk' }, {
+                        onProgress: function (loaded) {
+                            var sent = part.start + Math.min(loaded, part.end - part.start);
+                            var pct = Math.min(99, Math.floor(sent / total * 100));
+                            setUi('upload', pct, partText(part, pct));
+                            setBar(pct);
+                        }
+                    });
+            }, 3, [1000, 2000, 4000], sgSleep).catch(function (err) {
+                err.message = 'Upload of part ' + (part.index + 1) + ' of ' + plan.length + ' failed: ' + err.message + ' Please try again.';
+                throw err;
+            });
+        }
+        function sendParts(parts) {
+            var chain = Promise.resolve();
+            parts.forEach(function (part) { chain = chain.then(function () { return putChunk(part); }); });
+            return chain;
+        }
+        function finish(round) {
+            return sgPost({ action: 'gp_chunk_upload', step: 'finish', id: id, expected: plan.length, nonce: SG.nonce }).catch(function (err) {
+                var missing = err && err.status === 409 && err.data && err.data.missing;
+                if (missing && missing.length && round < 2) {
+                    return sendParts(plan.filter(function (p) { return missing.indexOf(p.index) !== -1; })).then(function () {
+                        setUi('process', 100, 'Processing your file...');
+                        return finish(round + 1);
+                    });
+                }
+                throw err;
+            });
+        }
+        // same sequence as core's nbdesigner_customer_upload success callback
+        function onResult(data) {
+            if (done) return;
+            done = true;
+            sgUpload.custom = null;
+            scope.$evalAsync(function () {
+                try {
+                    if (data.flag == 1) {
+                        if (angular.isDefined(data.ilr)) scope.resource.upload.ilr = true;
+                        if (scope.resource.upload.ilr && NBDESIGNCONFIG['nbdesigner_enable_low_resolution_image'] == 'no') {
+                            dropEntry();
+                            scope.toggleStageLoading();
+                            alert(data.mes);
+                            scope.uploadFile(files, idx + 1);
+                            return;
+                        }
+                        scope.storeUploadFile(data, data.name);
+                        if (maskId) { scope.addImage(data, false, true, false, false, maskId); } else { scope.addImage(data, false, true); }
+                        jQuery('#tab-photo .tab-scroll').stop().animate({ scrollTop: jQuery('#tab-photo .tab-scroll').prop('scrollHeight') }, 100);
+                        localStorage.setItem('uploaded', scope.resource.upload.data);
+                        scope.onEndRepeat('upload');
+                        scope.uploadFile(files, idx + 1);
+                    } else {
+                        dropEntry();
+                        scope.toggleStageLoading();
+                        alert(data.mes);
+                    }
+                } catch (e) {
+                    console.log('[SG-UPLOAD] result handler error:', e && e.message);
+                    try { scope.toggleStageLoading(); } catch (e2) { /* ignore */ }
+                } finally {
+                    jQuery('.nbd-progress-bar').removeClass('active');
+                }
+            });
+        }
+
+        try {
+            console.log('[SG-UPLOAD] chunked upload:', file.name, total, 'bytes');
+            scope.$evalAsync(function () {
+                scope.toggleStageLoading();
+                scope.resource.upload.progressBar = 0;
+                jQuery('.nbd-progress-bar').addClass('active');
+            });
+            setUi('upload', 0, 'Uploading ' + shortName + '...');
+            sgPost({ action: 'gp_chunk_upload', step: 'init', name: file.name, size: total, nonce: SG.nonce }).then(function (r) {
+                var d = r.json && r.json.data;
+                if (!d || !d.id) throw sgUploadErr('Unexpected response from the server.', 500);
+                id = d.id;
+                plan = sgChunkPlan(total, d.chunk || SG.chunkBytes);
+                return sendParts(plan);
+            }).then(function () {
+                setUi('process', 100, 'Processing your file...');
+                setBar(100);
+                return finish(0);
+            }).then(function (r) {
+                onResult(r.json);
+            }).catch(fail);
+        } catch (e) {
+            fail(e);
+        }
+    }
+
+    // Photos-tab hints + file input accept list; the DOM is rendered by Angular
+    // (possibly late), so this is idempotent and runs on a slow timer.
+    function sgPatchUploadUi() {
+        var SG = window.SG_UPLOAD;
+        if (!SG) return;
+        var input = document.querySelector('#tab-photo .form-upload input[type=file]');
+        if (input) {
+            var acc = input.getAttribute('accept') || '';
+            if (acc.indexOf('.eps') === -1) {
+                if (acc.indexOf('.pdf') === -1) acc += (acc ? ', ' : '') + '.pdf';
+                input.setAttribute('accept', acc + ', .ai,.eps,.tif,.tiff,image/tiff');
+            }
+        }
+        var spans = document.querySelectorAll('#tab-photo .allow-size > span');
+        for (var i = 0; i < spans.length; i++) {
+            var strong = spans[i].querySelector('strong');
+            if (!strong) continue;
+            var label = spans[i].textContent;
+            if (label.indexOf('Accept file types') === 0) {
+                if (strong.textContent !== 'png, jpg, svg, pdf, ai, eps, tiff') strong.textContent = 'png, jpg, svg, pdf, ai, eps, tiff';
+            } else if (label.indexOf('Max file size') === 0) {
+                // edit the text node in place so Angular's interpolation keeps its node
+                var node = strong.firstChild;
+                while (node && node.nodeType !== 3) node = node.nextSibling;
+                var want = SG.maxMb + ' MB';
+                if (node && node.nodeValue !== want) node.nodeValue = want;
+                else if (!node) strong.appendChild(document.createTextNode(want));
+            }
+        }
+    }
+
     function initUploadCaptureHook(attempt) {
         if (!window.angular) return;
         sgHookAlertForUploadErrors();
@@ -1984,8 +2277,10 @@
 
             (function (scope) {
                 var originalUpload = scope.uploadFile;
-                scope.uploadFile = function (files, indexFile) {
-                    var idx = (typeof indexFile === 'number') ? indexFile : 0;
+                // Queue the name/dpi entry (name = ORIGINAL file name) and hand the
+                // file to core. `args` are the (possibly rewritten) call arguments.
+                function queueAndUpload(args, idx, origName, started) {
+                    var files = args[0];
                     var file = files && files[idx];
                     // Skip SVGs: the core plugin handles them via FileReader +
                     // addSvgFromString, never calling storeUploadFile — queueing
@@ -1996,8 +2291,8 @@
                         // this is the SAME object storeUploadFile() will shift
                         // off the queue, so mutating .dpi later is visible
                         // wherever that reference ends up (sgUploadCapture).
-                        var entry = { name: file.name, dpi: null, first: idx === 0 };
-                        sgUploadStart(file.name);
+                        var entry = { name: origName || file.name, dpi: null, first: idx === 0 };
+                        if (!started) sgUploadStart(entry.name);
                         sgUploadNameQueue.push(entry);
                         if (typeof file.arrayBuffer === 'function') {
                             file.arrayBuffer().then(function (buf) {
@@ -2005,7 +2300,69 @@
                             }).catch(function () { /* leave dpi null — falls back to product default */ });
                         }
                     }
-                    return originalUpload.apply(this, arguments);
+                    return originalUpload.apply(scope, args);
+                }
+
+                scope.uploadFile = function (files, indexFile) {
+                    var idx = (typeof indexFile === 'number') ? indexFile : 0;
+                    var file = files && files[idx];
+                    var args = Array.prototype.slice.call(arguments);
+                    var SG = window.SG_UPLOAD;
+                    try {
+                        if (!SG || !file || !file.name) return queueAndUpload(args, idx, null, false);
+                        var ext = sgExt(file.name), orig = file.name;
+                        if (ext === 'svg' || (file.type && file.type.indexOf('svg') !== -1)) return queueAndUpload(args, idx, null, false);
+
+                        var list = sgCopyFiles(files);
+                        args[0] = list;
+                        args[1] = idx;
+                        var isConv = sgInList(SG.convertExt, ext);
+                        var isAlias = sgInList(SG.pdfAliasExt, ext);
+                        if (!isConv && !isAlias && file.type && file.type.indexOf('image/') !== 0 && file.type !== 'application/pdf') {
+                            return queueAndUpload(args, idx, null, false); // core rejects it with its own message
+                        }
+
+                        var started = false;
+                        var proceed = function (f) {
+                            list[idx] = f;
+                            sgUpload.custom = null;
+                            if (f.size > SG.maxMb * 1048576) {
+                                alert('This file is larger than ' + SG.maxMb + ' MB. Please send it to us by email or reduce its size.');
+                                return;
+                            }
+                            if (f.size > SG.directMaxMb * 1048576) {
+                                if (!started) sgUploadStart(orig);
+                                var entry = { name: orig, dpi: null, first: idx === 0 };
+                                sgUploadNameQueue.push(entry);
+                                var head = f.slice(0, 262144);
+                                if (typeof head.arrayBuffer === 'function') {
+                                    head.arrayBuffer().then(function (buf) { entry.dpi = readEmbeddedDpi(buf); }).catch(function () { });
+                                }
+                                sgChunkedUpload(scope, list, idx, args[2], entry);
+                                return;
+                            }
+                            return queueAndUpload(args, idx, orig, started);
+                        };
+
+                        if (isAlias) {
+                            return proceed(new File([file], orig.replace(/\.[^.]*$/, '') + '.pdf', { type: 'application/pdf' }));
+                        }
+                        if (isConv) {
+                            console.log('[SG-UPLOAD] converting', orig);
+                            sgUploadStart(orig);
+                            started = true;
+                            sgConvertFile(file, ext, orig).then(proceed).catch(function (err) {
+                                sgUpload.custom = null;
+                                alert((err && err.message) || 'This file could not be converted. Please try another file.');
+                            });
+                            return;
+                        }
+                        return proceed(file);
+                    } catch (e) {
+                        console.log('[SG-UPLOAD] wrapper error:', e && e.message);
+                        sgUpload.custom = null;
+                        return queueAndUpload(Array.prototype.slice.call(arguments), idx, null, false);
+                    }
                 };
 
                 var originalStore = scope.storeUploadFile;

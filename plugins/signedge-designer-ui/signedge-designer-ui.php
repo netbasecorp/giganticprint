@@ -14,7 +14,7 @@
 
 if ( ! defined( 'ABSPATH' ) ) exit;
 
-define( 'SG_DUI_VERSION', '1.10.134' );
+define( 'SG_DUI_VERSION', '1.10.135' );
 define( 'SG_DUI_URL', plugin_dir_url( __FILE__ ) );
 require_once plugin_dir_path( __FILE__ ) . 'includes/class-sg-upload.php';
 

@@ -77,7 +77,7 @@ $iz_store = PCS_DB::get_store_by_id( $iz_store_id );
 </div>
 
 <script>
-(function () {
+document.addEventListener('DOMContentLoaded', function () { // PCS_FE is localized in the footer, after this inline script
   var root = document.getElementById('pcs-iz');
   if (!root || typeof PCS_FE === 'undefined') { return; }
   var storeId = root.getAttribute('data-store');
@@ -191,5 +191,5 @@ $iz_store = PCS_DB::get_store_by_id( $iz_store_id );
   btn.onclick = upload;
   input.onchange = upload;
   load();
-})();
+});
 </script>

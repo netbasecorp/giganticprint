@@ -1633,14 +1633,28 @@
         if (!window.jQuery) return;
         var jq = window.jQuery;
         jq('#nav-photos').triggerHandler('click');
+        // Show the drop-zone view (not the source-picker grid) without
+        // touching the hidden file input. onClickTab is a toggle, so only
+        // click the Upload tile when the section is not already open.
+        function showUploadView() {
+            var tabPhotoEl = document.getElementById('tab-photo');
+            var tile = document.querySelector('#tab-photo .item[data-type="image-upload"]');
+            if (!tabPhotoEl || !tile) return;
+            var sc;
+            try { sc = window.angular && angular.element(tabPhotoEl).scope(); } catch (e) { sc = null; }
+            var open = !!(sc && sc.resource && sc.resource.photo && sc.resource.photo.onclick);
+            if (!open) jq(tile).click();
+            markSourceTileActive(tile);
+        }
         function flash() {
-            var tile = document.querySelector('#tab-photo [data-type="image-upload"]') ||
-                       document.querySelector('#tab-photo .form-upload');
+            showUploadView();
+            var tile = document.querySelector('#tab-photo .form-upload') ||
+                       document.querySelector('#tab-photo [data-type="image-upload"]');
             if (!tile) return;
             tile.classList.add('sg-flash');
             try { tile.scrollIntoView({ block: 'nearest' }); } catch (e) { /* old browser */ }
             clearTimeout(sgGuard.flashTimer);
-            sgGuard.flashTimer = setTimeout(function () { tile.classList.remove('sg-flash'); }, 1800);
+            sgGuard.flashTimer = setTimeout(function () { tile.classList.remove('sg-flash'); }, 1500);
         }
         flash();
         setTimeout(flash, 300); // the tile may only exist once the tab has rendered

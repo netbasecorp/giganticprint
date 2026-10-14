@@ -182,12 +182,12 @@
         var scope = INT ? INT.getDesignScope() : null;
         var stage = scope && scope.stages && scope.stages[scope.currentStage];
         var canvas = stage && stage.canvas;
-        var item = null, filled = false;
+        var item = null;
         try {
             item = canvas && INT.getArtItem(canvas);
-            filled = !!(canvas && typeof canvas.getObjects === 'function' && canvas.getObjects().length > 0);
         } catch (e) { /* canvas being rebuilt */ }
-        var hasArt = !!item || filled;
+        // only a real art image object counts (not any stray canvas object)
+        var hasArt = !!item;
         var bar = $('sg-artbar');
         var barShown = !!(bar && bar.classList.contains('is-visible'));
 
@@ -201,6 +201,11 @@
         var actual = $('sg-art-actual');
         var raw = actual ? actual.textContent : '';
         var nums = /([\d.]+)\s*x\s*([\d.]+)/i.exec(raw);
+        if (!nums && hasArt) {
+            var dw = document.querySelector('input.nbo-dimension[ng-model*="width"]');
+            var dh = document.querySelector('input.nbo-dimension[ng-model*="height"]');
+            if (dw && dh && dw.value && dh.value) { nums = [null, dw.value, dh.value]; nums = [null, dw.value, dh.value]; raw = 'Actual size: ' + dw.value + ' x ' + dh.value + ' in'; }
+        }
         var measure = hasArt && raw ? raw.replace(':', '') : '';
         setText($('sg-m-measure'), measure);
         setText($('sg-m-dim-w'), nums ? nums[1] + ' in' : '');
@@ -209,6 +214,8 @@
         // preview: re-render once the geometry has been stable for two ticks
         if (!hasArt || !canvas) {
             S.sig = ''; S.stableSig = '';
+            var pimg = $('sg-m-preview').querySelector('img');
+            if (pimg && pimg.hasAttribute('src')) pimg.removeAttribute('src');
             return;
         }
         var sig = signature(scope, canvas, item);

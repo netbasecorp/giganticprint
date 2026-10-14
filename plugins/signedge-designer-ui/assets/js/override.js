@@ -31,6 +31,10 @@
         injectAuthButton();
         injectB2BModal();
         injectLoginModal();
+        // Upload/auto-size hooks are not skin and must not wait for the
+        // workspace init below; both are idempotent.
+        initAutoSizeFromImage();
+        initUploadCaptureHook();
         // Give Angular time to bootstrap; retry for up to 10 s in case it's slow.
         attemptInit(0);
     });
@@ -398,13 +402,13 @@
         initSourceTileActiveState();
         initSoleUploadSourceAutoOpen();
         initSaveGuard();
-        if (!isMobile) {
-            injectSummaryPanel(workspace);
-            initB2BBadge();
-            startOptionsMirror();
-            startPriceMirror();
-            initCanvasCentering();
-        }
+        // Phones need the summary panel too: mobile.js moves the Add to Cart
+        // button, price and options out of it (the panel itself stays hidden).
+        injectSummaryPanel(workspace);
+        initB2BBadge();
+        startOptionsMirror();
+        startPriceMirror();
+        if (!isMobile) initCanvasCentering();
     }
 
     /* ----------------------------------------------------------------
@@ -932,9 +936,11 @@
        running immediately.
     ---------------------------------------------------------------- */
     function initAutoSizeFromImage(attempt) {
-        if (!window.angular) return;
-        var ngRoot = document.querySelector('[ng-controller]');
-        if (!ngRoot) return;
+        var ngRoot = window.angular && document.querySelector('[ng-controller]');
+        if (!ngRoot) {
+            if ((attempt || 0) < 40) setTimeout(function () { initAutoSizeFromImage((attempt || 0) + 1); }, 500);
+            return;
+        }
 
         var scope;
         try { scope = angular.element(ngRoot).scope(); } catch (e) { scope = null; }
@@ -2426,7 +2432,10 @@
     }
 
     function initUploadCaptureHook(attempt) {
-        if (!window.angular) return;
+        if (!window.angular) {
+            if ((attempt || 0) < 40) setTimeout(function () { initUploadCaptureHook((attempt || 0) + 1); }, 500);
+            return;
+        }
         sgHookAlertForUploadErrors();
         var ctrls = document.querySelectorAll('[ng-controller]');
         var wrappedAny = false;

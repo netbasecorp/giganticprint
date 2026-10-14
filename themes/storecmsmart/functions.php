@@ -1,6 +1,8 @@
 <?php
 defined( 'ABSPATH' ) || exit;
 
+require_once get_stylesheet_directory() . '/inc/gp-from-price.php';
+
 /* ---------------------------------------------------------------
    SHOP PAGE: force page-shop.php for the WooCommerce shop page
    BLOG PAGE: force page-blog.php for the WordPress Posts Page

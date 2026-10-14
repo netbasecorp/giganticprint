@@ -5,7 +5,7 @@ $quote_id = isset( $_GET['quote_id'] ) ? absint( $_GET['quote_id'] ) : 0;
 $quote    = $quote_id ? PCS_Quotes::get( $quote_id ) : null;
 
 /* Security: must own this quote */
-if ( ! $quote || (int) $quote->user_id !== $user_id ) { ?>
+if ( ! $quote || ! PCS_Quotes::user_can_access( $quote, $user_id ) ) { ?>
   <div style="padding:60px 24px;text-align:center;">
     <div style="font-size:40px;margin-bottom:12px;">⚠️</div>
     <p style="font-size:15px;color:#374151;">Quote not found.</p>

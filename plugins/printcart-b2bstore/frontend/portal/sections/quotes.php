@@ -4,18 +4,37 @@
 $filter    = isset( $_GET['qstatus'] ) ? sanitize_text_field( wp_unslash( $_GET['qstatus'] ) ) : '';
 $portal_url = PCS_B2B_Portal::url( 'quotes' );
 
-/* Handle accept/decline from email link */
-$pcs_qa  = isset( $_GET['pcs_quote_action'] ) ? sanitize_text_field( $_GET['pcs_quote_action'] ) : '';
-$pcs_qid = isset( $_GET['quote_id'] )         ? absint( $_GET['quote_id'] )                       : 0;
+/* Accept/decline from email link: GET only shows a confirmation form, POST + nonce does the change */
 $action_msg  = '';
 $action_type = '';
-if ( $pcs_qa && $pcs_qid && is_user_logged_in() ) {
-    $q = PCS_Quotes::get( $pcs_qid );
-    if ( $q && (int) $q->user_id === $user_id && 'sent' === $q->status ) {
-        $new_status = 'accept' === $pcs_qa ? 'accepted' : 'declined';
-        PCS_Quotes::update( $pcs_qid, array( 'status' => $new_status, 'responded_at' => current_time( 'mysql' ) ) );
-        $action_msg  = 'accept' === $pcs_qa ? '✅ Quote accepted! Our team will contact you shortly.' : 'Quote declined.';
-        $action_type = 'accept' === $pcs_qa ? 'success' : 'info';
+$confirm_q   = null;
+$confirm_act = '';
+$is_post     = isset( $_SERVER['REQUEST_METHOD'] ) && 'POST' === $_SERVER['REQUEST_METHOD'];
+
+if ( $is_post && isset( $_POST['pcs_quote_respond_do'] ) && is_user_logged_in() ) {
+    $post_qid = isset( $_POST['quote_id'] ) ? absint( $_POST['quote_id'] ) : 0;
+    $post_act = isset( $_POST['pcs_quote_action'] ) ? sanitize_text_field( wp_unslash( $_POST['pcs_quote_action'] ) ) : '';
+    if ( ! isset( $_POST['pcs_quote_nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['pcs_quote_nonce'] ) ), 'pcs_quote_respond_' . $post_qid ) ) {
+        $action_msg  = 'Security check failed. Please reload the page and try again.';
+        $action_type = 'info';
+    } else {
+        $res = PCS_Quotes::respond( $post_qid, $post_act, $user_id );
+        if ( is_wp_error( $res ) ) {
+            $action_msg  = $res->get_error_message();
+            $action_type = 'info';
+        } else {
+            $action_msg  = 'accepted' === $res['status'] ? '✅ Quote accepted! Our team will contact you shortly.' : 'Quote declined.';
+            $action_type = 'accepted' === $res['status'] ? 'success' : 'info';
+        }
+    }
+} elseif ( ! $is_post && isset( $_GET['pcs_quote_action'], $_GET['quote_id'] ) && is_user_logged_in() ) {
+    $get_act = sanitize_text_field( wp_unslash( $_GET['pcs_quote_action'] ) );
+    $get_qid = absint( $_GET['quote_id'] );
+    $get_q   = $get_qid ? PCS_Quotes::get( $get_qid ) : null;
+    if ( $get_q && in_array( $get_act, array( 'accept', 'decline' ), true )
+        && PCS_Quotes::user_can_access( $get_q, $user_id ) && 'sent' === $get_q->status && ! PCS_Quotes::is_expired( $get_q ) ) {
+        $confirm_q   = $get_q;
+        $confirm_act = $get_act;
     }
 }
 
@@ -64,6 +83,22 @@ $status_map = array(
 </div>
 
 <div style="padding:20px 24px;">
+
+  <?php if ( $confirm_q ) : ?>
+  <form method="post" action="<?php echo esc_url( $portal_url ); ?>" style="background:#fff;border:1px solid #e5e7eb;border-radius:10px;padding:18px 20px;margin-bottom:16px;">
+    <p style="margin:0 0 12px;font-size:14px;font-weight:600;color:#111827;">
+      <?php echo 'accept' === $confirm_act ? 'Accept' : 'Decline'; ?> quote <?php echo esc_html( $confirm_q->quote_number ); ?><?php echo $confirm_q->total > 0 ? ' (' . wp_kses_post( wc_price( $confirm_q->total ) ) . ')' : ''; ?>?
+    </p>
+    <input type="hidden" name="pcs_quote_respond_do" value="1">
+    <input type="hidden" name="quote_id" value="<?php echo (int) $confirm_q->id; ?>">
+    <input type="hidden" name="pcs_quote_action" value="<?php echo esc_attr( $confirm_act ); ?>">
+    <?php wp_nonce_field( 'pcs_quote_respond_' . (int) $confirm_q->id, 'pcs_quote_nonce' ); ?>
+    <button type="submit" style="padding:9px 20px;border:none;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;color:#fff;background:<?php echo 'accept' === $confirm_act ? '#059669' : '#374151'; ?>;">
+      <?php echo 'accept' === $confirm_act ? '✓ Confirm accept' : '✕ Confirm decline'; ?>
+    </button>
+    <a href="<?php echo esc_url( $portal_url ); ?>" style="margin-left:12px;font-size:13px;color:#6b7280;">Cancel</a>
+  </form>
+  <?php endif; ?>
 
   <?php if ( $action_msg ) : ?>
   <div style="background:<?php echo $action_type === 'success' ? '#dcfce7' : '#dbeafe'; ?>;color:<?php echo $action_type === 'success' ? '#065f46' : '#1e40af'; ?>;padding:14px 18px;border-radius:8px;font-size:14px;font-weight:600;margin-bottom:16px;">

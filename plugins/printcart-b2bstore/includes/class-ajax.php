@@ -414,42 +414,25 @@ class PCS_Ajax {
     /* Customer: accept or decline a sent quote                           */
     /* ---------------------------------------------------------------- */
     public static function pcs_quote_respond() {
+        if ( ! isset( $_SERVER['REQUEST_METHOD'] ) || 'POST' !== $_SERVER['REQUEST_METHOD'] ) {
+            wp_send_json_error( array( 'message' => 'Invalid request.' ), 405 );
+        }
         self::check_frontend_nonce();
         $quote_id = absint( $_POST['quote_id']  ?? 0 );
-        $action   = sanitize_text_field( $_POST['response'] ?? '' );
+        $action   = sanitize_text_field( wp_unslash( $_POST['response'] ?? '' ) );
 
         if ( ! $quote_id || ! in_array( $action, array( 'accept', 'decline' ), true ) ) {
             wp_send_json_error( array( 'message' => 'Invalid request.' ) );
         }
 
-        $quote = PCS_Quotes::get( $quote_id );
-        if ( ! $quote || (int) $quote->user_id !== get_current_user_id() ) {
-            wp_send_json_error( array( 'message' => 'Quote not found.' ) );
-        }
-        if ( 'sent' !== $quote->status ) {
-            wp_send_json_error( array( 'message' => 'This quote is no longer awaiting response.' ) );
+        $result = PCS_Quotes::respond( $quote_id, $action, get_current_user_id() );
+        if ( is_wp_error( $result ) ) {
+            wp_send_json_error( array( 'message' => $result->get_error_message() ) );
         }
 
-        $new_status = 'accept' === $action ? 'accepted' : 'declined';
-        PCS_Quotes::update( $quote_id, array(
-            'status'       => $new_status,
-            'responded_at' => current_time( 'mysql' ),
-        ) );
-
-        $order_id  = 0;
-        $order_url = '';
-
-        /* On accept: create WooCommerce order automatically */
-        if ( 'accept' === $action ) {
-            $result = PCS_Quotes::create_order_from_quote( $quote_id );
-            if ( ! is_wp_error( $result ) && $result ) {
-                $order_id  = (int) $result;
-                $order_url = wc_get_endpoint_url( 'view-order', $order_id, wc_get_page_permalink( 'myaccount' ) );
-            }
-        }
-
-        /* Notify admin */
-        PCS_Quotes::notify_admin_quote_response( $quote_id, $new_status );
+        $new_status = $result['status'];
+        $order_id   = $result['order_id'];
+        $order_url  = $result['order_url'];
 
         if ( 'accept' === $action ) {
             $msg = $order_id

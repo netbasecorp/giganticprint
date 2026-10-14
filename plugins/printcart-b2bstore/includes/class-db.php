@@ -337,7 +337,11 @@ class PCS_DB {
         $where_sql = implode( ' AND ', $where );
         $offset    = ( absint( $args['paged'] ) - 1 ) * absint( $args['per_page'] );
 
-        $sql = "SELECT * FROM $table WHERE $where_sql ORDER BY {$args['orderby']} {$args['order']} LIMIT %d OFFSET %d";
+        $orderby_ok = array( 'id', 'created_at', 'expires_at', 'email', 'company_name', 'contact_name', 'status', 'proposed_tier' );
+        $orderby    = in_array( $args['orderby'], $orderby_ok, true ) ? $args['orderby'] : 'created_at';
+        $order      = 'ASC' === strtoupper( (string) $args['order'] ) ? 'ASC' : 'DESC';
+
+        $sql = "SELECT * FROM $table WHERE $where_sql ORDER BY $orderby $order LIMIT %d OFFSET %d";
         $values[] = absint( $args['per_page'] );
         $values[] = $offset;
 

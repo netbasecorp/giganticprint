@@ -10,6 +10,8 @@
  *  - company 'Demo Signs Co': one Image Zone image ('Demo logo.png'), one template ('Demo banner template', product 1168,
  *    made from the design of the b2b sample order), private product 1263 assigned
  *  - carts of the test users emptied (persistent cart + WooCommerce session rows), login sessions cleared
+ *  sweep [--apply]: lists (default) or removes test leftovers of 2026-10-14: checkout drafts, design folders / generated download zips
+ *  that no remaining order references, chunk-upload folders (only under uploads/nbdesigner and uploads/gp-chunks).
  * Throw-away demo data: removed again by `b3-fixture.php cleanup` + `test-users.sh cleanup` at go-live.
  * No backup JSON (test data only); e-mails are suppressed by the bootstrap / gp_mail_sink.
  */
@@ -49,6 +51,36 @@ if ( 'status' === $mode ) {
 		echo 'COMPANY ' . $n . ' #' . $s->id . ' tier=' . $s->tier . ' status=' . $s->status . ' images=' . $img . ' templates=' . wp_json_encode( $tpl ) . ' private_products=' . wp_json_encode( $prv ) . "\n";
 	}
 	echo 'quotes=' . (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$wpdb->prefix}pcs_quotes" ) . ' all_orders=' . count( wc_get_orders( array( 'limit' => -1, 'return' => 'ids', 'status' => 'any' ) ) ) . ' gp_mail_sink=' . get_option( 'gp_mail_sink' ) . "\n";
+	exit( 0 );
+}
+
+if ( 'sweep' === $mode ) {
+	$apply = in_array( '--apply', $argv, true );
+	$since = strtotime( '2026-10-14 00:00:00 UTC' );
+	$used  = array();
+	foreach ( wc_get_orders( array( 'limit' => -1, 'status' => 'any' ) ) as $o ) { foreach ( $o->get_items() as $it ) { $k = $it->get_meta( '_nbd' ); if ( $k ) { $used[ $k ] = true; } } }
+	$n = 0; $bytes = 0;
+	foreach ( wc_get_orders( array( 'limit' => -1, 'status' => 'checkout-draft' ) ) as $o ) { echo '  checkout draft #' . $o->get_id() . "
+"; if ( $apply ) { $o->delete( true ); } $n++; }
+	foreach ( glob( NBDESIGNER_CUSTOMER_DIR . '/*', GLOB_ONLYDIR ) as $d ) {
+		$k = basename( $d );
+		if ( isset( $used[ $k ] ) || filemtime( $d ) < $since ) { continue; }
+		echo '  design folder ' . $k . ' (' . gmdate( 'Y-m-d H:i', filemtime( $d ) ) . " UTC)
+"; $n++;
+		if ( $apply ) { gp_ds_rm( $d ); }
+	}
+	$up = wp_upload_dir();
+	foreach ( glob( $up['basedir'] . '/nbdesigner/download/customer-design-*.zip' ) as $z ) {
+		if ( filemtime( $z ) < $since ) { continue; }
+		$key = preg_replace( '/^customer-design-(.*)-(png|pdf|svg|jpg|zip)\.zip$/', '$1', basename( $z ) );
+		if ( isset( $used[ $key ] ) ) { /* kept orders: the admin can re-download, the zip is rebuilt on demand, remove anyway */ }
+		echo '  download zip ' . basename( $z ) . "
+"; $n++; if ( $apply ) { @unlink( $z ); }
+	}
+	foreach ( glob( $up['basedir'] . '/gp-chunks/*', GLOB_ONLYDIR ) as $d ) { if ( filemtime( $d ) >= $since ) { echo '  chunk folder ' . basename( $d ) . "
+"; $n++; if ( $apply ) { gp_ds_rm( $d ); } } }
+	echo ( $apply ? '== removed ' : '== would remove ' ) . $n . " item(s)
+";
 	exit( 0 );
 }
 

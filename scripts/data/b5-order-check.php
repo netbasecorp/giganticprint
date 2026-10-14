@@ -25,7 +25,7 @@ try {
 		$o = wc_get_order( $oid );
 		echo "-- order #$oid\n";
 		if ( ! $o ) { gp_oc( 'order exists', false ); continue; }
-		gp_oc( 'status on-hold (Pay by invoice)', 'on-hold' === $o->get_status(), $o->get_status() );
+		gp_oc( 'status on-hold (new) or completed (demo sample)', in_array( $o->get_status(), array( 'on-hold', 'completed' ), true ), $o->get_status() );
 		gp_oc( 'payment method title', 'Pay by invoice' === $o->get_payment_method_title(), $o->get_payment_method_title() );
 		gp_oc( 'has a shipping line', count( $o->get_shipping_methods() ) > 0 );
 		$n = 0;

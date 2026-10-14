@@ -1,0 +1,1739 @@
+/* =============================================================================
+   CMSmart UI Override — Design System & Component CSS
+   =============================================================================
+   Targets CMSmart / NBDesigner printing-option markup without touching plugin files.
+
+   Key CMSmart classes this file overrides:
+     .nbd-option-wrapper        Main container (card wrapper)
+     .nbo-fields-wrapper        Inner flex column of all fields
+     .nbd-option-field          Per-field wrapper div
+     .nbd-field-header          Label + required + tooltip row
+     .nbd-swatch-wrap           Color swatch container
+     label.nbd-swatch           Individual swatch circle
+     .nbd-swatch-label-wrap     Swatch + text label combo
+     .nbd-xlabel-wrapper        XLabel (large-label) container
+     .nbd-xlabel-wrap           One XLabel item
+     label.nbd-xlabel           XLabel visual tile
+     .nbd-radio.__nbd-radio-wrap  Radio button group
+     .nbd-label-wrap            Quantity / label chip group
+     label.nbd-label            Individual qty chip
+   ============================================================================= */
+
+/* ─── 1. Design Tokens ─────────────────────────────────────────────────────── */
+:root {
+    /* Brand purple */
+    --cui-brand:        #5b21b6;
+    --cui-brand-mid:    #7c3aed;
+    --cui-brand-light:  #a78bfa;
+    --cui-brand-pale:   #ede9fe;
+    --cui-brand-ghost:  #f5f3ff;
+
+    /* Warm stone neutrals */
+    --cui-ink:          #1c1917;
+    --cui-ink-soft:     #44403c;
+    --cui-muted:        #78716c;
+    --cui-border:       #e7e5e4;
+    --cui-canvas:       #fafaf9;
+    --cui-white:        #ffffff;
+
+    /* Semantic */
+    --cui-green:        #10b981;
+    --cui-gold:         #f59e0b;
+    --cui-red:          #ef4444;
+
+    /* Typography */
+    --cui-ff-display:   'Plus Jakarta Sans', system-ui, sans-serif;
+    --cui-ff-body:      'Inter', system-ui, sans-serif;
+    --cui-ff-mono:      'JetBrains Mono', 'Fira Code', ui-monospace, monospace;
+
+    /* Radii */
+    --cui-r-sm:     6px;
+    --cui-r-md:     10px;
+    --cui-r-lg:     14px;
+    --cui-r-xl:     20px;
+    --cui-r-pill:   9999px;
+
+    /* Shadows */
+    --cui-sh-sm:    0 1px 3px rgba(0,0,0,.06), 0 1px 2px rgba(0,0,0,.04);
+    --cui-sh-md:    0 4px 16px rgba(0,0,0,.09), 0 1px 4px rgba(0,0,0,.05);
+    --cui-sh-ring:  0 0 0 3px rgba(91,33,182,.18);
+
+    /* Spacing rhythm */
+    --cui-gap:      24px;
+    --cui-gap-sm:   16px;
+}
+
+/* ─── 2. Outer card wrapper ────────────────────────────────────────────────── */
+.nbd-option-wrapper {
+    background:    var(--cui-white);
+    border:        1px solid var(--cui-border);
+    border-radius: var(--cui-r-xl);
+    box-shadow:    var(--cui-sh-md);
+    overflow:      hidden;
+    margin-bottom: 1.5rem;
+    font-family:   var(--cui-ff-body);
+    font-size:     14px;
+}
+
+/* ─── 3. Fields-wrapper: flex column, no top padding (price showcase is flush) */
+.nbd-option-wrapper .nbo-fields-wrapper {
+    display:         flex;
+    flex-direction:  column;
+    gap:             0;
+    padding:         0 0 var(--cui-gap);
+}
+
+/* ─── 4. Pre-field block (price showcase + steps + banner) ─────────────────── */
+.cui-pre-field {
+    display:         flex;
+    flex-direction:  column;
+    margin-bottom:   var(--cui-gap);
+}
+
+/* ── 4a. Price showcase — light card style ── */
+.cui-price-showcase {
+    background:      #f5f3ff;
+    border:          1px solid #ede9fe;
+    border-radius:   var(--cui-r-lg);
+    padding:         20px 22px 18px;
+    margin:          20px 20px 0;
+    display:         flex;
+    align-items:     center;
+    justify-content: space-between;
+    gap:             12px;
+}
+
+.cui-price-left {
+    display:        flex;
+    flex-direction: column;
+    gap:            4px;
+    min-width:      0;
+}
+
+.cui-price-eyebrow {
+    font-family:    var(--cui-ff-display);
+    font-size:      10px;
+    font-weight:    700;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color:          var(--cui-muted);
+}
+
+.cui-price-value {
+    font-family:    var(--cui-ff-mono);
+    font-size:      36px;
+    font-weight:    700;
+    color:          var(--cui-ink);
+    line-height:    1;
+    letter-spacing: -.02em;
+}
+
+/* WooCommerce wraps price in .woocommerce-Price-amount → keep it inline */
+.cui-price-value .woocommerce-Price-amount {
+    font-family: inherit;
+    font-size:   inherit;
+    font-weight: inherit;
+    color:       inherit;
+}
+
+.cui-price-placeholder {
+    font-family:    var(--cui-ff-mono);
+    font-size:      28px;
+    font-weight:    500;
+    color:          var(--cui-muted);
+    opacity:        .5;
+}
+
+.cui-price-sub {
+    font-size: 12px;
+    color:     var(--cui-muted);
+}
+
+/* Right-side per-item badge */
+.cui-price-right {
+    flex-shrink:    0;
+    display:        flex;
+    flex-direction: column;
+    align-items:    flex-end;
+    gap:            6px;
+}
+
+.cui-price-per-item {
+    background:    #ede9fe;
+    border:        1px solid #ddd6fe;
+    border-radius: var(--cui-r-lg);
+    padding:       8px 14px;
+    text-align:    center;
+}
+
+.cui-per-item-label {
+    font-size:      9px;
+    font-weight:    600;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color:          var(--cui-brand);
+    opacity:        .7;
+    margin-bottom:  2px;
+}
+
+.cui-per-item-value {
+    font-family:    var(--cui-ff-mono);
+    font-size:      16px;
+    font-weight:    700;
+    color:          var(--cui-brand);
+    white-space:    nowrap;
+}
+
+.cui-per-item-value .woocommerce-Price-amount {
+    font-family: inherit;
+    font-size:   inherit;
+    font-weight: inherit;
+    color:       inherit;
+}
+
+.cui-qty-badge {
+    background:    #ede9fe;
+    border:        1px solid #ddd6fe;
+    border-radius: var(--cui-r-pill);
+    padding:       4px 10px;
+    font-family:   var(--cui-ff-mono);
+    font-size:     12px;
+    font-weight:   600;
+    color:         var(--cui-brand);
+}
+
+
+/* ─── 5. Individual field wrappers ─────────────────────────────────────────── */
+.nbd-option-wrapper .nbd-option-field {
+    padding:    0 var(--cui-gap) !important;
+    margin:     0 !important;
+    border:     none !important;
+    background: none !important;
+}
+
+/* Spacing between consecutive fields */
+.nbd-option-wrapper .nbd-option-field + .nbd-option-field,
+.nbd-option-wrapper .nbd-option-field + #nbo-quantity-option-wrap,
+.nbd-option-wrapper #nbo-quantity-option-wrap + .nbd-option-field {
+    margin-top: 20px !important;
+}
+
+/* ─── 6. Field header (label row) ──────────────────────────────────────────── */
+.nbd-option-wrapper .nbd-field-header {
+    display:       flex;
+    align-items:   center;
+    gap:           7px;
+    margin-bottom: 10px;
+}
+
+/* Selected option name — injected by JS, floated to the right of any field header */
+.nbd-option-wrapper .cui-selected-val {
+    margin-left:   auto;
+    font-size:     13px;
+    font-weight:   600;
+    color:         var(--cui-ink);
+    flex-shrink:   0;
+    white-space:   nowrap;
+    overflow:      hidden;
+    text-overflow: ellipsis;
+    max-width:     50%;
+}
+
+/* Price badge inside the header selected value — covers both swatch (.cui-sw-price)
+   and label-chip (.cui-label-price) field types; force inline since .cui-sw-price
+   defaults to display:block in its base rule. */
+.nbd-option-wrapper .cui-selected-val .cui-sw-price,
+.nbd-option-wrapper .cui-selected-val .cui-label-price {
+    display:        inline !important;
+    font-size:      10px !important;
+    font-weight:    500 !important;
+    margin-left:    4px;
+    color:          var(--cui-muted) !important;
+    vertical-align: middle;
+}
+.nbd-option-wrapper .cui-selected-val .cui-sw-price--free,
+.nbd-option-wrapper .cui-selected-val .cui-label-price--free {
+    color: var(--cui-green) !important;
+}
+
+.nbd-option-wrapper .nbd-field-header > label {
+    font-family:    var(--cui-ff-display);
+    font-size:      11px;
+    font-weight:    700;
+    letter-spacing: .09em;
+    text-transform: uppercase;
+    color:          var(--cui-ink-soft);
+    cursor:         default;
+    margin:         0;
+}
+
+.nbd-option-wrapper .nbd-required {
+    font-size:   14px;
+    font-weight: 700;
+    color:       var(--cui-brand);
+    line-height: 1;
+}
+
+/* Help-tip icon bubble */
+.nbd-option-wrapper .nbd-help-tip {
+    display:         inline-flex;
+    align-items:     center;
+    justify-content: center;
+    width:           16px;
+    height:          16px;
+    border-radius:   var(--cui-r-pill);
+    background:      var(--cui-border);
+    font-size:       10px;
+    font-weight:     700;
+    color:           var(--cui-muted);
+    cursor:          help;
+    line-height:     1;
+    flex-shrink:     0;
+}
+
+.nbd-option-wrapper .nbd-help-tip::before { content: '?'; }
+
+/* ─── 7. Swatch field → large material cards ───────────────────────────────── */
+
+/* Grid container — cards fill available width */
+.nbd-option-wrapper .nbd-swatch-wrap {
+    display:               grid;
+    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+    gap:                   12px;
+    align-items:           stretch;
+}
+
+/* Hide radio but keep it in DOM (Angular ng-model binds to it) */
+.nbd-option-wrapper .nbd-swatch-wrap input[type="radio"] {
+    position:    absolute;
+    width:       1px;
+    height:      1px;
+    padding:     0;
+    margin:      -1px;
+    overflow:    hidden;
+    clip:        rect(0,0,0,0);
+    white-space: nowrap;
+    border:      0;
+}
+
+/* ── Compact mode: .nbd-swatch is the entire card ── */
+
+.nbd-option-wrapper label.nbd-swatch {
+    display:       block !important;
+    width:         100% !important;
+    height:        88px !important;
+    border-radius: var(--cui-r-md) !important;
+    border:        2px solid var(--cui-border) !important;
+    outline:       none !important;
+    cursor:        pointer;
+    transition:    border-color .15s, box-shadow .15s;
+    margin:        0 !important;
+    flex-shrink:   0;
+    position:      relative;
+    overflow:      hidden;
+    background-size: cover !important;
+    background-position: center !important;
+}
+
+.nbd-option-wrapper label.nbd-swatch:hover {
+    transform:    none !important;
+    border-color: var(--cui-brand-light) !important;
+}
+
+.nbd-option-wrapper input[type="radio"]:checked + label.nbd-swatch {
+    border-color: var(--cui-brand) !important;
+    box-shadow:   0 0 0 3px rgba(91,33,182,.15) !important;
+    outline:      none !important;
+    transform:    none !important;
+}
+
+/* Suppress CMSmart's default swatch ring (::before) and tick (::before) on our cards */
+.nbd-option-wrapper .nbd-swatch-wrap input[type="radio"]:checked + label.nbd-swatch::before {
+    display: none !important;
+}
+
+/* Checkmark badge — compact mode */
+.nbd-option-wrapper input[type="radio"]:checked + label.nbd-swatch::after {
+    content:            '';
+    position:           absolute;
+    top:                6px;
+    right:              6px;
+    left:               auto !important;  /* Reset CMSmart's left:12px */
+    width:              18px;
+    height:             18px;
+    border-radius:      50%;
+    border:             none !important;  /* Reset CMSmart's border tick */
+    transform:          none !important;  /* Reset CMSmart's rotate(45deg) */
+    background-color:   var(--cui-brand);
+    background-image:   url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M2 6l3 3 5-5' stroke='%23fff' stroke-width='1.8' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    background-size:    10px;
+    background-repeat:  no-repeat;
+    background-position: center;
+    z-index:            2;
+}
+
+/* In label-mode: suppress compact badge (use .nbd-swatch-value::after instead) */
+.nbd-option-wrapper .nbd-swatch-label-wrap input[type="radio"]:checked + label.nbd-swatch::after {
+    display: none !important;
+}
+
+/* Tooltip — always-visible label at the bottom of the card */
+.nbd-option-wrapper label.nbd-swatch .nbd-swatch-tooltip {
+    position:      absolute !important;
+    bottom:        0 !important;
+    left:          0 !important;
+    right:         0 !important;
+    top:           auto !important;
+    transform:     none !important;
+    background:    rgba(255,255,255,.92) !important;
+    backdrop-filter: blur(2px);
+    color:         var(--cui-ink) !important;
+    font-size:     11px !important;
+    font-weight:   600 !important;
+    white-space:   normal !important;
+    text-align:    center !important;
+    padding:       5px 6px !important;
+    opacity:       1 !important;
+    pointer-events: none;
+    border-top:    1px solid rgba(0,0,0,.07) !important;
+    border-radius: 0 0 8px 8px !important;
+    line-height:   1.3 !important;
+    z-index:       1;
+    font-family:   var(--cui-ff-body);
+}
+
+/* ── Label mode: .nbd-swatch-label-wrap wraps color + text ── */
+
+.nbd-option-wrapper .nbd-swatch-label-wrap {
+    display:        flex;
+    flex-direction: column;
+    align-items:    stretch !important;
+    gap:            0 !important;
+    cursor:         pointer;
+    border:         2px solid var(--cui-border);
+    border-radius:  var(--cui-r-md);
+    overflow:       hidden;
+    background:     #fff;
+    transition:     border-color .15s, box-shadow .15s;
+    min-height:     178px; /* reserve space: 110px image + 68px text — prevents layout shift when JS injects price */
+}
+
+.nbd-option-wrapper .nbd-swatch-label-wrap:hover {
+    border-color: var(--cui-brand-light);
+}
+
+.nbd-option-wrapper .nbd-swatch-label-wrap:has(input:checked) {
+    border-color: var(--cui-brand);
+    box-shadow:   0 0 0 3px rgba(91,33,182,.15);
+}
+
+.nbd-option-wrapper .nbd-swatch-value {
+    display:  block;
+    position: relative;
+}
+
+/* Color swatch inside label-mode card */
+.nbd-option-wrapper .nbd-swatch-label-wrap label.nbd-swatch {
+    border:        none !important;
+    border-radius: 0 !important;
+    box-shadow:    none !important;
+    outline:       none !important;
+    transform:     none !important;
+    width:         100% !important;
+    height:        110px !important;
+    display:       block !important;
+}
+
+.nbd-option-wrapper .nbd-swatch-label-wrap label.nbd-swatch:hover {
+    border-color: transparent !important;
+}
+
+/* Checkmark badge — label mode */
+.nbd-option-wrapper .nbd-swatch-label-wrap:has(input:checked) .nbd-swatch-value::after {
+    content:            '';
+    position:           absolute;
+    top:                6px;
+    right:              6px;
+    width:              18px;
+    height:             18px;
+    border-radius:      50%;
+    background-color:   var(--cui-brand);
+    background-image:   url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M2 6l3 3 5-5' stroke='%23fff' stroke-width='1.8' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    background-size:    10px;
+    background-repeat:  no-repeat;
+    background-position: center;
+    z-index:            2;
+}
+
+/* Text section below the swatch color */
+.nbd-option-wrapper .nbd-swatch-label-wrap > label {
+    flex:        1;             /* grow to fill remaining card height → equal-height rows */
+    font-size:   12px !important;
+    color:       var(--cui-ink-soft) !important;
+    text-align:  left !important;
+    max-width:   none !important;
+    line-height: 1.3 !important;
+    cursor:      pointer;
+    margin:      0 !important;
+    padding:     10px 12px !important;
+    background:  #fff;
+    border-top:  1px solid #f0f0f0;
+}
+
+.nbd-option-wrapper .nbd-swatch-description {
+    display:        flex;
+    flex-direction: column;
+    gap:            3px;
+}
+
+/* Price injected by JS into each swatch card */
+.nbd-option-wrapper .cui-sw-price {
+    display:     block;
+    font-size:   11px;
+    font-weight: 600;
+    color:       var(--cui-ink-soft);
+    line-height: 1.2;
+}
+.nbd-option-wrapper .cui-sw-price--free {
+    color: var(--cui-green);
+}
+
+.nbd-option-wrapper .nbd-swatch-title b {
+    font-size:   14px;
+    font-weight: 700;
+    color:       var(--cui-ink);
+    display:     block;
+    line-height: 1.2;
+}
+
+.nbd-option-wrapper .nbd-swatch-title {
+    font-size:   11px;
+    line-height: 1.3;
+    color:       var(--cui-muted);
+}
+
+.nbd-option-wrapper .nbd-swatch-label-wrap:has(input:checked) > label {
+    background: #faf9ff !important;
+}
+
+/* ─── 7b. Swatch circle override — add class "swatch-circle" to the field
+   in CMSmart admin (field settings → Custom CSS class) to revert to the
+   classic circle style for solid-color options (e.g. mug color, shirt color). ── */
+
+/* Count badge (swatch-circle only) */
+.nbd-option-wrapper .swatch-circle .cui-swatch-count {
+    font-size:      11px;
+    font-weight:    600;
+    color:          var(--cui-muted);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    flex-shrink:    0;
+}
+
+/* Swatch row */
+.nbd-option-wrapper .swatch-circle .nbd-swatch-wrap {
+    display:     flex !important;
+    flex-wrap:   wrap !important;
+    gap:         12px !important;
+    align-items: flex-start !important;
+    padding:     4px 0 !important;
+}
+
+/* Circle */
+.nbd-option-wrapper .swatch-circle label.nbd-swatch {
+    width:           62px !important;
+    height:          62px !important;
+    border-radius:   50% !important;
+    border:          2.5px solid rgba(0,0,0,.10) !important;
+    outline:         none !important;
+    box-shadow:      none !important;
+    transform:       none !important;
+    overflow:        hidden !important;
+    position:        relative !important;
+    display:         inline-flex !important;
+    align-items:     center !important;
+    justify-content: center !important;
+    background-size: cover !important;
+    cursor:          pointer !important;
+    transition:      border-color .15s, box-shadow .15s, transform .15s !important;
+}
+
+.nbd-option-wrapper .swatch-circle label.nbd-swatch:hover {
+    transform:    scale(1.06) !important;
+    border-color: rgba(0,0,0,.28) !important;
+    outline:      none !important;
+}
+
+/* Selected: brand border + soft glow (matches mockup .color-sw--active pattern) */
+.nbd-option-wrapper .swatch-circle input[type="radio"]:checked + label.nbd-swatch {
+    border:     2.5px solid var(--cui-brand) !important;
+    box-shadow: 0 0 0 4px rgba(91,33,182,.15) !important;
+    transform:  none !important;
+}
+
+/* Checkmark overlay on selected — semi-dark scrim so ✓ is readable on any color */
+.nbd-option-wrapper .swatch-circle input[type="radio"]:checked + label.nbd-swatch::after {
+    display:         flex !important;
+    align-items:     center !important;
+    justify-content: center !important;
+    content:         '✓' !important;
+    position:        absolute !important;
+    inset:           0 !important;
+    width:           100% !important;
+    height:          100% !important;
+    color:           #fff !important;
+    font-size:       24px !important;
+    font-weight:     700 !important;
+    text-shadow:     0 1px 4px rgba(0,0,0,.7) !important;
+    border-radius:   0 !important;
+    background:      rgba(0,0,0,.14) !important;
+}
+
+/* Tooltip above on hover */
+.nbd-option-wrapper .swatch-circle label.nbd-swatch .nbd-swatch-tooltip {
+    position:        absolute !important;
+    bottom:          calc(100% + 8px) !important;
+    left:            50% !important;
+    right:           auto !important;
+    top:             auto !important;
+    transform:       translateX(-50%) !important;
+    background:      var(--cui-ink) !important;
+    color:           #fff !important;
+    font-size:       11px !important;
+    font-weight:     500 !important;
+    white-space:     nowrap !important;
+    padding:         4px 8px !important;
+    border-radius:   var(--cui-r-sm) !important;
+    opacity:         0 !important;
+    pointer-events:  none !important;
+    border-top:      none !important;
+    backdrop-filter: none !important;
+    transition:      opacity .15s !important;
+}
+.nbd-option-wrapper .swatch-circle label.nbd-swatch:hover .nbd-swatch-tooltip {
+    opacity: 1 !important;
+}
+
+/* Label-wrap: stack circle + text vertically, centered, no card styling */
+.nbd-option-wrapper .swatch-circle .nbd-swatch-label-wrap {
+    display:        flex !important;
+    flex-direction: column !important;
+    align-items:    center !important;
+    gap:            6px !important;
+    border:         none !important;
+    border-radius:  0 !important;
+    background:     transparent !important;
+    box-shadow:     none !important;
+    overflow:       visible !important;
+    padding:        0 !important;
+}
+
+/* Color name below circle */
+.nbd-option-wrapper .swatch-circle .nbd-swatch-label-wrap > label {
+    font-size:   11px !important;
+    color:       var(--cui-muted) !important;
+    text-align:  center !important;
+    padding:     0 !important;
+    border-top:  none !important;
+    background:  transparent !important;
+    max-width:   68px !important;
+    line-height: 1.3 !important;
+}
+
+/* Bold name for selected swatch */
+.nbd-option-wrapper .swatch-circle .nbd-swatch-label-wrap:has(input:checked) > label {
+    font-weight: 700 !important;
+    color:       var(--cui-ink) !important;
+    background:  transparent !important;
+}
+
+/* Hide "Free" price badge — color choices are not priced upgrades */
+.nbd-option-wrapper .swatch-circle .cui-sw-price {
+    display: none !important;
+}
+
+/* No checked-ring from the generic label-mode rule */
+.nbd-option-wrapper .swatch-circle .nbd-swatch-value::after {
+    display: none !important;
+}
+
+/* ─── 8. XLabel (large-label) → chip tiles ─────────────────────────────────── */
+.nbd-option-wrapper .nbd-xlabel-wrapper {
+    display:   flex;
+    flex-wrap: wrap;
+    gap:       8px;
+}
+
+.nbd-option-wrapper .nbd-xlabel-wrap {
+    display:        flex;
+    flex-direction: column;
+    align-items:    center;
+    gap:            5px;
+    cursor:         pointer;
+}
+
+/* Hide radio */
+.nbd-option-wrapper .nbd-xlabel-value-inner input[type="radio"] {
+    position:   absolute;
+    width:      1px;
+    height:     1px;
+    padding:    0;
+    margin:     -1px;
+    overflow:   hidden;
+    clip:       rect(0,0,0,0);
+    white-space: nowrap;
+    border:     0;
+}
+
+.nbd-option-wrapper .nbd-xlabel-value-inner {
+    position: relative;
+    display:  flex;
+}
+
+.nbd-option-wrapper label.nbd-xlabel {
+    display:       block;
+    width:         52px;
+    height:        52px;
+    border-radius: var(--cui-r-md);
+    border:        2px solid var(--cui-border);
+    cursor:        pointer;
+    transition:    border-color .12s, box-shadow .12s;
+    overflow:      hidden;
+    margin:        0;
+    position:      relative;
+    background-size: cover !important;
+    background-position: center !important;
+}
+
+.nbd-option-wrapper label.nbd-xlabel:hover {
+    border-color: var(--cui-brand-light);
+    box-shadow:   var(--cui-sh-ring);
+}
+
+.nbd-option-wrapper input[type="radio"]:checked + label.nbd-xlabel {
+    border-color: var(--cui-brand);
+    box-shadow:   var(--cui-sh-ring);
+}
+
+/* Tinted overlay on checked state */
+.nbd-option-wrapper input[type="radio"]:checked + label.nbd-xlabel::after {
+    content:    '';
+    position:   absolute;
+    inset:      0;
+    background: rgba(91,33,182,.14);
+}
+
+/* Checkmark on checked tile */
+.nbd-option-wrapper input[type="radio"]:checked + label.nbd-xlabel::before {
+    content:     '✓';
+    position:    absolute;
+    bottom:      3px;
+    right:       5px;
+    font-size:   12px;
+    font-weight: 900;
+    color:       var(--cui-brand);
+    z-index:     1;
+    text-shadow: 0 0 5px rgba(255,255,255,.9);
+}
+
+/* Text label below each tile */
+.nbd-option-wrapper .nbd-xlabel-wrap > label {
+    font-size:  11px;
+    color:      var(--cui-muted);
+    text-align: center;
+    max-width:  68px;
+    line-height: 1.2;
+    cursor:     pointer;
+    margin:     0;
+}
+
+.nbd-option-wrapper .nbd-xlabel-wrap:has(input:checked) > label {
+    color:       var(--cui-brand);
+    font-weight: 600;
+}
+
+/* Recommended star badge (set via CMSmart admin as default option) */
+.nbd-option-wrapper .nbo-recomand {
+    position: absolute;
+    top:      3px;
+    left:     3px;
+    color:    var(--cui-gold);
+    font-size: 9px;
+    z-index:  2;
+    line-height: 1;
+}
+
+/* ─── 9. Radio field → pill chips ──────────────────────────────────────────── */
+.nbd-option-wrapper .nbd-radio.__nbd-radio-wrap,
+.nbd-option-wrapper .nbd-radio:not(.nbd-label-wrap) {
+    display:     flex;
+    flex-wrap:   wrap;
+    gap:         7px;
+    align-items: center;
+}
+
+/* Hide radio */
+.nbd-option-wrapper .nbd-radio input[type="radio"] {
+    position:   absolute;
+    width:      1px;
+    height:     1px;
+    padding:    0;
+    margin:     -1px;
+    overflow:   hidden;
+    clip:       rect(0,0,0,0);
+    white-space: nowrap;
+    border:     0;
+}
+
+.nbd-option-wrapper .nbd-radio label {
+    display:         inline-flex;
+    align-items:     center;
+    justify-content: center;
+    padding:         7px 18px;
+    border-radius:   var(--cui-r-pill);
+    border:          1.5px solid var(--cui-border);
+    background:      var(--cui-white);
+    color:           var(--cui-ink-soft);
+    font-size:       13px;
+    font-weight:     500;
+    cursor:          pointer;
+    transition:      all .12s;
+    user-select:     none;
+    margin:          0 !important;
+    line-height:     1;
+    white-space:     nowrap;
+}
+
+.nbd-option-wrapper .nbd-radio label:hover {
+    border-color: var(--cui-brand-light);
+    color:        var(--cui-brand);
+    background:   var(--cui-brand-ghost);
+}
+
+.nbd-option-wrapper .nbd-radio input[type="radio"]:checked + label {
+    background:   var(--cui-brand);
+    border-color: var(--cui-brand);
+    color:        #fff;
+    font-weight:  600;
+    box-shadow:   0 2px 10px rgba(91,33,182,.30);
+}
+
+/* Disabled option (CMSmart adds nbo-disabled class via directive) */
+.nbd-option-wrapper .nbd-radio label.nbo-disabled {
+    opacity:       .45;
+    cursor:        not-allowed;
+    pointer-events: none;
+}
+
+/* ─── 10. Label / quantity chips ───────────────────────────────────────────── */
+.nbd-option-wrapper .nbd-label-wrap {
+    display:   flex;
+    flex-wrap: wrap;
+    gap:       7px;
+}
+
+/* Hide radio */
+.nbd-option-wrapper .nbd-label-wrap input[type="radio"] {
+    position:   absolute;
+    width:      1px;
+    height:     1px;
+    padding:    0;
+    margin:     -1px;
+    overflow:   hidden;
+    clip:       rect(0,0,0,0);
+    white-space: nowrap;
+    border:     0;
+}
+
+.nbd-option-wrapper .nbd-label-wrap label.nbd-label {
+    display:         inline-flex;
+    align-items:     center;
+    gap:             5px;
+    padding:         10px 18px !important;
+    border-radius:   var(--cui-r-md) !important;
+    border:          1.5px solid var(--cui-border);
+    background:      var(--cui-white);
+    color:           var(--cui-ink);
+    font-family:     var(--cui-ff-body);
+    font-size:       13px;
+    font-weight:     500;
+    cursor:          pointer;
+    transition:      all .12s;
+    user-select:     none;
+    margin:          0 !important;
+    line-height:     1 !important;
+    height:          auto !important;
+    text-transform:  none !important;
+    letter-spacing:  0 !important;
+}
+
+.nbd-option-wrapper .nbd-label-wrap label.nbd-label:hover {
+    border-color: var(--cui-brand-light);
+    background:   var(--cui-brand-ghost);
+    color:        var(--cui-brand);
+}
+
+/* Selected: outlined style — white bg + purple border + purple text */
+.nbd-option-wrapper .nbd-label-wrap input[type="radio"]:checked + label.nbd-label {
+    background:    var(--cui-white);
+    border-color:  var(--cui-brand);
+    border-width:  2px;
+    color:         var(--cui-brand);
+    font-weight:   700;
+    box-shadow:    0 0 0 3px rgba(91,33,182,.12);
+}
+
+/* Price text inside label chip */
+.nbd-option-wrapper .nbd-label-wrap label.nbd-label .cui-label-price {
+    font-size:   11px;
+    font-weight: 400;
+    color:       var(--cui-muted);
+    line-height: 1;
+}
+
+.nbd-option-wrapper .nbd-label-wrap label.nbd-label .cui-label-price--free {
+    color: var(--cui-green);
+}
+
+/* Selected chip: price colours */
+.nbd-option-wrapper .nbd-label-wrap input[type="radio"]:checked + label.nbd-label .cui-label-price {
+    color: rgba(91,33,182,.55);
+}
+
+.nbd-option-wrapper .nbd-label-wrap input[type="radio"]:checked + label.nbd-label .cui-label-price--free {
+    color: var(--cui-green);
+}
+
+/* ─── 11. Quantity field ───────────────────────────────────────────────────── */
+/* Give quantity the same first-field top spacing */
+.nbd-option-wrapper #nbo-quantity-option-wrap {
+    padding:    0 var(--cui-gap) !important;
+    margin-top: 20px !important;
+    border:     none !important;
+    background: none !important;
+}
+
+.nbd-option-wrapper #nbo-quantity-option-wrap .nbd-field-header > label {
+    font-family:    var(--cui-ff-display);
+    font-size:      11px;
+    font-weight:    700;
+    letter-spacing: .09em;
+    text-transform: uppercase;
+    color:          var(--cui-ink-soft);
+}
+
+/* Range slider */
+.nbd-option-wrapper input[type="range"] {
+    accent-color: var(--cui-brand);
+}
+
+.nbd-option-wrapper .nbd-input-range {
+    font-family: var(--cui-ff-mono);
+    font-weight: 600;
+    color:       var(--cui-brand);
+    margin-left: 10px;
+}
+
+/* Dropdown (quantity type 'd') */
+.nbd-option-wrapper select.nbo-dropdown {
+    padding:       8px 12px;
+    border:        1.5px solid var(--cui-border);
+    border-radius: var(--cui-r-md);
+    background:    var(--cui-white);
+    color:         var(--cui-ink-soft);
+    font-family:   var(--cui-ff-body);
+    font-size:     13px;
+    cursor:        pointer;
+    outline:       none;
+    transition:    border-color .12s;
+}
+
+.nbd-option-wrapper select.nbo-dropdown:focus {
+    border-color: var(--cui-brand);
+    box-shadow:   var(--cui-sh-ring);
+}
+
+/* ─── 12. Quantity break cards (Select box mode) ───────────────────────────── */
+#nbo-quantity-option-wrap .nbd-label-wrap {
+    display:               grid !important;
+    grid-template-columns: repeat(4, 1fr) !important;
+    gap:                   10px;
+}
+
+#nbo-quantity-option-wrap label.nbd-label.cui-qty-card {
+    display:        flex !important;
+    flex-direction: column;
+    align-items:    flex-start;
+    padding:        14px 14px 12px !important;
+    height:         auto !important;
+    min-height:     unset !important;
+    border-radius:  var(--cui-r-md) !important;
+    border:         1.5px solid var(--cui-border) !important;
+    background:     var(--cui-white) !important;
+    color:          var(--cui-ink) !important;
+    font-weight:    500 !important;
+    text-transform: none !important;
+    letter-spacing: 0 !important;
+    position:       relative;
+    overflow:       visible !important;
+    gap:            0 !important;
+    box-shadow:     none !important;
+}
+
+#nbo-quantity-option-wrap input[type="radio"]:checked + label.nbd-label.cui-qty-card {
+    border-color: var(--cui-brand) !important;
+    border-width: 2px !important;
+    background:   var(--cui-brand-ghost) !important;
+    box-shadow:   0 0 0 3px rgba(91,33,182,.12) !important;
+    color:        var(--cui-ink) !important;
+    font-weight:  500 !important;
+}
+
+.cui-qty-popular {
+    position:       absolute;
+    top:            -11px;
+    left:           50%;
+    transform:      translateX(-50%);
+    background:     var(--cui-gold);
+    color:          #fff;
+    font-size:      9px;
+    font-weight:    700;
+    font-family:    var(--cui-ff-body);
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    padding:        3px 8px;
+    border-radius:  100px;
+    white-space:    nowrap;
+}
+
+.cui-qty-num {
+    font-family:   var(--cui-ff-display);
+    font-size:     26px;
+    font-weight:   800;
+    color:         var(--cui-ink);
+    line-height:   1;
+    margin-bottom: 2px;
+}
+
+#nbo-quantity-option-wrap input[type="radio"]:checked + label.nbd-label.cui-qty-card .cui-qty-num {
+    color: var(--cui-brand);
+}
+
+.cui-qty-unit {
+    font-size:     11px;
+    color:         var(--cui-muted);
+    font-family:   var(--cui-ff-body);
+    margin-bottom: 10px;
+    line-height:   1;
+}
+
+.cui-qty-price {
+    font-size:     12px;
+    font-weight:   600;
+    font-family:   var(--cui-ff-mono);
+    color:         var(--cui-ink-soft);
+    line-height:   1;
+    margin-bottom: 6px;
+}
+
+.cui-qty-save {
+    display:        inline-block;
+    background:     #d1fae5;
+    color:          #065f46;
+    font-size:      10px;
+    font-weight:    700;
+    font-family:    var(--cui-ff-body);
+    letter-spacing: .04em;
+    padding:        3px 7px;
+    border-radius:  100px;
+    line-height:    1;
+}
+
+/* Custom quantity card */
+#nbo-quantity-option-wrap .cui-qty-custom-card {
+    display:        flex;
+    flex-direction: column;
+    align-items:    flex-start;
+    padding:        14px 14px 12px;
+    border-radius:  var(--cui-r-md);
+    border:         1.5px solid var(--cui-border);
+    background:     var(--cui-white);
+    color:          var(--cui-ink);
+    font-weight:    500;
+    position:       relative;
+    cursor:         pointer;
+    transition:     border-color .15s, box-shadow .15s;
+}
+#nbo-quantity-option-wrap .cui-qty-custom-card.is-active {
+    border-color: var(--cui-brand) !important;
+    border-width: 2px !important;
+    background:   var(--cui-brand-ghost) !important;
+    box-shadow:   0 0 0 3px rgba(91,33,182,.12) !important;
+}
+#nbo-quantity-option-wrap .cui-qty-custom-card.is-active .cui-qty-num {
+    color: var(--cui-brand);
+}
+.cui-qty-custom-input {
+    display:       none;
+    width:         100%;
+    border:        none;
+    border-bottom: 1.5px solid var(--cui-border);
+    padding:       3px 0;
+    font-size:     13px;
+    font-weight:   600;
+    font-family:   var(--cui-ff-display);
+    outline:       none;
+    background:    transparent;
+    color:         var(--cui-ink);
+    margin-top:    4px;
+    -moz-appearance: textfield;
+}
+.cui-qty-custom-input::-webkit-outer-spin-button,
+.cui-qty-custom-input::-webkit-inner-spin-button { -webkit-appearance: none; }
+.cui-qty-custom-input:focus { border-bottom-color: var(--cui-brand); }
+
+/* ─── 13. Post-field block (guarantee + save/share) ────────────────────────── */
+.cui-post-field {
+    display:        flex;
+    flex-direction: column;
+    gap:            12px;
+    padding:        var(--cui-gap-sm) var(--cui-gap) 0;
+    margin-top:     4px;
+}
+
+/* Guarantee row */
+.cui-guarantee-row {
+    display:       flex;
+    flex-wrap:     wrap;
+    gap:           6px 12px;
+    padding:       12px 14px;
+    background:    var(--cui-canvas);
+    border-radius: var(--cui-r-lg);
+    border:        1px solid var(--cui-border);
+}
+
+.cui-guarantee-item {
+    display:     flex;
+    align-items: center;
+    gap:         7px;
+    font-size:   12px;
+    font-weight: 500;
+    color:       var(--cui-ink-soft);
+    flex:        1;
+    min-width:   110px;
+}
+
+.cui-guarantee-item svg {
+    flex-shrink: 0;
+    color:       var(--cui-green);
+    stroke:      var(--cui-green);
+}
+
+/* Save / share buttons */
+.cui-save-share {
+    display: flex;
+    gap:     8px;
+}
+
+.cui-btn-ghost {
+    display:      inline-flex;
+    align-items:  center;
+    gap:          6px;
+    padding:      7px 14px;
+    border:       1.5px solid var(--cui-border);
+    border-radius: var(--cui-r-pill);
+    background:   transparent;
+    color:        var(--cui-muted);
+    font-family:  var(--cui-ff-body);
+    font-size:    12px;
+    font-weight:  500;
+    cursor:       pointer;
+    transition:   all .12s;
+    line-height:  1;
+}
+
+.cui-btn-ghost:hover {
+    border-color: var(--cui-brand-light);
+    color:        var(--cui-brand);
+    background:   var(--cui-brand-ghost);
+}
+
+.cui-btn-ghost svg {
+    flex-shrink: 0;
+    stroke:      currentColor;
+}
+
+/* ─── 12b. Disabled options (CMSmart adds .nbo-disabled via nbo-disabled directive) */
+.nbd-option-wrapper label.nbo-disabled {
+    opacity:        .4;
+    cursor:         not-allowed;
+    pointer-events: none;
+    filter:         grayscale(.6);
+}
+
+/* ─── 13. Validation error message ─────────────────────────────────────────── */
+.nbd-option-wrapper .nbo-invalid-option.active {
+    margin-top:    8px;
+    padding:       6px 10px;
+    background:    #fef2f2;
+    border:        1px solid #fca5a5;
+    border-radius: var(--cui-r-sm);
+    font-size:     12px;
+    color:         var(--cui-red);
+}
+
+/* ─── 14. Summary wrapper (CMSmart's built-in price summary table) ──────────── */
+.nbd-option-wrapper .nbo-summary-wrapper {
+    padding:       0 var(--cui-gap) var(--cui-gap);
+    margin-top:    var(--cui-gap-sm);
+    border-top:    1px solid var(--cui-border);
+    padding-top:   var(--cui-gap-sm);
+}
+
+.nbd-option-wrapper .nbo-summary-title {
+    font-family:    var(--cui-ff-display);
+    font-size:      11px;
+    font-weight:    700;
+    letter-spacing: .09em;
+    text-transform: uppercase;
+    color:          var(--cui-ink-soft);
+    margin-bottom:  10px;
+}
+
+.nbd-option-wrapper .nbo-summary-table {
+    width:          100%;
+    border-collapse: collapse;
+    font-size:      13px;
+}
+
+.nbd-option-wrapper .nbo-summary-table td {
+    padding:    5px 0;
+    color:      var(--cui-ink-soft);
+    border:     none;
+}
+
+.nbd-option-wrapper .nbo-summary-table tfoot td {
+    padding-top: 8px;
+    font-weight: 600;
+    color:       var(--cui-ink);
+}
+
+.nbd-option-wrapper .nbo-final-price.nbo-total-price td {
+    color:       var(--cui-brand);
+    font-size:   15px;
+    font-family: var(--cui-ff-mono);
+}
+
+/* Clear-selection link */
+.nbd-option-wrapper .nbo-clear-option-wrap {
+    padding: var(--cui-gap-sm) var(--cui-gap) 0;
+}
+
+.nbd-option-wrapper a.nbd-button.button {
+    display:       inline-flex;
+    align-items:   center;
+    padding:       7px 16px;
+    border:        1.5px solid var(--cui-border);
+    border-radius: var(--cui-r-pill);
+    background:    transparent;
+    color:         var(--cui-muted);
+    font-size:     12px;
+    font-weight:   500;
+    text-decoration: none;
+    transition:    all .12s;
+}
+
+.nbd-option-wrapper a.nbd-button.button:hover {
+    border-color: var(--cui-red);
+    color:        var(--cui-red);
+    background:   #fff5f5;
+}
+
+/* ─── 14b. Price flash animation (triggered by JS via MutationObserver) ─────── */
+@keyframes cui-flash {
+    0%   { opacity: 1; }
+    25%  { opacity: .55; color: var(--cui-brand-light); }
+    100% { opacity: 1; }
+}
+
+.cui-price-flash {
+    animation: cui-flash .55s ease-out;
+}
+
+/* ─── 14c. Gallery option-change animation ──────────────────────────────────── */
+@keyframes cui-gallery-change {
+    0%   { opacity: 1;    transform: scale(1); }
+    20%  { opacity: 0.72; transform: scale(0.985); }
+    65%  { opacity: 1;    transform: scale(1.008); }
+    100% { opacity: 1;    transform: scale(1); }
+}
+
+.single-product .woocommerce-product-gallery .flexslider.cui-option-change {
+    animation: cui-gallery-change 0.48s cubic-bezier(0.34, 1.56, 0.64, 1);
+    transform-origin: center center;
+}
+
+/* ─── 15. Product page header: category label + rating ─────────────────────── */
+
+/* Hide the default WooCommerce rating row — replaced by .cui-product-rating */
+.single-product .woocommerce-product-rating {
+    display: none !important;
+}
+
+/* Category + badge row (above title) */
+.cui-product-meta {
+    display:     flex;
+    align-items: center;
+    gap:         8px;
+    margin-bottom: 5px;
+}
+
+.cui-product-cats {
+    font-family:    var(--cui-ff-body);
+    font-size:      11px;
+    font-weight:    700;
+    letter-spacing: .08em;
+    color:          var(--cui-brand);
+}
+
+.cui-product-badge {
+    display:        inline-block;
+    font-size:      10px;
+    font-weight:    700;
+    font-family:    var(--cui-ff-body);
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    padding:        3px 9px;
+    border-radius:  100px;
+}
+
+.cui-product-badge--bestseller {
+    background: var(--cui-gold);
+    color:      #fff;
+}
+
+/* Compact rating row */
+.cui-product-rating {
+    display:     flex;
+    align-items: center;
+    gap:         6px;
+    margin-bottom: 10px;
+}
+
+/* CSS-only star fill using --pct custom property */
+.cui-stars {
+    display:   inline-block;
+    position:  relative;
+    font-size: 15px;
+    line-height: 1;
+}
+
+.cui-stars::before {
+    content: '★★★★★';
+    color:   #e2e8f0;
+}
+
+.cui-stars::after {
+    content:  '★★★★★';
+    position: absolute;
+    left:     0;
+    top:      0;
+    width:    var(--pct, 100%);
+    overflow: hidden;
+    color:    var(--cui-gold);
+    white-space: nowrap;
+}
+
+.cui-rating-score {
+    font-size:   13px;
+    font-weight: 700;
+    color:       var(--cui-ink);
+    font-family: var(--cui-ff-body);
+}
+
+.cui-rating-sep {
+    color:       var(--cui-muted);
+    font-size:   13px;
+    font-family: var(--cui-ff-body);
+}
+
+.cui-rating-count {
+    font-size:       13px;
+    color:           var(--cui-muted);
+    font-family:     var(--cui-ff-body);
+    text-decoration: none;
+}
+
+.cui-rating-count:hover {
+    color:           var(--cui-brand);
+    text-decoration: underline;
+}
+
+.cui-product-rating--empty a {
+    font-size:       13px;
+    color:           var(--cui-muted);
+    text-decoration: none;
+}
+
+/* ─── 16. Responsive ───────────────────────────────────────────────────────── */
+@media (max-width: 480px) {
+    .cui-price-showcase  { padding: 16px; }
+    .cui-price-value     { font-size: 26px; }
+
+    .nbd-option-wrapper .nbo-fields-wrapper,
+    .nbd-option-wrapper .nbd-option-field,
+    .nbd-option-wrapper #nbo-quantity-option-wrap {
+        padding-left:  16px !important;
+        padding-right: 16px !important;
+    }
+
+    .cui-post-field,
+    .nbd-option-wrapper .nbo-summary-wrapper,
+    .nbd-option-wrapper .nbo-clear-option-wrap {
+        padding-left:  16px;
+        padding-right: 16px;
+    }
+
+    .cui-guarantee-item  { min-width: 80px; font-size: 11px; }
+    .cui-price-per-item  { display: none; }
+
+    #nbo-quantity-option-wrap .nbd-label-wrap {
+        grid-template-columns: repeat(2, 1fr) !important;
+    }
+}
+
+/* =============================================================================
+   Single Product Layout + Gallery — storecmsmart theme ONLY.
+   Gated with body.theme-storecmsmart so other themes handle their own layout.
+   ============================================================================= */
+
+/* ─── Two-column product layout (42 gallery / 58 summary) ─────────────────── */
+
+body.theme-storecmsmart.single-product .woocommerce-product-gallery {
+    float:     none !important;
+    width:     100% !important;
+    max-width: none !important;
+}
+body.theme-storecmsmart.single-product .summary {
+    float: none !important;
+    width: 100% !important;
+}
+
+@media (min-width: 768px) {
+    body.theme-storecmsmart.single-product .product-top {
+        display:               grid !important;
+        grid-template-columns: minmax(0, 48%) minmax(0, 1fr) !important;
+        gap:                   40px !important;
+        align-items:           start !important;
+    }
+    body.theme-storecmsmart.single-product .product-top .woocommerce-product-gallery {
+        align-self: start;
+    }
+}
+
+/* Design cards: 1 column on mobile + tablet (up to 1024px) — all themes */
+@media (max-width: 1024px) {
+    .nbd-actions-wrap,
+    .nbd-actions-wrap.cui-3cols {
+        grid-template-columns: 1fr !important;
+    }
+}
+
+/* Mobile-only layout adjustments */
+@media (max-width: 767px) {
+    body.theme-storecmsmart.single-product .product-top {
+        display:        flex !important;
+        flex-direction: column !important;
+        gap:            20px !important;
+    }
+    .cui-price-showcase { padding: 14px 16px; }
+    .cui-price-value    { font-size: 26px; }
+    /* flex-viewport sizes to image naturally — no min-height */
+}
+
+/* ─── Gallery: clean card container — all themes ────────────────────────────── */
+
+.single-product .woocommerce-product-gallery .flexslider {
+    display:       block !important;
+    width:         100% !important;
+    box-sizing:    border-box !important;
+    border:        none !important;
+    border-radius: 16px !important;
+    background:    transparent !important;
+    overflow:      hidden !important;
+    margin:        0 !important;
+    box-shadow:    0 4px 20px rgba(0,0,0,.08);
+}
+
+.single-product .woocommerce-product-gallery .woocommerce-product-gallery__image img {
+    width:      100% !important;
+    height:     auto !important;
+    max-width:  none !important;
+    display:    block !important;
+    padding:    0 !important;
+}
+
+.single-product .woocommerce-product-gallery .woocommerce-product-gallery__trigger {
+    top:            12px !important;
+    right:          12px !important;
+    background:     rgba(255,255,255,.92) !important;
+    border:         1px solid #e0e0e0 !important;
+    border-radius:  50% !important;
+    width:          36px !important;
+    height:         36px !important;
+    z-index:        9;
+}
+
+/* =============================================================================
+   Design step — card-style buttons (Upload design / Custom design)
+   ============================================================================= */
+
+/* Section wrapper: always 2 equal columns */
+.nbd-actions-wrap {
+    display:               grid !important;
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap:                   10px !important;
+    margin:                0 !important;
+    width:                 100% !important;
+    box-sizing:            border-box !important;
+}
+
+/* Allow 3 columns when a third button (Use templates) exists */
+.nbd-actions-wrap.cui-3cols {
+    grid-template-columns: repeat(3, 1fr) !important;
+}
+
+/* "Add your design" section heading via pseudo-element */
+.nbd-actions-wrap::before {
+    content:        'Add your design';
+    display:        block;
+    font-family:    var(--cui-ff-body);
+    font-size:      13px;
+    font-weight:    700;
+    color:          var(--cui-ink);
+    letter-spacing: 0;
+    margin-bottom:  4px;
+    grid-column:    1 / -1;
+}
+
+/* Card base — fully overrides red WooCommerce button */
+.nbd-actions-wrap a.nbdesign-button.button.alt {
+    display:        flex !important;
+    flex-direction: column !important;
+    align-items:    center !important;
+    justify-content: space-between !important;
+    text-align:     center;
+    padding:        18px 12px 14px !important;
+    background:     #fff !important;
+    color:          var(--cui-ink) !important;
+    border:         1.5px solid var(--cui-border) !important;
+    border-radius:  var(--cui-r-lg) !important;
+    box-shadow:     none !important;
+    text-transform: none !important;
+    font-family:    var(--cui-ff-body);
+    font-size:      13px;
+    font-weight:    600;
+    letter-spacing: 0;
+    height:         auto !important;
+    min-height:     130px !important;
+    width:          100% !important;
+    min-width:      0 !important;
+    white-space:    normal !important;
+    line-height:    1.3;
+    gap:            0;
+    cursor:         pointer;
+    transition:     border-color .15s, box-shadow .15s, transform .15s;
+    box-sizing:     border-box !important;
+}
+
+/* Reset the inner text <span> that CMSmart outputs inside each button */
+.nbd-actions-wrap a.nbdesign-button.button.alt > span:not([class]) {
+    display:     block;
+    font-size:   13px;
+    font-weight: 600;
+    color:       var(--cui-ink);
+    white-space: normal;
+    line-height: 1.3;
+    margin:      0;
+    padding:     0;
+    width:       100%;
+}
+
+.nbd-actions-wrap a.nbdesign-button.button.alt:hover {
+    border-color: var(--cui-brand-light) !important;
+    box-shadow:   0 4px 16px rgba(91,33,182,.10) !important;
+    transform:    translateY(-2px) !important;
+    background:   #fff !important;
+    color:        var(--cui-ink) !important;
+}
+
+.nbd-actions-wrap a.nbdesign-button.button.alt:focus,
+.nbd-actions-wrap a.nbdesign-button.button.alt:focus-visible {
+    outline: none !important;
+    box-shadow: none !important;
+}
+
+/* Colored icon container (wraps the SVG, injected by JS) */
+.cui-btn-icon {
+    display:         flex;
+    align-items:     center;
+    justify-content: center;
+    width:           48px;
+    height:          48px;
+    border-radius:   var(--cui-r-md);
+    margin-bottom:   10px;
+    flex-shrink:     0;
+}
+
+.cui-btn-icon--design   { background: var(--cui-brand-ghost); }
+.cui-btn-icon--upload   { background: #e0f2fe; }
+.cui-btn-icon--template { background: #fef9c3; }
+
+.cui-btn-icon svg {
+    width:  22px !important;
+    height: 22px !important;
+    margin: 0 !important;
+}
+
+/* Override SVG inline fill="#fff" with CSS */
+.cui-btn-icon--design   svg path:not([fill="none"]) { fill: var(--cui-brand) !important; }
+.cui-btn-icon--upload   svg path:not([fill="none"]) { fill: #0284c7 !important; }
+.cui-btn-icon--template svg path:not([fill="none"]) { fill: #92400e !important; }
+
+/* Description line below title */
+.cui-btn-desc {
+    display:       block;
+    font-size:     10px;
+    color:         var(--cui-muted);
+    font-weight:   400;
+    margin-top:    3px;
+    line-height:   1.3;
+    width:         100%;
+    overflow:      hidden;
+    text-overflow: ellipsis;
+    white-space:   nowrap;
+}
+
+/* "Free" badge at the bottom of the card */
+.cui-btn-free {
+    display:       inline-block;
+    background:    #d1fae5;
+    color:         #065f46;
+    font-size:     9px;
+    font-weight:   700;
+    font-family:   var(--cui-ff-body);
+    padding:       2px 7px;
+    border-radius: 100px;
+    margin-top:    8px;
+    line-height:   1;
+}
+
+
+/* =============================================================================
+   Add to Cart — full-width outlined button below the design section
+   ============================================================================= */
+
+
+/* Full-width outlined Add to Cart button (storecmsmart: flex column so CMSmart
+   option wrapper stacks correctly inside form.cart) */
+body.theme-storecmsmart.single-product form.cart {
+    display:        flex !important;
+    flex-direction: column !important;
+    align-items:    stretch !important;
+    gap:            0 !important;
+}
+
+.single-product .single_add_to_cart_button.button {
+    display:         flex !important;
+    align-items:     center !important;
+    justify-content: center !important;
+    gap:             10px !important;
+    width:           100% !important;
+    padding:         16px 20px !important;
+    min-height:      56px !important;
+    background:      var(--cui-white) !important;
+    color:           var(--cui-ink) !important;
+    border:          1.5px solid var(--cui-border) !important;
+    border-radius:  var(--cui-r-lg) !important;
+    box-shadow:     none !important;
+    text-transform: none !important;
+    font-family:    var(--cui-ff-body);
+    font-size:      15px;
+    font-weight:    600;
+    letter-spacing: 0;
+    text-align:     center;
+    transition:     background .15s, border-color .15s;
+}
+
+.single-product .single_add_to_cart_button.button:hover {
+    opacity:    0.82 !important;
+    transform:  none !important;
+    box-shadow: none !important;
+}
+
+/* Price injected next to ADD TO CART text */
+.single-product .single_add_to_cart_button .cui-cart-sep {
+    color:       rgba(255,255,255,0.45) !important;
+    font-weight: 300;
+    font-size:   18px;
+    line-height: 1;
+    user-select: none;
+}
+.single-product .single_add_to_cart_button .cui-cart-price {
+    font-size:   15px;
+    font-weight: 700;
+    color:       #fff !important;
+}
+
+/* ─── Thumbnail strip ───────────────────────────────────────────────────────── */
+.single-product .woocommerce-product-gallery .flex-control-thumbs {
+    display:   flex;
+    gap:       8px;
+    padding:   10px 4px 0;
+    flex-wrap: wrap;
+    list-style: none;
+    margin:    0;
+}
+
+.single-product .woocommerce-product-gallery .flex-control-thumbs li {
+    list-style: none;
+    flex:       0 0 80px;
+}
+
+.single-product .woocommerce-product-gallery .flex-control-thumbs li img {
+    width:         80px;
+    height:        64px;
+    object-fit:    cover;
+    display:       block;
+    border:        2px solid transparent;
+    border-radius: 8px;
+    cursor:        pointer;
+    opacity:       .65;
+    background:    #f0f0f0;
+    transition:    border-color .15s, opacity .15s;
+}
+
+.single-product .woocommerce-product-gallery .flex-control-thumbs li img:hover {
+    opacity:      1;
+    border-color: #bbb;
+}
+
+.single-product .woocommerce-product-gallery .flex-control-thumbs .flex-active img {
+    opacity:      1;
+    border-color: #1a1a1a !important;
+}
+
+@media (max-width: 767px) {
+    /* flex-viewport sizes to image naturally — no min-height */
+    .single-product .woocommerce-product-gallery .flex-control-thumbs li      { flex: 0 0 60px; }
+    .single-product .woocommerce-product-gallery .flex-control-thumbs li img  { width: 60px; height: 48px; }
+}
+
+/* ─── Hide duplicate WooCommerce default price on CMSmart products ──────────
+   CMSmart updates .price with "Total Xđ" via Angular, which duplicates the
+   live price already shown in the purple TOTAL PRICE showcase block.
+   :has() targets only products where the CMSmart configurator is present. */
+.single-product .summary:has(.nbd-option-wrapper) p.price,
+.single-product .summary:has(.nbd-option-wrapper) span.price {
+    display: none !important;
+}

@@ -68,7 +68,7 @@ test('designer: 13oz tier fix, US format, pole pocket, rope, rush', async ({ bro
     await G.pickOption(page, 'Add rope');
     expect(G.num(await G.price(page)), '+rope').toBeCloseTo(17.68 + 14.0 + 6.67, 2);
     await G.shot(page, 'b1', '04-designer-banner-pole-rope-1440');
-    await G.pickOption(page, 'RUSH');
+    await G.pickOption(page, 'Add 100%');
     expect(G.num(await G.price(page)), '+rush').toBeCloseTo((17.68 + 14.0 + 6.67) * 2, 2);
     await G.pickOption(page, 'Standard turnaround');
     await G.pickOption(page, 'No rope');
@@ -123,11 +123,14 @@ test('cart price equals designer price (server recalculation)', async ({ browser
     const designer = G.num(await G.price(page));
     expect(designer).toBeCloseTo(31.68, 2);
     await page.locator('#sg-add-to-cart-btn').click({ force: true });
-    await page.waitForURL(/cart/, { timeout: 120000 }).catch(() => {});
-    await page.goto(G.BASE + '/shopping-cart/', { waitUntil: 'domcontentloaded' });
-    const txt = await page.locator('.cart_item').first().innerText();
-    const amounts = (txt.match(/\$\s?[\d,]+\.\d{2}/g) || []).map(G.num);
-    expect(amounts.some(a => Math.abs(a - 31.68) < 0.011), txt.replace(/\s+/g, ' ')).toBeTruthy();
+    await page.waitForURL(/shopping-cart|checkout/, { timeout: 120000 });
+    await page.waitForTimeout(1500);
+    const rows = await page.$$eval('.cart_item', els => els.map(e => e.innerText.replace(/\s+/g, ' ')));
+    expect(rows.length).toBeGreaterThan(0);
+    const hit = rows.find(t => /Top & Bottom/.test(t) && /\+\$14\.00/.test(t));
+    expect(hit, rows.join(' || ')).toBeTruthy();
+    const amounts = (hit.match(/\$\s?[\d,]+\.\d{2}/g) || []).map(G.num);
+    expect(amounts.some(a => Math.abs(a - 31.68) < 0.011), hit).toBeTruthy();
     await G.shot(page, 'b1', '06-cart-banner-pole-1440');
   } finally { await ctx.close(); }
 });

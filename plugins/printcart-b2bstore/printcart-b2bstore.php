@@ -38,6 +38,7 @@ function pcs_autoload() {
         'includes/class-invitations.php',
         'includes/class-team-invitations.php',
         'includes/class-quotes.php',
+        'includes/class-reorder.php',
         'includes/class-ajax.php',
         'includes/class-admin.php',
         'includes/class-frontend.php',
@@ -68,6 +69,7 @@ function pcs_init() {
     if ( class_exists( 'WooCommerce' ) ) {
         PCS_Frontend::init();
         PCS_B2B_Portal::init();
+        PCS_Reorder::init();
     }
 }
 add_action( 'plugins_loaded', 'pcs_init' );

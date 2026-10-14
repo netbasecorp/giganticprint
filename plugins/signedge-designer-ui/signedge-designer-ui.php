@@ -23,6 +23,7 @@ function sg_dui_asset_ver( $rel ) {
 }
 define( 'SG_DUI_URL', plugin_dir_url( __FILE__ ) );
 require_once plugin_dir_path( __FILE__ ) . 'includes/class-sg-upload.php';
+require_once plugin_dir_path( __FILE__ ) . 'includes/company-library.php'; // Image Zone block (company members only)
 
 /**
  * Injection strategy:

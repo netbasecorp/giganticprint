@@ -3156,95 +3156,6 @@ body.sg-options-loading .await-for-options p::after {
     font-weight: 600 !important;
 }
 
-/* ============================================================
-   FLOATING "FIT" / "CENTER" MENU
-   A small vertical menu to the LEFT of the selected image on canvas
-   (printcart/signs365-style — they show a fixed side panel; we don't
-   have that layout, so tying it to the current selection is the closest
-   equivalent that still works with our multi-layer canvas, where "which
-   image" isn't implicit like it is on a single-image product). Started
-   as a horizontal pill floating ABOVE the image, but that overlapped the
-   "Show dimensions" ruler labels near the canvas top edge — moved to the
-   side instead. Falls back to the right side of the image if there's not
-   enough room on the left (image flush against the sidebar). Light
-   theme (var(--sg-*)) to match the rest of this skin, not a dark pill.
-   Position is recalculated on a poll in override.js
-   (initFitCenterFloatingToolbar) since the fabric canvas instance itself
-   gets replaced whenever dimension options change — see project memory
-   on why this codebase avoids relying on one-time event bindings here.
-   ============================================================ */
-.sg-fit-center-toolbar {
-    position: fixed !important;
-    /* top/left are NOT !important — they're set dynamically via inline
-       style from override.js (positionFitCenterToolbar) on every poll
-       tick. An !important rule here would always win over that inline
-       style and freeze the toolbar at a fixed spot (confirmed live: it
-       rendered pinned to the top-left corner regardless of the computed
-       position actually being correct). */
-    top: 0;
-    left: 0;
-    display: none !important;
-    flex-direction: column !important;
-    gap: 2px !important;
-    background: var(--sg-bg) !important;
-    border: 1px solid var(--sg-border) !important;
-    border-radius: var(--sg-radius) !important;
-    padding: 4px !important;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, .16) !important;
-    z-index: 400 !important;
-    min-width: 92px !important;
-    /* Right edge of the menu lands 10px before the image's left edge. */
-    transform: translate(calc(-100% - 10px), 0) !important;
-}
-.sg-fit-center-toolbar.is-visible {
-    display: flex !important;
-}
-.sg-fit-center-toolbar.sg-right {
-    /* Left edge of the menu starts 10px after the image's right edge. */
-    transform: translate(10px, 0) !important;
-}
-.sg-fit-center-sep {
-    height: 1px !important;
-    width: auto !important;
-    background: var(--sg-border) !important;
-    margin: 1px 4px !important;
-}
-.sg-fit-center-btn {
-    display: flex !important;
-    align-items: center !important;
-    gap: 8px !important;
-    border: 0 !important;
-    background: transparent !important;
-    color: var(--sg-text) !important;
-    font-size: 12px !important;
-    font-weight: 600 !important;
-    text-transform: none !important;
-    letter-spacing: 0 !important;
-    padding: 8px 10px !important;
-    border-radius: 6px !important;
-    cursor: pointer !important;
-    white-space: nowrap !important;
-    transition: background .12s, color .12s !important;
-}
-.sg-fit-center-btn:hover {
-    background: var(--sg-bg-soft) !important;
-    color: var(--sg-primary) !important;
-}
-.sg-fit-center-btn:active {
-    background: rgba(37, 99, 235, .12) !important;
-}
-.sg-fit-center-btn span {
-    color: inherit !important;
-    line-height: 1 !important;
-}
-.sg-fit-center-btn svg {
-    width: 16px !important;
-    height: 16px !important;
-    fill: currentColor !important;
-    flex-shrink: 0 !important;
-    color: var(--sg-text-soft) !important;
-}
-
 .nbd-mode-modern .nbd-load-page .loader {
     position: absolute !important;
     top: 0 !important;
@@ -3255,3 +3166,208 @@ body.sg-options-loading .await-for-options p::after {
 }
 
 
+
+/* ============================================================
+   ART BAR (#sg-artbar) — fit modes + same-screen size editor.
+   Sits in the canvas column between the contextual toolbar
+   padding and .nbd-stages, so it never covers the canvas.
+   ============================================================ */
+.sg-artbar {
+    display: none !important;
+    flex: 0 0 auto !important;
+    flex-wrap: wrap !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 8px 16px !important;
+    box-sizing: border-box !important;
+    max-width: 100% !important;
+    margin: 6px auto 0 !important;
+    padding: 6px 12px !important;
+    background: var(--sg-bg) !important;
+    border: 1px solid var(--sg-border) !important;
+    border-radius: var(--sg-radius) !important;
+    box-shadow: var(--sg-shadow-sm) !important;
+    font-size: 13px !important;
+    color: var(--sg-text) !important;
+    position: relative !important;
+    z-index: 5 !important;
+}
+.sg-artbar.is-visible { display: flex !important; }
+.sg-artbar-group {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    align-items: center !important;
+    gap: 6px !important;
+}
+.sg-artbar:not(.sg-has-size) .sg-artbar-size { display: none !important; }
+.sg-artbar-btn {
+    padding: 6px 12px !important;
+    background: var(--sg-bg-soft) !important;
+    border: 1px solid var(--sg-border) !important;
+    border-radius: 6px !important;
+    color: var(--sg-text) !important;
+    font-size: 13px !important;
+    line-height: 1.2 !important;
+    cursor: pointer !important;
+}
+.sg-artbar-btn:hover { border-color: var(--sg-primary) !important; color: var(--sg-primary) !important; }
+.sg-artbar-btn.sg-active {
+    background: var(--sg-primary) !important;
+    border-color: var(--sg-primary) !important;
+    color: #fff !important;
+}
+.sg-artbar-field { display: inline-flex !important; align-items: center !important; gap: 4px !important; color: var(--sg-text-soft) !important; }
+.sg-artbar-field input[type="number"] {
+    width: 74px !important;
+    height: 30px !important;
+    padding: 0 6px !important;
+    border: 1px solid var(--sg-border) !important;
+    border-radius: 6px !important;
+    background: #fff !important;
+    color: var(--sg-text) !important;
+    font-size: 13px !important;
+}
+.sg-artbar-field input[type="number"]:focus { border-color: var(--sg-primary) !important; outline: none !important; box-shadow: 0 0 0 2px var(--sg-primary-soft) !important; }
+.sg-artbar-x, .sg-artbar-unit { color: var(--sg-text-soft) !important; }
+.sg-artbar-lock { display: inline-flex !important; align-items: center !important; gap: 4px !important; color: var(--sg-text-soft) !important; cursor: pointer !important; }
+.sg-artbar-actual { color: var(--sg-text-soft) !important; white-space: nowrap !important; }
+.sg-artbar-err { flex-basis: 100% !important; text-align: center !important; color: #b91c1c !important; font-size: 12px !important; }
+.sg-artbar-err:empty { display: none !important; }
+@media (max-width: 767px) {
+    .sg-artbar { margin: 4px !important; padding: 6px 8px !important; gap: 6px 10px !important; }
+    .sg-artbar-btn { padding: 5px 8px !important; font-size: 12px !important; }
+    .sg-artbar-field input[type="number"] { width: 64px !important; }
+}
+
+/* ============================================================
+   UPLOAD PROGRESS (#sg-upload-progress) — overlay on the canvas
+   column for upload -> processing -> placing. Replaces core's
+   generic loading mask while it is up.
+   ============================================================ */
+.sg-upload-progress {
+    display: none !important;
+    position: absolute !important;
+    top: 0 !important; right: 0 !important; bottom: 0 !important; left: 0 !important;
+    z-index: 50 !important;
+    align-items: center !important;
+    justify-content: center !important;
+    background: rgba(243, 244, 246, .82) !important;
+    padding: 16px !important;
+    box-sizing: border-box !important;
+}
+.sg-upload-progress.is-visible { display: flex !important; }
+.sg-up-card {
+    width: 420px !important;
+    max-width: 100% !important;
+    padding: 20px 24px !important;
+    background: var(--sg-bg) !important;
+    border: 1px solid var(--sg-border) !important;
+    border-radius: 12px !important;
+    box-shadow: var(--sg-shadow-md) !important;
+    box-sizing: border-box !important;
+    text-align: center !important;
+}
+.sg-up-name {
+    margin-bottom: 12px !important;
+    font-size: 14px !important;
+    font-weight: 600 !important;
+    color: var(--sg-text) !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+}
+.sg-up-bar {
+    height: 10px !important;
+    background: var(--sg-border) !important;
+    border-radius: 5px !important;
+    overflow: hidden !important;
+}
+.sg-up-fill {
+    height: 100% !important;
+    width: 0;
+    background: var(--sg-primary) !important;
+    border-radius: 5px !important;
+    transition: width .25s ease !important;
+}
+.sg-upload-progress:not([data-phase="upload"]) .sg-up-fill { animation: sg-up-pulse 1.2s ease-in-out infinite; }
+.sg-up-status {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 8px !important;
+    margin-top: 12px !important;
+    font-size: 13px !important;
+    color: var(--sg-text-soft) !important;
+}
+.sg-up-spinner {
+    display: none;
+    width: 14px; height: 14px;
+    border: 2px solid var(--sg-border);
+    border-top-color: var(--sg-primary);
+    border-radius: 50%;
+    animation: sg-up-spin .8s linear infinite;
+}
+.sg-upload-progress:not([data-phase="upload"]) .sg-up-spinner { display: inline-block; }
+@keyframes sg-up-spin { to { transform: rotate(360deg); } }
+@keyframes sg-up-pulse { 0%, 100% { opacity: 1; } 50% { opacity: .45; } }
+body.sg-upload-busy .loading-workflow { display: none !important; }
+
+/* ============================================================
+   LOW-RESOLUTION WARNING (#sg-lowres-warning) — non-blocking,
+   sits right under the art bar.
+   ============================================================ */
+.sg-lowres-warning {
+    display: none !important;
+    flex: 0 0 auto !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex-wrap: wrap !important;
+    gap: 6px 12px !important;
+    box-sizing: border-box !important;
+    max-width: calc(100% - 16px) !important;
+    margin: 6px auto 0 !important;
+    padding: 6px 12px !important;
+    background: #fffbeb !important;
+    border: 1px solid #f59e0b !important;
+    border-radius: var(--sg-radius) !important;
+    color: #92400e !important;
+    font-size: 13px !important;
+    line-height: 1.35 !important;
+    position: relative !important;
+    z-index: 5 !important;
+}
+.sg-lowres-warning.is-visible { display: flex !important; }
+.sg-lowres-dismiss {
+    padding: 3px 10px !important;
+    background: transparent !important;
+    border: 1px solid #f59e0b !important;
+    border-radius: 6px !important;
+    color: #92400e !important;
+    font-size: 12px !important;
+    cursor: pointer !important;
+}
+.sg-lowres-dismiss:hover { background: #fef3c7 !important; }
+
+/* ============================================================
+   EMPTY PRINT AREA MESSAGE (#sg-empty-msg) + upload tile flash
+   ============================================================ */
+.sg-empty-msg {
+    display: none !important;
+    margin: 0 0 10px !important;
+    padding: 8px 12px !important;
+    background: #fef2f2 !important;
+    border: 1px solid #fca5a5 !important;
+    border-radius: var(--sg-radius) !important;
+    color: #b91c1c !important;
+    font-size: 13px !important;
+    line-height: 1.35 !important;
+}
+.sg-empty-msg.is-visible { display: block !important; }
+.nbd-mode-modern #tab-photo .sg-flash {
+    animation: sg-flash-ring .6s ease-in-out 3;
+    border-radius: var(--sg-radius);
+}
+@keyframes sg-flash-ring {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(37, 99, 235, 0); }
+    50% { box-shadow: 0 0 0 4px rgba(37, 99, 235, .45); }
+}

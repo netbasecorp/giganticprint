@@ -142,6 +142,8 @@ class GP_Data {
 		wp_cache_flush();
 		if ( function_exists( 'wc_delete_product_transients' ) ) { /* per product when needed */ }
 		delete_transient( 'wc_term_counts' );
+		delete_transient( 'nbd_all_settings' ); // NBDesigner caches all its settings in transients
+		delete_transient( 'nbd_all_frontend_settings' );
 	}
 
 	public static function finish() {

@@ -1545,10 +1545,108 @@
         if (hIn.value !== h) hIn.value = h;
     }
 
+    /* ----------------------------------------------------------------
+       UPLOAD PROGRESS (#sg-upload-progress)
+       Overlay on the canvas column for the whole upload -> add-to-canvas
+       span. Phases: determinate bar from resource.upload.progressBar,
+       "Processing your file..." once it hits 100 (server + cloud relay
+       can take a minute), then "Placing..." while sgArt.placing. Core
+       reports every failure through alert(), which resets the counter.
+    ---------------------------------------------------------------- */
+    var sgUpload = { pending: 0, names: [], lastName: '', lastActivity: 0, lastProgress: -1, el: null };
+
+    function sgUploadStart(name) {
+        sgUpload.pending++;
+        sgUpload.names.push(name);
+        sgUpload.lastName = name;
+        sgUpload.lastActivity = Date.now();
+    }
+
+    function sgUploadDone() {
+        sgUpload.pending = Math.max(0, sgUpload.pending - 1);
+        sgUpload.names.shift();
+        sgUpload.lastActivity = Date.now();
+    }
+
+    function sgUploadReset() {
+        sgUpload.pending = 0;
+        sgUpload.names = [];
+    }
+
+    function sgHookAlertForUploadErrors() {
+        if (window.__sgAlertHooked) return;
+        window.__sgAlertHooked = true;
+        var origAlert = window.alert;
+        window.alert = function () {
+            sgUploadReset();
+            return origAlert.apply(window, arguments);
+        };
+    }
+
+    function ensureUploadProgressEl() {
+        if (sgUpload.el && document.body.contains(sgUpload.el)) return sgUpload.el;
+        var stages = document.querySelector('.nbd-workspace .nbd-stages');
+        if (!stages || !stages.parentNode) return null;
+        var el = document.createElement('div');
+        el.id = 'sg-upload-progress';
+        el.className = 'sg-upload-progress';
+        el.setAttribute('role', 'status');
+        el.setAttribute('aria-live', 'polite');
+        el.innerHTML =
+            '<div class="sg-up-card">' +
+                '<div class="sg-up-name"></div>' +
+                '<div class="sg-up-bar"><div class="sg-up-fill"></div></div>' +
+                '<div class="sg-up-status"><span class="sg-up-spinner"></span><span class="sg-up-text"></span></div>' +
+            '</div>';
+        stages.parentNode.appendChild(el);
+        sgUpload.el = el;
+        return el;
+    }
+
+    function updateUploadProgress(scope) {
+        var el = ensureUploadProgressEl();
+        if (!el) return;
+        var progress = 0;
+        try { progress = parseInt(scope.resource.upload.progressBar, 10) || 0; } catch (e) { progress = 0; }
+        if (progress !== sgUpload.lastProgress) {
+            sgUpload.lastProgress = progress;
+            sgUpload.lastActivity = Date.now();
+        }
+        // never let a lost callback leave the overlay up forever
+        if (sgUpload.pending > 0 && Date.now() - sgUpload.lastActivity > 180000) sgUploadReset();
+
+        var phase = '';
+        if (sgUpload.pending > 0) phase = progress >= 100 ? 'process' : 'upload';
+        else if (sgArt.placing) phase = 'place';
+
+        if (!phase) {
+            if (el.classList.contains('is-visible')) {
+                el.classList.remove('is-visible');
+                document.body.classList.remove('sg-upload-busy');
+            }
+            return;
+        }
+        var name = sgUpload.names[0] || sgUpload.lastName || '';
+        var text = phase === 'upload' ? 'Uploading... ' + progress + '%'
+            : phase === 'process' ? 'Processing your file...'
+            : 'Placing your artwork on the product...';
+        var pct = phase === 'upload' ? progress : 100;
+        el.setAttribute('data-phase', phase);
+        el.querySelector('.sg-up-name').textContent = name;
+        el.querySelector('.sg-up-fill').style.width = pct + '%';
+        var textEl = el.querySelector('.sg-up-text');
+        if (textEl.textContent !== text) textEl.textContent = text;
+        if (!el.classList.contains('is-visible')) {
+            el.classList.add('is-visible');
+            document.body.classList.add('sg-upload-busy');
+        }
+    }
+
     function artBarTick() {
         try {
             var bar = ensureArtBar();
             var scope = getDesignScope();
+            if (scope) updateUploadProgress(scope);
             var stage = scope && scope.stages && scope.stages[scope.currentStage];
             var canvas = stage && stage.canvas;
             var item = canvas && getArtItem(canvas);
@@ -1636,6 +1734,7 @@
 
     function initUploadCaptureHook(attempt) {
         if (!window.angular) return;
+        sgHookAlertForUploadErrors();
         var ctrls = document.querySelectorAll('[ng-controller]');
         var wrappedAny = false;
         for (var i = 0; i < ctrls.length; i++) {
@@ -1662,6 +1761,7 @@
                         // off the queue, so mutating .dpi later is visible
                         // wherever that reference ends up (sgUploadCapture).
                         var entry = { name: file.name, dpi: null, first: idx === 0 };
+                        sgUploadStart(file.name);
                         sgUploadNameQueue.push(entry);
                         if (typeof file.arrayBuffer === 'function') {
                             file.arrayBuffer().then(function (buf) {
@@ -1679,6 +1779,7 @@
                     var queued = sgUploadNameQueue.length ? sgUploadNameQueue.shift() : null;
                     // Core calls addImage() synchronously right after this; only
                     // the first file of a batch is auto-placed (see addImage wrapper).
+                    sgUploadDone();
                     sgJustStored = !queued || queued.first;
                     setTimeout(function () { sgJustStored = false; }, 0);
                     // uploadedAt is stamped HERE — the instant this upload actually

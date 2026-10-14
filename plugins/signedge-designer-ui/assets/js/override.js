@@ -396,6 +396,7 @@
         initDimensionFieldRestyle();
         initSourceTileActiveState();
         initSoleUploadSourceAutoOpen();
+        initSaveGuard();
         if (!isMobile) {
             injectSummaryPanel(workspace);
             initB2BBadge();
@@ -1546,6 +1547,104 @@
     }
 
     /* ----------------------------------------------------------------
+       EMPTY PRINT AREA BLOCKS ADD TO CART (#sg-empty-msg)
+       Guard used by the summary-panel button and by a wrapper around
+       scope.saveData (the core Process button). Only the add-to-cart
+       path (no type argument) is guarded; draft/download/save-for-later
+       calls pass through untouched.
+    ---------------------------------------------------------------- */
+    var sgGuard = { passed: false, flashTimer: null };
+
+    function countFilledStages(scope) {
+        var res = { total: 0, filled: 0, firstEmpty: -1 };
+        var stages = (scope && scope.stages) || [];
+        for (var i = 0; i < stages.length; i++) {
+            res.total++;
+            var c = stages[i] && stages[i].canvas;
+            if (c && typeof c.getObjects === 'function' && c.getObjects().length > 0) res.filled++;
+            else if (res.firstEmpty < 0) res.firstEmpty = i;
+        }
+        return res;
+    }
+
+    function setEmptyMsg(show) {
+        var el = document.getElementById('sg-empty-msg');
+        if (!el && show) {
+            el = document.createElement('div');
+            el.id = 'sg-empty-msg';
+            el.className = 'sg-empty-msg';
+            el.setAttribute('role', 'alert');
+            el.textContent = 'Add your artwork first: upload a file or create a design, then press Add to Cart.';
+            var btn = document.getElementById('sg-add-to-cart-btn');
+            var stages = document.querySelector('.nbd-workspace .nbd-stages');
+            if (btn && btn.parentNode) btn.parentNode.insertBefore(el, btn);
+            else if (stages && stages.parentNode) stages.parentNode.insertBefore(el, stages);
+            else return;
+        }
+        if (el) el.classList.toggle('is-visible', !!show);
+    }
+
+    function focusUploadTile() {
+        if (!window.jQuery) return;
+        var jq = window.jQuery;
+        jq('#nav-photos').triggerHandler('click');
+        function flash() {
+            var tile = document.querySelector('#tab-photo [data-type="image-upload"]') ||
+                       document.querySelector('#tab-photo .form-upload');
+            if (!tile) return;
+            tile.classList.add('sg-flash');
+            try { tile.scrollIntoView({ block: 'nearest' }); } catch (e) { /* old browser */ }
+            clearTimeout(sgGuard.flashTimer);
+            sgGuard.flashTimer = setTimeout(function () { tile.classList.remove('sg-flash'); }, 1800);
+        }
+        flash();
+        setTimeout(flash, 300); // the tile may only exist once the tab has rendered
+    }
+
+    // true = go ahead and save
+    function sgGuardAddToCart(scopeArg) {
+        try {
+            var scope = getDesignScope() || scopeArg;
+            if (!scope || !scope.stages) return true;
+            var info = countFilledStages(scope);
+            if (info.filled === 0) {
+                setEmptyMsg(true);
+                focusUploadTile();
+                return false;
+            }
+            setEmptyMsg(false);
+            if (info.total > 1 && info.filled < info.total) {
+                return window.confirm('Side ' + (info.firstEmpty + 1) + ' is empty. Add to cart anyway?');
+            }
+        } catch (e) { /* guard must never block on its own failure */ }
+        return true;
+    }
+
+    function initSaveGuard(attempt) {
+        if (!window.angular) return;
+        var ctrls = document.querySelectorAll('[ng-controller]');
+        var wrapped = false;
+        for (var i = 0; i < ctrls.length; i++) {
+            var scope;
+            try { scope = angular.element(ctrls[i]).scope(); } catch (e) { scope = null; }
+            if (!scope || typeof scope.saveData !== 'function') continue;
+            wrapped = true;
+            if (scope.__sgSaveGuardWrapped) continue;
+            scope.__sgSaveGuardWrapped = true;
+            (function (scope) {
+                var originalSave = scope.saveData;
+                scope.saveData = function (type) {
+                    if (!type && !sgGuard.passed && !sgGuardAddToCart(scope)) return;
+                    return originalSave.apply(this, arguments);
+                };
+            })(scope);
+        }
+        if (!wrapped && (attempt || 0) < 20) {
+            setTimeout(function () { initSaveGuard((attempt || 0) + 1); }, 500);
+        }
+    }
+
+    /* ----------------------------------------------------------------
        UPLOAD PROGRESS (#sg-upload-progress)
        Overlay on the canvas column for the whole upload -> add-to-canvas
        span. Phases: determinate bar from resource.upload.progressBar,
@@ -1717,7 +1816,11 @@
         try {
             var bar = ensureArtBar();
             var scope = getDesignScope();
-            if (scope) updateUploadProgress(scope);
+            if (scope) {
+                updateUploadProgress(scope);
+                var msgEl = document.getElementById('sg-empty-msg');
+                if (msgEl && msgEl.classList.contains('is-visible') && countFilledStages(scope).filled > 0) setEmptyMsg(false);
+            }
             var stage = scope && scope.stages && scope.stages[scope.currentStage];
             var canvas = stage && stage.canvas;
             var item = canvas && getArtItem(canvas);
@@ -2978,21 +3081,29 @@
 
         // Wire the CTA to saveData() — same function the Process button calls via ng-click="saveData()"
         document.getElementById('sg-add-to-cart-btn').addEventListener('click', function () {
-            // Primary: call saveData() directly on the Angular scope
+            // Empty print area (or empty second side) never reaches saveData().
+            // The guard has run here, so tell the saveData wrapper not to ask again.
+            if (!sgGuardAddToCart()) return;
+            sgGuard.passed = true;
             try {
-                var ngRoot = document.querySelector('[ng-controller]');
-                if (ngRoot && window.angular) {
-                    var scope = angular.element(ngRoot).scope();
-                    if (scope && typeof scope.saveData === 'function') {
-                        scope.$apply(function () { scope.saveData(); });
-                        return;
+                // Primary: call saveData() directly on the Angular scope
+                try {
+                    var ngRoot = document.querySelector('[ng-controller]');
+                    if (ngRoot && window.angular) {
+                        var scope = angular.element(ngRoot).scope();
+                        if (scope && typeof scope.saveData === 'function') {
+                            scope.$apply(function () { scope.saveData(); });
+                            return;
+                        }
                     }
-                }
-            } catch (e) { /* fall through */ }
+                } catch (e) { /* fall through */ }
 
-            // Fallback: click the Process button in the top bar
-            var processBtn = document.querySelector('.nbd-main-bar .item-process.save-data');
-            if (processBtn) processBtn.click();
+                // Fallback: click the Process button in the top bar
+                var processBtn = document.querySelector('.nbd-main-bar .item-process.save-data');
+                if (processBtn) processBtn.click();
+            } finally {
+                sgGuard.passed = false;
+            }
         });
     }
 

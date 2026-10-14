@@ -2,6 +2,7 @@
 defined( 'ABSPATH' ) || exit;
 
 require_once get_stylesheet_directory() . '/inc/gp-from-price.php';
+require_once get_stylesheet_directory() . '/inc/gp-redirects.php';
 
 /* ---------------------------------------------------------------
    SHOP PAGE: force page-shop.php for the WooCommerce shop page

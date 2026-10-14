@@ -4,7 +4,42 @@ if ( ! defined( 'ABSPATH' ) ) exit;
 class PCS_Customers {
 
     public static function init() {
-        // Nothing extra needed; B2B_Stores handles auto-upgrade
+        // B2B_Stores handles B2B auto-upgrade; here we promote repeat B2C buyers.
+        add_action( 'woocommerce_order_status_completed', array( __CLASS__, 'maybe_promote_returning' ), 20, 2 );
+        add_action( 'woocommerce_order_status_processing', array( __CLASS__, 'maybe_promote_returning' ), 20, 2 );
+    }
+
+    /**
+     * Promote a B2C customer to the 'returning' tier once they have enough
+     * other paid/in-progress orders. Never demotes, never touches other tiers.
+     *
+     * @param int           $order_id Order ID.
+     * @param WC_Order|null $order    Order (passed by WooCommerce 3.7+).
+     */
+    public static function maybe_promote_returning( $order_id, $order = null ) {
+        if ( ! $order instanceof WC_Order ) {
+            $order = wc_get_order( $order_id );
+        }
+        if ( ! $order ) return;
+
+        $user_id = (int) $order->get_customer_id();
+        if ( $user_id <= 0 ) return;
+
+        if ( 'b2c' !== PCS_DB::get_customer_tier( $user_id ) ) return;
+
+        $min_prior = max( 1, (int) apply_filters( 'gp_returning_min_prior_orders', 1 ) );
+
+        $prior = wc_get_orders( array(
+            'customer_id' => $user_id,
+            'status'      => array( 'completed', 'processing', 'on-hold' ),
+            'exclude'     => array( (int) $order->get_id() ),
+            'limit'       => $min_prior,
+            'return'      => 'ids',
+        ) );
+
+        if ( count( $prior ) >= $min_prior ) {
+            PCS_DB::set_customer_tier( $user_id, 'returning', 0, 'Auto: returning customer' );
+        }
     }
 
     /* ---------------------------------------------------------------- */

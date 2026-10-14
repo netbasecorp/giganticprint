@@ -14,7 +14,13 @@
 
 if ( ! defined( 'ABSPATH' ) ) exit;
 
-define( 'SG_DUI_VERSION', '1.10.135' );
+define( 'SG_DUI_VERSION', '1.10.136' );
+
+/** Cache-busting version of a plugin asset: plugin version + file mtime (assets are served with a 1 year max-age behind Cloudflare). */
+function sg_dui_asset_ver( $rel ) {
+    $f = plugin_dir_path( __FILE__ ) . $rel;
+    return SG_DUI_VERSION . ( file_exists( $f ) ? '.' . filemtime( $f ) : '' );
+}
 define( 'SG_DUI_URL', plugin_dir_url( __FILE__ ) );
 require_once plugin_dir_path( __FILE__ ) . 'includes/class-sg-upload.php';
 
@@ -172,7 +178,7 @@ add_action( 'nbd_extra_js', 'sg_dui_inject_css', 5 );
 function sg_dui_inject_css() {
     echo '<link rel="stylesheet" id="sg-dui-override-css" href="'
         . esc_url( SG_DUI_URL . 'assets/css/override.css' )
-        . '?v=' . SG_DUI_VERSION . '" />' . "\n";
+        . '?v=' . sg_dui_asset_ver( 'assets/css/override.css' ) . '" />' . "\n";
 }
 
 // Priority 10: main JS.
@@ -180,7 +186,7 @@ add_action( 'nbd_extra_js', 'sg_dui_inject_js', 10 );
 function sg_dui_inject_js() {
     echo '<script id="sg-dui-override-js" src="'
         . esc_url( SG_DUI_URL . 'assets/js/override.js' )
-        . '?v=' . SG_DUI_VERSION . '"></script>' . "\n";
+        . '?v=' . sg_dui_asset_ver( 'assets/js/override.js' ) . '"></script>' . "\n";
 }
 
 /* -----------------------------------------------------------------------

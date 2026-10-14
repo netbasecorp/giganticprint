@@ -21,6 +21,7 @@ const USERS = [['gp_test_b2c', 17.68, 25.0, 6.63], ['gp_test_b2b', 15.91, 22.5, 
 
 for (const [login, banner, acrylic, pageDefault] of USERS) {
   test(`one discount only: ${login} sees banner ${banner} and acrylic ${acrylic} (designer, product page, cart)`, async ({ browser }) => {
+    test.skip(!!FX && login === 'gp_test_b2c', 'gp_test_b2c is a company member while the fixture exists (see the member test)');
     const ctx = await G.loginContext(browser, login, { viewport: { width: 1440, height: 900 } });
     const page = await ctx.newPage();
     page.on('dialog', d => d.accept());
@@ -66,6 +67,26 @@ test('company member gets the company discount (status active)', async ({ browse
     await page.goto(`${G.BASE}/create-your-own/?product_id=1168&view=m`, { waitUntil: 'domcontentloaded' });
     const d = await page.evaluate(() => ({ d: window.sg_b2b_discount, t: window.sg_b2b_tier }));
     expect(Number(d.d), JSON.stringify(d)).toBe(10);
+  } finally { await ctx.close(); }
+});
+
+test('company member sees the discounted price in the designer and in the cart', async ({ browser }) => {
+  test.skip(!FX, 'fixture missing');
+  const ctx = await G.loginContext(browser, 'gp_test_b2c', { viewport: { width: 1440, height: 900 } });
+  const page = await ctx.newPage();
+  page.on('dialog', d => d.accept());
+  try {
+    expect(await G.openDesigner(page, 1168)).toBeTruthy();
+    await upload(page, 'testimg/test-24x16in-150dpi.png');
+    expect(G.num(await G.price(page)), 'member designer').toBeCloseTo(15.91, 2);
+    await G.shot(page, 'b3', '07-member-designer-1440');
+    await page.locator('#sg-add-to-cart-btn').click({ force: true });
+    await page.waitForURL(/shopping-cart|checkout/, { timeout: 120000 });
+    await page.waitForTimeout(1500);
+    const rows = await page.$$eval('.cart_item', els => els.map(e => e.innerText.replace(/\s+/g, ' ')));
+    const last = rows[rows.length - 1];
+    const amounts = (last.match(/\$\s?[\d,]+\.\d{2}/g) || []).map(G.num);
+    expect(amounts.some(a => near(a, 15.91)), `member cart row: ${last}`).toBeTruthy();
   } finally { await ctx.close(); }
 });
 

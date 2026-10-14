@@ -14,7 +14,7 @@
 
 if ( ! defined( 'ABSPATH' ) ) exit;
 
-define( 'SG_DUI_VERSION', '1.10.131' );
+define( 'SG_DUI_VERSION', '1.10.132' );
 define( 'SG_DUI_URL', plugin_dir_url( __FILE__ ) );
 
 /**

@@ -2854,10 +2854,72 @@
         }
     }
 
+    /* ----------------------------------------------------------------
+       OPTIONS LOADING STATE
+       The product options arrive by AJAX (can take several seconds).
+       Until the NBO scope has its fields and nbOption.initialed is set,
+       show "Calculating..." instead of a bogus 0 price and keep the
+       Add to Cart button disabled. Gives up after SG_OPTIONS_WAIT_MS.
+    ---------------------------------------------------------------- */
+    var SG_OPTIONS_WAIT_MS = 25000;
+    var sgOptionsWaitStart = 0;
+    var sgLoadingApplied   = false;
+    var sgBtnLabelOrig     = '';
+
+    function optionsReady() {
+        try {
+            var s = getNboScope();
+            return !!(s && s.nbd_fields && Object.keys(s.nbd_fields).length > 0 &&
+                      window.nbOption && window.nbOption.initialed);
+        } catch (e) { return false; }
+    }
+
+    // Returns true while the loading state is active.
+    function syncLoadingState() {
+        if (!sgOptionsWaitStart) sgOptionsWaitStart = Date.now();
+        var loading = !optionsReady() && (Date.now() - sgOptionsWaitStart) < SG_OPTIONS_WAIT_MS;
+
+        var totalEl = document.getElementById('sg-total-price');
+        var baseEl  = document.getElementById('sg-base-price');
+        var btnEl   = document.getElementById('sg-btn-price');
+        var addBtn  = document.getElementById('sg-add-to-cart-btn');
+        var lblEl   = addBtn ? addBtn.querySelector('.sg-btn-label') : null;
+
+        if (loading) {
+            if (!sgLoadingApplied) {
+                sgLoadingApplied = true;
+                document.body.classList.add('sg-options-loading');
+                if (lblEl) sgBtnLabelOrig = lblEl.textContent;
+            }
+            if (totalEl && totalEl.textContent !== 'Calculating...') totalEl.textContent = 'Calculating...';
+            if (baseEl && baseEl.textContent !== 'Calculating...') baseEl.textContent = 'Calculating...';
+            if (btnEl && btnEl.textContent !== 'Calculating...') btnEl.textContent = 'Calculating...';
+            if (addBtn) {
+                addBtn.disabled = true;
+                addBtn.classList.add('sg-btn-loading');
+            }
+            if (lblEl && lblEl.textContent !== 'Loading options...') lblEl.textContent = 'Loading options...';
+        } else if (sgLoadingApplied) {
+            sgLoadingApplied = false;
+            document.body.classList.remove('sg-options-loading');
+            if (totalEl && totalEl.textContent === 'Calculating...') totalEl.textContent = '—';
+            if (baseEl && baseEl.textContent === 'Calculating...') baseEl.textContent = '—';
+            if (btnEl && btnEl.textContent === 'Calculating...') btnEl.textContent = '—';
+            if (addBtn) {
+                addBtn.disabled = false;
+                addBtn.classList.remove('sg-btn-loading');
+            }
+            if (lblEl) lblEl.textContent = sgBtnLabelOrig || 'Add to Cart';
+        }
+        return loading;
+    }
+
     function updatePrice() {
         var totalEl   = document.getElementById('sg-total-price');
         var baseEl    = document.getElementById('sg-base-price');
         if (!totalEl) return;
+
+        if (syncLoadingState()) return;
 
         var totalPrice = null;
         var basePrice  = null;

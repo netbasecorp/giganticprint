@@ -2,7 +2,6 @@
 const { test, expect } = require('@playwright/test');
 const G = require('../lib/gp');
 
-test.describe.configure({ mode: 'serial' });
 test.use({ viewport: { width: 1440, height: 900 } });
 test.setTimeout(180000);
 const US = /^\$\d{1,3}(,\d{3})*\.\d{2}$/;

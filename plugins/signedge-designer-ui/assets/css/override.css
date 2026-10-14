@@ -3181,7 +3181,8 @@ body.sg-options-loading .await-for-options p::after {
     gap: 8px 16px !important;
     box-sizing: border-box !important;
     max-width: 100% !important;
-    margin: 6px auto 0 !important;
+    align-self: flex-start !important;
+    margin: 6px 0 0 0 !important;
     padding: 6px 12px !important;
     background: var(--sg-bg) !important;
     border: 1px solid var(--sg-border) !important;
@@ -3190,7 +3191,7 @@ body.sg-options-loading .await-for-options p::after {
     font-size: 13px !important;
     color: var(--sg-text) !important;
     position: relative !important;
-    z-index: 5 !important;
+    z-index: 60 !important;
 }
 .sg-artbar.is-visible { display: flex !important; }
 .sg-artbar-group {
@@ -3234,7 +3235,7 @@ body.sg-options-loading .await-for-options p::after {
 .sg-artbar-err { flex-basis: 100% !important; text-align: center !important; color: #b91c1c !important; font-size: 12px !important; }
 .sg-artbar-err:empty { display: none !important; }
 @media (max-width: 767px) {
-    .sg-artbar { margin: 4px !important; padding: 6px 8px !important; gap: 6px 10px !important; }
+    .sg-artbar { margin-top: 4px !important; padding: 6px 8px !important; gap: 6px 10px !important; }
     .sg-artbar-btn { padding: 5px 8px !important; font-size: 12px !important; }
     .sg-artbar-field input[type="number"] { width: 64px !important; }
 }
@@ -3325,7 +3326,8 @@ body.sg-upload-busy .loading-workflow { display: none !important; }
     gap: 6px 12px !important;
     box-sizing: border-box !important;
     max-width: calc(100% - 16px) !important;
-    margin: 6px auto 0 !important;
+    align-self: flex-start !important;
+    margin: 6px 0 0 0 !important;
     padding: 6px 12px !important;
     background: #fffbeb !important;
     border: 1px solid #f59e0b !important;

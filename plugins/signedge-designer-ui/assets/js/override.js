@@ -1387,6 +1387,7 @@
     function initArtBar(workspace) {
         if (sgArtBar.timer) return;
         sgArtBar.timer = setInterval(artBarTick, 300);
+        window.addEventListener('resize', positionArtBars);
         artBarTick();
     }
 
@@ -1430,6 +1431,32 @@
             });
         });
         return bar;
+    }
+
+    // Keep the bar (and the low-res banner under it) inside the visible canvas
+    // region: right of the sidebar, left of the summary panel, centred there.
+    function positionArtBars() {
+        var bar = sgArtBar.el;
+        var parent = bar && bar.parentNode;
+        if (!parent || !bar.classList.contains('is-visible')) return;
+        var pr = parent.getBoundingClientRect();
+        var left = pr.left, right = pr.right;
+        var side = document.querySelector('.nbd-sidebar');
+        var sum = document.querySelector('.sg-summary');
+        if (side) { var sr = side.getBoundingClientRect(); if (sr.width > 0 && sr.right > left) left = sr.right; }
+        if (sum) { var mr = sum.getBoundingClientRect(); if (mr.width > 0 && mr.left < right && mr.left > left) right = mr.left; }
+        var regionW = Math.max(200, right - left);
+        var els = [bar, sgLowRes.el];
+        for (var i = 0; i < els.length; i++) {
+            var el = els[i];
+            if (!el || el.parentNode !== parent || !el.classList.contains('is-visible')) continue;
+            var maxW = Math.max(200, regionW - 16);
+            el.style.setProperty('max-width', maxW + 'px', 'important');
+            var w = Math.min(el.offsetWidth, maxW);
+            var ml = Math.max(0, Math.round(left - pr.left + (regionW - w) / 2));
+            el.style.setProperty('margin-left', ml + 'px', 'important');
+            el.style.setProperty('margin-right', '0', 'important');
+        }
     }
 
     function showArtBarError(msg) {
@@ -1845,6 +1872,7 @@
             if (dim) syncArtBarInputs(dim, false);
 
             updateLowResWarning(bar, scope, stage, canvas, item);
+            positionArtBars();
 
             var btns = bar.querySelectorAll('[data-sg-art]');
             for (var i = 0; i < btns.length; i++) {

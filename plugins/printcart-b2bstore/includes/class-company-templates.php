@@ -27,6 +27,7 @@ class PCS_Company_Templates {
         add_action( 'wp_ajax_gp_tpl_rename', array( __CLASS__, 'ajax_rename' ) );
         add_action( 'wp_ajax_gp_tpl_clone',  array( __CLASS__, 'ajax_clone' ) );
         add_action( 'wp_ajax_gp_tpl_delete', array( __CLASS__, 'ajax_delete' ) );
+        add_action( 'pcs_store_deleted',     array( __CLASS__, 'purge_store' ) );
     }
 
     /* ---------------------------------------------------------------- */

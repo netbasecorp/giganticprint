@@ -30,6 +30,7 @@ class PCS_Private_Products {
         add_filter( 'wp_sitemaps_posts_query_args', array( __CLASS__, 'sitemap_args' ), 20, 2 );
 
         add_action( 'admin_post_pcs_save_private_products', array( __CLASS__, 'handle_save' ) );
+        add_action( 'pcs_store_deleted', array( __CLASS__, 'purge_store' ) );
     }
 
     /* ---------------------------------------------------------------- */
@@ -102,6 +103,22 @@ class PCS_Private_Products {
         }
         self::invalidate();
         return true;
+    }
+
+    /** Company deleted: drop its product assignments and its per-company settings. */
+    public static function purge_store( $store_id ) {
+        global $wpdb;
+        $sid = absint( $store_id );
+        if ( ! $sid ) {
+            return;
+        }
+        $wpdb->delete( self::table(), array( 'store_id' => $sid ), array( '%d' ) );
+        self::invalidate();
+        $all = get_option( self::OPT_SETTINGS, array() );
+        if ( is_array( $all ) && array_key_exists( $sid, $all ) ) {
+            unset( $all[ $sid ] );
+            update_option( self::OPT_SETTINGS, $all, false );
+        }
     }
 
     public static function get_for_store( $store_id ) {

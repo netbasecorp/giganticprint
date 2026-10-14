@@ -31,6 +31,10 @@
         injectAuthButton();
         injectB2BModal();
         injectLoginModal();
+        // Upload/auto-size hooks are not skin and must not wait for the
+        // workspace init below; both are idempotent.
+        initAutoSizeFromImage();
+        initUploadCaptureHook();
         // Give Angular time to bootstrap; retry for up to 10 s in case it's slow.
         attemptInit(0);
     });
@@ -398,13 +402,13 @@
         initSourceTileActiveState();
         initSoleUploadSourceAutoOpen();
         initSaveGuard();
-        if (!isMobile) {
-            injectSummaryPanel(workspace);
-            initB2BBadge();
-            startOptionsMirror();
-            startPriceMirror();
-            initCanvasCentering();
-        }
+        // Phones need the summary panel too: mobile.js moves the Add to Cart
+        // button, price and options out of it (the panel itself stays hidden).
+        injectSummaryPanel(workspace);
+        initB2BBadge();
+        startOptionsMirror();
+        startPriceMirror();
+        if (!isMobile) initCanvasCentering();
     }
 
     /* ----------------------------------------------------------------
@@ -932,9 +936,11 @@
        running immediately.
     ---------------------------------------------------------------- */
     function initAutoSizeFromImage(attempt) {
-        if (!window.angular) return;
-        var ngRoot = document.querySelector('[ng-controller]');
-        if (!ngRoot) return;
+        var ngRoot = window.angular && document.querySelector('[ng-controller]');
+        if (!ngRoot) {
+            if ((attempt || 0) < 40) setTimeout(function () { initAutoSizeFromImage((attempt || 0) + 1); }, 500);
+            return;
+        }
 
         var scope;
         try { scope = angular.element(ngRoot).scope(); } catch (e) { scope = null; }
@@ -1455,6 +1461,7 @@
     // Keep the bar (and the low-res banner under it) inside the visible canvas
     // region: right of the sidebar, left of the summary panel, centred there.
     function positionArtBars() {
+        if (window.SG_DUI_M && window.SG_DUI_M.active) return; // mobile.js lays the bar out itself
         var bar = sgArtBar.el;
         var parent = bar && bar.parentNode;
         if (!parent || !bar.classList.contains('is-visible')) return;
@@ -1631,6 +1638,7 @@
     }
 
     function focusUploadTile() {
+        if (window.SG_DUI_M && window.SG_DUI_M.active && window.SG_DUI_M.focusUpload()) return; // mobile.js
         if (!window.jQuery) return;
         var jq = window.jQuery;
         jq('#nav-photos').triggerHandler('click');
@@ -1712,7 +1720,7 @@
        can take a minute), then "Placing..." while sgArt.placing. Core
        reports every failure through alert(), which resets the counter.
     ---------------------------------------------------------------- */
-    var sgUpload = { pending: 0, names: [], lastName: '', lastActivity: 0, lastProgress: -1, el: null, custom: null };
+    var sgUpload = { pending: 0, names: [], lastName: '', lastActivity: 0, lastProgress: -1, el: null, custom: null, preview: null };
 
     function sgUploadStart(name) {
         sgUpload.pending++;
@@ -1754,12 +1762,155 @@
         el.innerHTML =
             '<div class="sg-up-card">' +
                 '<div class="sg-up-name"></div>' +
+                '<div class="sg-up-pv" hidden><div class="sg-up-thumb"></div><div class="sg-up-info">' +
+                    '<div class="sg-up-px"></div><div class="sg-up-in"></div><div class="sg-up-mb"></div>' +
+                '</div></div>' +
+                '<div class="sg-up-lowres" hidden></div>' +
                 '<div class="sg-up-bar"><div class="sg-up-fill"></div></div>' +
                 '<div class="sg-up-status"><span class="sg-up-spinner"></span><span class="sg-up-text"></span></div>' +
             '</div>';
         stages.parentNode.appendChild(el);
         sgUpload.el = el;
         return el;
+    }
+
+    /* Instant client-side preview inside the overlay: measurements come from
+       the first 64 KB of the file, the thumbnail from a downscaled decode. */
+    function sgPreviewClear() {
+        sgUpload.preview = null;
+        if (!sgUpload.el) return;
+        var pvEl = sgUpload.el.querySelector('.sg-up-pv');
+        var low = sgUpload.el.querySelector('.sg-up-lowres');
+        if (pvEl) { pvEl.hidden = true; var t = pvEl.querySelector('.sg-up-thumb'); if (t) t.innerHTML = ''; }
+        if (low) { low.hidden = true; low.textContent = ''; }
+    }
+
+    function sgPreviewRender(el) {
+        var pv = sgUpload.preview;
+        var pvEl = el.querySelector('.sg-up-pv');
+        var low = el.querySelector('.sg-up-lowres');
+        if (!pv) { if (pvEl && !pvEl.hidden) sgPreviewClear(); return; }
+        function setText(sel, txt) {
+            var n = el.querySelector(sel);
+            if (n.textContent !== txt) n.textContent = txt;
+        }
+        var thumb = el.querySelector('.sg-up-thumb');
+        if (pv.thumb && thumb.firstChild !== pv.thumb) { thumb.innerHTML = ''; thumb.appendChild(pv.thumb); }
+        var hasInfo = !!(pv.w && pv.h);
+        pvEl.hidden = !hasInfo && !pv.thumb;
+        setText('.sg-up-px', hasInfo ? pv.w + ' x ' + pv.h + ' px' : '');
+        var dpi = pv.dpi || getProductDefaultDpi();
+        var wIn = hasInfo ? pv.w / dpi : 0, hIn = hasInfo ? pv.h / dpi : 0;
+        setText('.sg-up-in', hasInfo ? fmtIn(wIn) + ' x ' + fmtIn(hIn) + ' in at ' + Math.round(dpi) + ' dpi' : '');
+        setText('.sg-up-mb', pv.mb);
+        var lowDpi = hasInfo && pv.dpi && pv.dpi < 100;
+        low.hidden = !lowDpi;
+        setText('.sg-up-lowres', lowDpi ? 'Low resolution: about ' + Math.round(pv.dpi) + ' dpi at ' + fmtIn(wIn) + ' x ' + fmtIn(hIn) +
+            ' in. The print may look soft. Use a larger file or reduce the print size.' : '');
+    }
+
+    // width/height (+ dpi) from the leading bytes; null fields when unknown
+    function sgParseImageHeader(buf) {
+        var out = { w: 0, h: 0, dpi: null };
+        try {
+            var v = new DataView(buf), n = v.byteLength, i;
+            if (n >= 24 && v.getUint32(0) === 0x89504e47) {
+                out.w = v.getUint32(16); out.h = v.getUint32(20);
+            } else if (n >= 10 && v.getUint16(0) === 0xffd8) {
+                var pos = 2;
+                while (pos + 9 <= n && v.getUint8(pos) === 0xff) {
+                    var m = v.getUint8(pos + 1);
+                    if (m === 0xd8 || m === 0x01 || (m >= 0xd0 && m <= 0xd9)) { pos += 2; continue; }
+                    if (m >= 0xc0 && m <= 0xcf && m !== 0xc4 && m !== 0xc8 && m !== 0xcc) {
+                        out.h = v.getUint16(pos + 5); out.w = v.getUint16(pos + 7);
+                        break;
+                    }
+                    pos += 2 + v.getUint16(pos + 2);
+                }
+            } else if (n >= 10 && v.getUint8(0) === 0x47 && v.getUint8(1) === 0x49 && v.getUint8(2) === 0x46) {
+                out.w = v.getUint16(6, true); out.h = v.getUint16(8, true);
+            } else if (n >= 30 && v.getUint32(0) === 0x52494646 && v.getUint32(8) === 0x57454250) {
+                var fmt = String.fromCharCode(v.getUint8(12), v.getUint8(13), v.getUint8(14), v.getUint8(15));
+                if (fmt === 'VP8X') {
+                    out.w = 1 + (v.getUint8(24) | (v.getUint8(25) << 8) | (v.getUint8(26) << 16));
+                    out.h = 1 + (v.getUint8(27) | (v.getUint8(28) << 8) | (v.getUint8(29) << 16));
+                } else if (fmt === 'VP8L') {
+                    i = v.getUint32(21, true);
+                    out.w = (i & 0x3fff) + 1; out.h = ((i >> 14) & 0x3fff) + 1;
+                } else if (fmt === 'VP8 ') {
+                    out.w = v.getUint16(26, true) & 0x3fff; out.h = v.getUint16(28, true) & 0x3fff;
+                }
+            }
+            out.dpi = readEmbeddedDpi(buf);
+        } catch (e) { /* unknown header: thumbnail only */ }
+        return out;
+    }
+
+    function sgPreviewThumb(file, maxW, done) {
+        var finished = false;
+        function out(canvas) { if (!finished) { finished = true; done(canvas); } }
+        function fromImg() {
+            var url, img = new Image();
+            try { url = URL.createObjectURL(file); } catch (e) { out(null); return; }
+            img.onload = function () {
+                var c = null;
+                try {
+                    var s = Math.min(1, 640 / Math.max(img.naturalWidth, img.naturalHeight, 1));
+                    c = document.createElement('canvas');
+                    c.width = Math.max(1, Math.round(img.naturalWidth * s));
+                    c.height = Math.max(1, Math.round(img.naturalHeight * s));
+                    c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+                } catch (e) { c = null; }
+                img.onload = img.onerror = null; img.src = '';
+                URL.revokeObjectURL(url);
+                out(c);
+            };
+            img.onerror = function () { img.onload = img.onerror = null; URL.revokeObjectURL(url); out(null); };
+            img.src = url;
+        }
+        function fromBitmap(bmp) {
+            var c = document.createElement('canvas');
+            c.width = bmp.width; c.height = bmp.height;
+            c.getContext('2d').drawImage(bmp, 0, 0);
+            if (bmp.close) bmp.close();
+            out(c);
+        }
+        if (typeof createImageBitmap === 'function' && !/svg/.test(file.type || '') && !/\.svg$/i.test(file.name || '')) {
+            var opts = !(maxW && maxW <= 640) ? { resizeWidth: 640, resizeQuality: 'low' } : undefined;
+            try {
+                createImageBitmap(file, opts).then(fromBitmap).catch(fromImg);
+                return;
+            } catch (e) { /* fall back */ }
+        }
+        fromImg();
+    }
+
+    function sgPreviewStart(file, ext) {
+        if (!/^(png|jpe?g|gif|webp|svg)$/.test(ext)) return;
+        var pv = { name: file.name, w: 0, h: 0, dpi: null, thumb: null, idleSince: 0,
+            mb: (Math.round(file.size / 104857.6) / 10) + ' MB' };
+        sgUpload.preview = pv;
+        var started = false;
+        function thumb(maxW) {
+            if (started) return;
+            started = true;
+            sgPreviewThumb(file, maxW, function (c) {
+                if (sgUpload.preview === pv && c && c.width > 0) { c.id = 'sg-upload-preview'; pv.thumb = c; }
+                else if (c) { c.width = c.height = 0; }
+            });
+        }
+        var head = typeof file.slice === 'function' ? file.slice(0, 65536) : null;
+        if (head && typeof head.arrayBuffer === 'function') {
+            head.arrayBuffer().then(function (buf) {
+                if (sgUpload.preview !== pv) return;
+                var h = sgParseImageHeader(buf);
+                pv.w = h.w; pv.h = h.h; pv.dpi = h.dpi;
+                thumb(h.w);
+            }).catch(function () { thumb(0); });
+            setTimeout(function () { thumb(0); }, 1500); // header read stalled: still decode
+        } else {
+            thumb(0);
+        }
     }
 
     function updateUploadProgress(scope) {
@@ -1783,6 +1934,12 @@
         else if (sgUpload.pending > 0) phase = progress >= 100 ? 'process' : 'upload';
         else if (sgArt.placing) phase = 'place';
 
+        var pv = sgUpload.preview;
+        if (pv) {
+            if (phase) pv.idleSince = 0;
+            else if (!pv.idleSince) pv.idleSince = Date.now();
+            else if (Date.now() - pv.idleSince > 3000) sgPreviewClear();
+        }
         if (!phase) {
             if (el.classList.contains('is-visible')) {
                 el.classList.remove('is-visible');
@@ -1802,6 +1959,7 @@
         el.querySelector('.sg-up-fill').style.width = pct + '%';
         var textEl = el.querySelector('.sg-up-text');
         if (textEl.textContent !== text) textEl.textContent = text;
+        sgPreviewRender(el);
         if (!el.classList.contains('is-visible')) {
             el.classList.add('is-visible');
             document.body.classList.add('sg-upload-busy');
@@ -2104,6 +2262,18 @@
         return out;
     }
 
+    // Embedded dpi lives at the start of png/jpg files: never read the whole
+    // file (tiff keeps a larger window, capped at 8 MB).
+    function sgReadFileDpi(file, entry) {
+        var limit = /^(tiff?)$/.test(sgExt(file.name || '')) ? 8388608 : 1048576;
+        if (typeof file.slice !== 'function') return;
+        var head = file.slice(0, limit);
+        if (typeof head.arrayBuffer !== 'function') return;
+        head.arrayBuffer().then(function (buf) {
+            entry.dpi = readEmbeddedDpi(buf);
+        }).catch(function () { /* leave dpi null — falls back to product default */ });
+    }
+
     function sgChunkedUpload(scope, files, idx, maskId, entry) {
         var SG = window.SG_UPLOAD, file = files[idx], total = file.size, done = false;
         var shortName = entry && entry.name ? entry.name : file.name;
@@ -2262,7 +2432,10 @@
     }
 
     function initUploadCaptureHook(attempt) {
-        if (!window.angular) return;
+        if (!window.angular) {
+            if ((attempt || 0) < 40) setTimeout(function () { initUploadCaptureHook((attempt || 0) + 1); }, 500);
+            return;
+        }
         sgHookAlertForUploadErrors();
         var ctrls = document.querySelectorAll('[ng-controller]');
         var wrappedAny = false;
@@ -2294,11 +2467,7 @@
                         var entry = { name: origName || file.name, dpi: null, first: idx === 0 };
                         if (!started) sgUploadStart(entry.name);
                         sgUploadNameQueue.push(entry);
-                        if (typeof file.arrayBuffer === 'function') {
-                            file.arrayBuffer().then(function (buf) {
-                                entry.dpi = readEmbeddedDpi(buf);
-                            }).catch(function () { /* leave dpi null — falls back to product default */ });
-                        }
+                        sgReadFileDpi(file, entry);
                     }
                     return originalUpload.apply(scope, args);
                 }
@@ -2311,6 +2480,7 @@
                     try {
                         if (!SG || !file || !file.name) return queueAndUpload(args, idx, null, false);
                         var ext = sgExt(file.name), orig = file.name;
+                        try { sgPreviewStart(file, ext); } catch (ePv) { sgUpload.preview = null; }
                         if (ext === 'svg' || (file.type && file.type.indexOf('svg') !== -1)) return queueAndUpload(args, idx, null, false);
 
                         var list = sgCopyFiles(files);
@@ -2334,10 +2504,7 @@
                                 if (!started) sgUploadStart(orig);
                                 var entry = { name: orig, dpi: null, first: idx === 0 };
                                 sgUploadNameQueue.push(entry);
-                                var head = f.slice(0, 262144);
-                                if (typeof head.arrayBuffer === 'function') {
-                                    head.arrayBuffer().then(function (buf) { entry.dpi = readEmbeddedDpi(buf); }).catch(function () { });
-                                }
+                                sgReadFileDpi(f, entry);
                                 sgChunkedUpload(scope, list, idx, args[2], entry);
                                 return;
                             }
@@ -3608,7 +3775,16 @@
                          document.querySelector('#nbo-options-wrap');
             }
             if (!ctrlEl) return null;
-            return angular.element(ctrlEl).scope() || null;
+            var sc = angular.element(ctrlEl).scope() || null;
+            // On phones the options scope is compiled outside the designer scope chain, so it does not inherit
+            // applyOptions(); the function only uses the designer scope closure, so borrow it.
+            if (sc && typeof sc.applyOptions !== 'function') {
+                var dsc = getDesignScope();
+                if (dsc && typeof dsc.applyOptions === 'function') {
+                    sc.applyOptions = function () { return dsc.applyOptions.apply(dsc, arguments); };
+                }
+            }
+            return sc;
         } catch(e) { return null; }
     }
 
@@ -4139,5 +4315,11 @@
         div.appendChild(document.createTextNode(str || ''));
         return div.innerHTML;
     }
+
+    // Internals for mobile.js (phone order flow).
+    window.SG_DUI_INT = {
+        getDesignScope: getDesignScope, getArtItem: getArtItem, countFilledStages: countFilledStages,
+        openPhotoUpload: openPhotoUpload, injectSummaryPanel: injectSummaryPanel, updatePrice: updatePrice
+    };
 
 })();

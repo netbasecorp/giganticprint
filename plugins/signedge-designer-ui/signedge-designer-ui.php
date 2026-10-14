@@ -14,7 +14,7 @@
 
 if ( ! defined( 'ABSPATH' ) ) exit;
 
-define( 'SG_DUI_VERSION', '1.10.136' );
+define( 'SG_DUI_VERSION', '1.10.140' );
 
 /** Cache-busting version of a plugin asset: plugin version + file mtime (assets are served with a 1 year max-age behind Cloudflare). */
 function sg_dui_asset_ver( $rel ) {
@@ -23,6 +23,8 @@ function sg_dui_asset_ver( $rel ) {
 }
 define( 'SG_DUI_URL', plugin_dir_url( __FILE__ ) );
 require_once plugin_dir_path( __FILE__ ) . 'includes/class-sg-upload.php';
+require_once plugin_dir_path( __FILE__ ) . 'includes/company-library.php'; // Image Zone block (company members only)
+require_once plugin_dir_path( __FILE__ ) . 'includes/company-templates.php'; // company template toolbar (company members only)
 
 /**
  * Injection strategy:
@@ -187,6 +189,22 @@ function sg_dui_inject_js() {
     echo '<script id="sg-dui-override-js" src="'
         . esc_url( SG_DUI_URL . 'assets/js/override.js' )
         . '?v=' . sg_dui_asset_ver( 'assets/js/override.js' ) . '"></script>' . "\n";
+}
+
+// Phone order flow: every selector is scoped to body.sg-m-on / body.sg-m-adv / #sg-m,
+// which only mobile.js (viewport <= 768 px at load) creates, so wider screens are untouched.
+add_action( 'nbd_extra_js', 'sg_dui_inject_mobile_css', 6 );
+function sg_dui_inject_mobile_css() {
+    echo '<link rel="stylesheet" id="sg-dui-mobile-css" href="'
+        . esc_url( SG_DUI_URL . 'assets/css/mobile.css' )
+        . '?v=' . sg_dui_asset_ver( 'assets/css/mobile.css' ) . '" />' . "\n";
+}
+
+add_action( 'nbd_extra_js', 'sg_dui_inject_mobile_js', 11 );
+function sg_dui_inject_mobile_js() {
+    echo '<script id="sg-dui-mobile-js" src="'
+        . esc_url( SG_DUI_URL . 'assets/js/mobile.js' )
+        . '?v=' . sg_dui_asset_ver( 'assets/js/mobile.js' ) . '"></script>' . "\n";
 }
 
 /* -----------------------------------------------------------------------

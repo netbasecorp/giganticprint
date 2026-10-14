@@ -258,6 +258,8 @@ $sc = $status_colors[ $store->status ] ?? array( '#f3f4f6', '#374151' );
         </div>
       </div>
 
+      <?php PCS_Private_Products::render_admin_box( $store ); ?>
+
     </div><!-- /right -->
   </div>
 

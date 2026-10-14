@@ -84,6 +84,12 @@ $portal_base   = PCS_B2B_Portal::url( '' );
         <span class="pcs-portal-nav-icon" style="font-size:12px;">↗</span>
         <span>More account features</span>
       </a>
+      <?php if ( ! $is_b2b && PCS_Company_Images::user_store_ids( $user_id ) ) : ?>
+      <a href="<?php echo esc_url( PCS_B2B_Portal::url( 'images' ) ); ?>"
+         class="pcs-portal-nav-item <?php echo $current === 'images' ? 'active' : ''; ?>">
+        <span class="pcs-portal-nav-icon">🖼️</span><span>Image Zone</span>
+      </a>
+      <?php endif; ?>
       <?php if ( ! $is_b2b && get_option( 'pcs_b2b_self_register', '1' ) !== '0' ) : ?>
       <a href="<?php echo esc_url( PCS_B2B_Portal::url( 'apply' ) ); ?>"
          class="pcs-portal-nav-item <?php echo $current === 'apply' ? 'active' : ''; ?>" style="color:#f59e0b;font-weight:600;">
@@ -124,7 +130,7 @@ $portal_base   = PCS_B2B_Portal::url( '' );
     /** @var WP_User $user */
 
     /* Allow any section file, including order-detail */
-    $allowed = array( 'overview', 'orders', 'order-detail', 'quotes', 'quote-request', 'quote-view', 'store', 'team', 'approvals', 'apply', 'profile' );
+    $allowed = array( 'overview', 'orders', 'order-detail', 'quotes', 'quote-request', 'quote-view', 'store', 'team', 'approvals', 'images', 'templates', 'apply', 'profile' );
     $safe_current = in_array( $current, $allowed, true ) ? $current : 'overview';
     $section_file = PCS_PLUGIN_DIR . 'frontend/portal/sections/' . $safe_current . '.php';
 

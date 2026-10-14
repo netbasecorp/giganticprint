@@ -1,0 +1,45 @@
+/* Image Zone block in the designer Photos tab (#sg-iz) */
+#sg-iz { margin: 14px 0 6px; border: 1px solid #e5e7eb; border-radius: 10px; background: #fff; overflow: hidden; }
+#sg-iz .sg-iz-head { display: flex; align-items: center; justify-content: space-between; width: 100%; padding: 10px 12px; margin: 0; border: 0; background: #f9fafb; color: #111827; font-size: 13px; font-weight: 600; cursor: pointer; text-align: left; }
+#sg-iz .sg-iz-head:hover { background: #f3f4f6; }
+#sg-iz .sg-iz-caret { font-size: 11px; color: #6b7280; transition: transform .15s; }
+#sg-iz.sg-iz-open .sg-iz-caret { transform: rotate(180deg); }
+#sg-iz .sg-iz-body { display: none; padding: 10px; }
+#sg-iz.sg-iz-open .sg-iz-body { display: block; }
+#sg-iz .sg-iz-msg { font-size: 12px; color: #6b7280; padding: 4px 2px 8px; }
+#sg-iz .sg-iz-msg.sg-iz-err { color: #b91c1c; }
+#sg-iz .sg-iz-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+#sg-iz .sg-iz-item { border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden; cursor: pointer; background: #fff; min-width: 0; position: relative; }
+#sg-iz .sg-iz-item:hover { border-color: #2563eb; box-shadow: 0 0 0 2px rgba(37, 99, 235, .15); }
+#sg-iz .sg-iz-thumb { height: 84px; background: #f3f4f6; display: flex; align-items: center; justify-content: center; }
+#sg-iz .sg-iz-thumb img { max-width: 100%; max-height: 100%; display: block; }
+#sg-iz .sg-iz-cap { padding: 5px 7px; font-size: 11px; line-height: 1.3; color: #4b5563; }
+#sg-iz .sg-iz-name { display: block; font-weight: 600; color: #111827; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+#sg-iz .sg-iz-item.sg-iz-loading { opacity: .6; pointer-events: none; }
+#sg-iz .sg-iz-item.sg-iz-loading .sg-iz-thumb:after { content: attr(data-loading); position: absolute; left: 0; right: 0; top: 30px; text-align: center; font-size: 11px; font-weight: 600; color: #1e3a8a; background: rgba(255, 255, 255, .85); padding: 2px 4px; }
+
+/* Company templates toolbar (#sg-tpl-bar): fixed, independent of the art bar and the mobile quick flow */
+#sg-tpl-bar { position: fixed; left: 12px; bottom: 12px; z-index: 99990; display: flex; flex-wrap: wrap; align-items: center; gap: 6px; max-width: calc(100vw - 24px); box-sizing: border-box; padding: 6px 8px; background: #fff; border: 1px solid #e5e7eb; border-radius: 10px; box-shadow: 0 2px 10px rgba(0, 0, 0, .15); font-size: 12px; line-height: 1.3; }
+#sg-tpl-bar .sg-tpl-label { font-weight: 700; color: #111827; }
+#sg-tpl-bar .sg-tpl-btn { border: 1px solid #1e3a8a; background: #1e3a8a; color: #fff; border-radius: 8px; padding: 6px 10px; font-size: 12px; font-weight: 600; cursor: pointer; line-height: 1.3; }
+#sg-tpl-bar .sg-tpl-btn:hover { background: #1e40af; }
+#sg-tpl-bar .sg-tpl-btn[disabled] { opacity: .5; cursor: default; }
+#sg-tpl-bar .sg-tpl-select { max-width: 180px; min-width: 0; border: 1px solid #d1d5db; border-radius: 8px; padding: 5px 6px; font-size: 12px; background: #fff; color: #111827; height: auto; }
+#sg-tpl-bar .sg-tpl-msg { flex: 1 1 100%; color: #047857; font-size: 12px; }
+#sg-tpl-bar .sg-tpl-msg.sg-tpl-err { color: #b91c1c; }
+@media (max-width: 768px) {
+  #sg-tpl-bar { left: 8px; right: 8px; bottom: 72px; max-width: none; }
+  #sg-tpl-bar .sg-tpl-select { flex: 1 1 120px; max-width: none; }
+}
+#sg-tpl-busy { display: none; position: fixed; inset: 0; z-index: 99995; background: rgba(255, 255, 255, .7); align-items: center; justify-content: center; }
+#sg-tpl-busy.sg-tpl-busy-on { display: flex; }
+#sg-tpl-busy .sg-tpl-busy-card { display: flex; align-items: center; gap: 10px; background: #fff; border: 1px solid #e5e7eb; border-radius: 10px; padding: 14px 20px; box-shadow: 0 4px 16px rgba(0, 0, 0, .18); font-size: 14px; font-weight: 600; color: #1e3a8a; }
+#sg-tpl-busy .sg-tpl-spinner { width: 16px; height: 16px; border: 2px solid #bfdbfe; border-top-color: #1e3a8a; border-radius: 50%; animation: sg-tpl-spin .8s linear infinite; }
+@keyframes sg-tpl-spin { to { transform: rotate(360deg); } }
+
+/* Company setting "Hide public templates": public template UI of the designer */
+body.sg-hide-public-templates #nav-templates,
+body.sg-hide-public-templates #tab-product-template,
+body.sg-hide-public-templates .nbd-templates,
+body.sg-hide-public-templates [data-type="globalTemplate"],
+body.sg-hide-public-templates .nbd-suggest-tag { display: none !important; }

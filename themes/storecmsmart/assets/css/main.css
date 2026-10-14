@@ -5638,3 +5638,26 @@ a.nbdesign-button:hover,
   .cat-nav-item { padding: 7px 12px 6px; font-size: 10px; }
   .cat-nav-icon { width: 22px; height: 22px; }
 }
+
+/* ===== B4: mobile (390 px) - no horizontal scroll anywhere ===== */
+html, body { max-width: 100%; overflow-x: hidden; }
+@supports (overflow: clip) { html, body { overflow-x: clip; } }
+.mobile-nav-panel {
+  right: 0 !important;
+  transform: translateX(110%);
+  visibility: hidden;
+  transition: transform .28s var(--nbd-ease-out), visibility 0s linear .28s;
+}
+body.mobile-nav-open .mobile-nav-panel {
+  transform: none;
+  visibility: visible;
+  transition: transform .28s var(--nbd-ease-out), visibility 0s;
+}
+@media (max-width: 768px) {
+  .single-product .woocommerce-product-gallery,
+  .single-product .woocommerce-product-gallery .flex-viewport { max-width: 100%; overflow: hidden; }
+  .single-product .woocommerce-product-gallery__image img { max-width: 100%; height: auto; }
+  img, video, iframe, table { max-width: 100%; }
+  .woocommerce table.shop_table_responsive,
+  .woocommerce-page table.shop_table_responsive { width: 100%; }
+}

@@ -8,6 +8,10 @@
 require __DIR__ . '/_lib.php';
 GP_Data::init( 'price-check' );
 
+// pre-deploy verification: load the repo copy of the linear pricing class when the live plugin does not have it yet
+$gp_repo_class = ( getenv( 'GP_REPO' ) ?: '/srv/gp-dev/giganticprint' ) . '/plugins/cmsmart-ui-override/includes/class-gp-linear-pricing.php';
+if ( ! class_exists( 'GP_Linear_Pricing' ) && is_readable( $gp_repo_class ) ) { require_once $gp_repo_class; echo "(using repo GP_Linear_Pricing)
+"; }
 $nbo  = NBD_FRONTEND_PRINTING_OPTIONS::instance();
 $json = in_array( '--json', GP_Data::$arg, true );
 
@@ -83,8 +87,8 @@ $cases = array(
 	array( 'Poster 12x12',          'poster', array( 'size' => array( 12, 12 ) ), 6.00, true ),
 	array( 'NoCurl 12x12',          'nocurl', array( 'size' => array( 12, 12 ) ), 9.00, true ),
 	array( 'Mesh 12x12',            'mesh',   array( 'size' => array( 12, 12 ) ), 10.98, true ),
-	array( 'Acrylic 4x4 (min 25)',  'acr',    array( 'size' => array( 4, 4 ), 'Rounded' => 0 ), 25.00, false ),
-	array( 'Acrylic 10x10',         'acr',    array( 'size' => array( 10, 10 ), 'Rounded' => 0 ), 30.00, false ),
+	array( 'Acrylic 4x4 (min 25)',  'acr',    array( 'size' => array( 4, 4 ), 'Rounded' => 1 ), 25.00, true ),
+	array( 'Acrylic 10x10',         'acr',    array( 'size' => array( 10, 10 ), 'Rounded' => 1 ), 30.00, true ),
 	array( 'Magnet default (72x24)', 'magnet', array(), 224.25, true ),
 	array( 'Transfer film 22x12',   'film',   array( 'size' => array( 22, 12 ) ), 18.00, true ),
 	array( 'Vinyl 3M IJ-35C 12x12 (1 sqft)', 'vinyl3m', array( 'size' => array( 12, 12 ), 'Laminate' => 2 ), 8.97, true ),

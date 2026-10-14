@@ -1749,3 +1749,7 @@ body.theme-storecmsmart.single-product form.cart {
 .nbd-option-wrapper .gp-lin-rule:empty {
     display: none;
 }
+/* name + amount on the first line, rule text on its own line (narrow left panel: no wrapped amounts) */
+.nbd-option-wrapper label:has(.gp-lin-rule) { flex-wrap: wrap; }
+.nbd-option-wrapper .gp-lin-badge { white-space: nowrap; }
+.nbd-option-wrapper .gp-lin-rule { flex: 0 0 100%; width: 100%; margin-top: 2px; }

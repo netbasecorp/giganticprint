@@ -65,14 +65,14 @@ class Cmsmart_UI_Override {
             'cmsmart-ui-override',
             CMSMART_UI_OVERRIDE_URL . 'assets/css/override.css',
             array( 'cui-google-fonts' ),
-            '1.5.4'
+            '1.5.5'
         );
 
         wp_enqueue_script(
             'cmsmart-ui-override',
             CMSMART_UI_OVERRIDE_URL . 'assets/js/override.js',
             array( 'jquery' ),
-            '1.5.4',
+            '1.5.5',
             true
         );
 

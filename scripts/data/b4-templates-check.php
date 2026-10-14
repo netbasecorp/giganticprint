@@ -52,7 +52,7 @@ try {
 		gp_b4t_assert( 'table exists', $tbl === $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $tbl ) ) );
 
 		$owner    = get_user_by( 'login', 'gp_test_b2b' );
-		$member   = get_user_by( 'login', 'gp_test_b2c' );
+		$member   = get_user_by( 'login', 'gp_test_staff' );
 		$reseller = get_user_by( 'login', 'gp_test_reseller' );
 		gp_b4t_assert( 'test users gp_test_b2b / gp_test_b2c / gp_test_reseller exist', $owner && $member && $reseller );
 

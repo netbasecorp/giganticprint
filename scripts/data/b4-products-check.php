@@ -47,7 +47,7 @@ try {
 		gp_b4_assert( 'PCS_Private_Products loaded', false );
 	} else {
 		$owner    = get_user_by( 'login', 'gp_test_b2b' );
-		$member   = get_user_by( 'login', 'gp_test_b2c' );
+		$member   = get_user_by( 'login', 'gp_test_staff' );
 		$reseller = get_user_by( 'login', 'gp_test_reseller' );
 		gp_b4_assert( 'test users exist', $owner && $member && $reseller );
 		gp_b4_assert( "product $pid exists", (bool) get_post( $pid ) );

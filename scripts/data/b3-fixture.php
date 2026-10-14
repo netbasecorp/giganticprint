@@ -88,6 +88,14 @@ if ( 'cleanup' === $mode ) {
 	$store = gp_fx_find_store();
 	if ( $store ) {
 		if ( class_exists( 'PCS_Private_Products' ) ) { PCS_Private_Products::unassign( (int) $store->id, 1263 ); }
+		// B4 company data of the fixture store: images (rows + private files), templates, private product assignments
+		foreach ( array( 'pcs_company_images', 'pcs_company_templates', 'pcs_store_products' ) as $t ) {
+			if ( $wpdb->get_var( "SHOW TABLES LIKE '{$wpdb->prefix}$t'" ) ) { $n = $wpdb->delete( $wpdb->prefix . $t, array( 'store_id' => $store->id ) ); echo "deleted $n row(s) of $t
+"; }
+		}
+		$iz = wp_upload_dir(); $izdir = $iz['basedir'] . '/gp-imagezone/' . (int) $store->id;
+		if ( is_dir( $izdir ) ) { foreach ( scandir( $izdir ) as $f ) { if ( '.' !== $f && '..' !== $f ) { @unlink( "$izdir/$f" ); } } @rmdir( $izdir ); echo "removed $izdir
+"; }
 		$wpdb->delete( $wpdb->prefix . 'pcs_b2b_members', array( 'store_id' => $store->id ) );
 		$wpdb->delete( $wpdb->prefix . 'pcs_b2b_stores', array( 'id' => $store->id ) );
 		echo "deleted store {$store->id} and its members\n";

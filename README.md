@@ -35,3 +35,8 @@ Idempotent, dry-run by default, every touched option/meta/row/term is saved as J
   loading state, `SG_Upload` (TIFF/EPS conversion, chunked upload up to 200 MB), single B2B discount on raw numeric prices. Assets are cache-busted by file mtime.
 - `printcart-b2bstore`: one store status vocabulary (`active`), cookie-bound invitations, POST + nonce quotes, discount applied once in the cart.
 - theme `storecmsmart`: real "From" price, category bar in Signs365 order, old category redirects, "Coming soon" for empty categories.
+
+## B4 additions (2026-10-15)
+- Phone flow: `signedge-designer-ui/assets/js/mobile.js` + `mobile.css` build `#sg-m` (upload, preview, size, options, price, Add to Cart) on screens up to 768 px; the core editor stays reachable through "Advanced editor". Theme CSS removes horizontal scroll on every page.
+- `printcart-b2bstore`: `PCS_Reorder` (one-click reorder with options and a copy of the design folder), `PCS_Company_Images` (private Image Zone, files under `uploads/gp-imagezone/<store>/`, served only through `admin-ajax gp_iz_file` after a membership check), `PCS_Company_Templates` (company templates: save in the designer, portal list/rename/clone/delete, `?gp_tpl=<id>` starts an order), `PCS_Private_Products` (assign products to a company on the company admin screen; hidden from everybody else, 404 on the URL and the designer URL). New tables are created lazily: `pcs_company_images`, `pcs_company_templates`, `pcs_store_products`; the per-company setting "Hide public templates" lives in the option `pcs_store_settings`.
+- Tests: `tests/e2e/tests/b4.spec.js`; fixtures `scripts/data/b3-fixture.php create|assign-private|cleanup`, `b4-reorder-fixture.php`; checks `b4-*-check.php`.

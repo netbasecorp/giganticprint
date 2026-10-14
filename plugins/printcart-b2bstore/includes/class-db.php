@@ -388,6 +388,27 @@ class PCS_DB {
         ) );
     }
 
+    /* Single-use claim: pending -> accepted, true only for the one caller that wins */
+    public static function claim_invitation( $id ) {
+        global $wpdb;
+        $rows = $wpdb->query( $wpdb->prepare(
+            "UPDATE {$wpdb->prefix}pcs_invitations SET status = 'accepted', accepted_at = %s WHERE id = %d AND status = 'pending'",
+            current_time( 'mysql' ),
+            absint( $id )
+        ) );
+        return 1 === (int) $rows;
+    }
+
+    public static function claim_team_invite( $id ) {
+        global $wpdb;
+        $rows = $wpdb->query( $wpdb->prepare(
+            "UPDATE {$wpdb->prefix}pcs_team_invitations SET status = 'accepted', responded_at = %s WHERE id = %d AND status = 'pending'",
+            current_time( 'mysql' ),
+            absint( $id )
+        ) );
+        return 1 === (int) $rows;
+    }
+
     public static function get_invitation_by_id( $id ) {
         global $wpdb;
         return $wpdb->get_row( $wpdb->prepare(

@@ -44,6 +44,7 @@ function pcs_autoload() {
         'includes/class-frontend.php',
         'includes/class-b2b-portal.php',
         'includes/class-private-products.php',
+        'includes/class-company-images.php',
     );
     foreach ( $files as $file ) {
         require_once PCS_PLUGIN_DIR . $file;
@@ -65,6 +66,7 @@ function pcs_init() {
     PCS_Quotes::init();
     PCS_Ajax::init();
     PCS_Private_Products::init();
+    PCS_Company_Images::init();
     add_action( 'admin_init', array( 'PCS_Activator', 'maybe_run_migrations' ) );
 
     /* Frontend — only when WooCommerce is active */

@@ -1737,3 +1737,15 @@ body.theme-storecmsmart.single-product form.cart {
 .single-product .summary:has(.nbd-option-wrapper) span.price {
     display: none !important;
 }
+
+/* Pole pocket / rope option buttons: rule text from the live rates */
+.nbd-option-wrapper .gp-lin-rule {
+    display:     block;
+    font-size:   10px;
+    font-weight: 400;
+    line-height: 1.3;
+    opacity:     .75;
+}
+.nbd-option-wrapper .gp-lin-rule:empty {
+    display: none;
+}

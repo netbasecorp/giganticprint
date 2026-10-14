@@ -24,14 +24,20 @@
 		return String(s == null ? '' : s).replace(/&amp;/g, '&').replace(/\\(.)/g, '$1');
 	}
 
+	function factorFor(kind, name) {
+		var c = compiled[kind], i;
+		if (!c) { return 0; }
+		name = decode(name);
+		for (i = 0; i < c.opts.length; i++) {
+			if (c.opts[i][0].test(name)) { return c.opts[i][1]; }
+		}
+		return 0;
+	}
+
 	function compute(kind, w, h, name) {
 		var rule = rules[kind], c = compiled[kind];
 		if (!rule || !c || !(w > 0) || !(h > 0)) { return 0; }
-		var factor = 0, i;
-		name = decode(name);
-		for (i = 0; i < c.opts.length; i++) {
-			if (c.opts[i][0].test(name)) { factor = c.opts[i][1]; break; }
-		}
+		var factor = factorFor(kind, name);
 		if (!(factor > 0)) { return 0; }
 		var feet = rule.measure === 'perimeter' ? 2 * (w + h) / 12 : w / 12;
 		var v = factor * feet * Number(rule.rate || 0) + Number(rule.setup || 0);
@@ -81,6 +87,7 @@
 
 	function patch(scope) {
 		var size = currentSize(scope);
+		try { relabel(scope, size); } catch (e) { /* labels are cosmetic */ }
 		if (!size) { return; }
 		var fields = targetFields(scope), i, f, kind, opts, j, price, slots, k;
 		var qb = scope.options && scope.options.quantity_breaks;
@@ -99,6 +106,86 @@
 				for (k = 0; k <= nBreaks; k++) { if (slots.indexOf(String(k)) < 0) { slots.push(String(k)); } }
 				for (k = 0; k < slots.length; k++) { opts[j].price[slots[k]] = price; }
 			}
+		}
+	}
+
+	// ---- Honest option button labels (rule text from live rates + amount for the current size) ----
+	var sym = cfg.symbol || '$';
+
+	function money(v) { return sym + Number(v).toFixed(2); }
+
+	function ruleText(kind, name) {
+		var rule = rules[kind], short = decode(name).replace(/\s*[—–-]+\s*quoted.*$/i, '').trim();
+		var t = short + ': ' + money(rule.rate || 0) + '/ft';
+		if (Number(rule.setup || 0) > 0) { t += ' + ' + money(rule.setup) + ' setup'; }
+		return t;
+	}
+
+	function setText(el, txt) { if (el.textContent !== txt) { el.textContent = txt; } }
+
+	function syncSelectedVal(fieldEl) {
+		var val = fieldEl.querySelector('.cui-selected-val'), on = fieldEl.querySelector('.nbd-label-wrap input[type="radio"]:checked');
+		var lbl = on && on.nextElementSibling, clone;
+		if (!val || !lbl || lbl.tagName !== 'LABEL') { return; }
+		clone = lbl.cloneNode(true);
+		Array.prototype.forEach.call(clone.querySelectorAll('.gp-lin-rule'), function (n) { n.parentNode.removeChild(n); });
+		if (val.innerHTML !== clone.innerHTML) { val.innerHTML = clone.innerHTML; }
+	}
+
+	function relabel(scope, size) {
+		var fields = (scope.options && scope.options.fields) || [], i, f, kind, opts, fieldEl, radios, r, key, opt, name, factor, host, badge, rule, txt, swatch, label, amount;
+		for (i = 0; i < fields.length; i++) {
+			f = fields[i];
+			if (!f || !f.general || !f.general.attributes || !f.general.attributes.options) { continue; }
+			kind = kindFor(f.general.title);
+			if (!kind) { continue; }
+			opts = f.general.attributes.options;
+			fieldEl = document.querySelector('[data-id="' + f.id + '"]');
+			if (!fieldEl) { continue; }
+			radios = fieldEl.querySelectorAll('input[type="radio"]');
+			for (r = 0; r < radios.length; r++) {
+				key = radios[r].value;
+				opt = opts[key];
+				if (!opt) { continue; }
+				name = opt.name;
+				factor = factorFor(kind, name);
+				swatch = radios[r].closest ? radios[r].closest('.nbd-swatch-label-wrap') : null;
+				label = swatch || (radios[r].id ? fieldEl.querySelector('label[for="' + radios[r].id + '"]') : null);
+				if (!label) { continue; }
+				host = (swatch && swatch.querySelector('.nbd-swatch-description')) || label;
+				badge = host.querySelector('.gp-lin-badge');
+				if (!badge) {
+					// Drop any stale flat-price badge written by the theme script.
+					Array.prototype.forEach.call(host.querySelectorAll('.cui-sw-price, .cui-label-price'), function (n) { n.parentNode.removeChild(n); });
+					badge = document.createElement('span');
+					badge.className = 'gp-lin-badge ' + (swatch ? 'cui-sw-price' : 'cui-label-price');
+					host.appendChild(badge);
+				}
+				rule = host.querySelector('.gp-lin-rule');
+				if (!rule) {
+					rule = document.createElement('small');
+					rule.className = 'gp-lin-rule';
+					host.appendChild(rule);
+				}
+				if (!(factor > 0)) {
+					setText(badge, 'Free');
+					setText(rule, '');
+					badge.className = badge.className.replace(/\s*\S*--free/, '') + (swatch ? ' cui-sw-price--free' : ' cui-label-price--free');
+					continue;
+				}
+				badge.className = badge.className.replace(/\s*\S*--free/, '');
+				txt = ruleText(kind, name);
+				if (size) {
+					amount = compute(kind, size.w, size.h, name);
+					setText(badge, '+' + money(amount));
+					setText(rule, txt);
+				} else {
+					setText(badge, txt);
+					setText(rule, '');
+				}
+				if (label.getAttribute('title') !== txt) { label.setAttribute('title', txt); }
+			}
+			syncSelectedVal(fieldEl);
 		}
 	}
 
@@ -130,6 +217,10 @@
 		};
 		// Size changes go through check_valid() -> calculate_price(), so the wrapper re-runs on its own.
 		// Re-run once now: the first pass may have happened before this script installed.
+		// The theme's swatch script and Angular ng-if may render buttons late: relabel again shortly.
+		[300, 900, 2000].forEach(function (ms) {
+			setTimeout(function () { try { relabel(scope, currentSize(scope)); } catch (e) { /* ignore */ } }, ms);
+		});
 		scope.$applyAsync(function () {
 			if (typeof scope.check_valid === 'function') { scope.check_valid(); } else { scope.calculate_price(); }
 		});

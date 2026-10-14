@@ -985,6 +985,21 @@
         }
     }
 
+    // Embedded dpi that readEmbeddedDpi found for an upload made in this
+    // session (filled asynchronously after upload start), or null when
+    // unknown / not a sane value.
+    function getEmbeddedDpiForUrl(url) {
+        if (!url) return null;
+        for (var k in sgUploadCaptureByIndex) {
+            var e = sgUploadCaptureByIndex[k];
+            if (e && e.url === url && e.dpiEntry) {
+                var d = parseFloat(e.dpiEntry.dpi);
+                return (d >= 30 && d <= 1200) ? d : null;
+            }
+        }
+        return null;
+    }
+
     // Returns true if it took over (image + dimension field both found —
     // the original add-to-canvas call will happen later, after resize).
     // Returns false to let the caller fall back to the normal behaviour
@@ -1037,8 +1052,11 @@
             // customer clicks Save/Add to Cart, so it's useless here.
             // settings.nbdesigner_default_dpi is the global-only fallback and
             // ignores any per-product override — don't read that either.)
-            var dpi = parseFloat(s.settings && s.settings.product_data && s.settings.product_data.option &&
-                s.settings.product_data.option.dpi) || 150;
+            // The image's own embedded dpi (same value the thumbnail label
+            // shows) wins when sane, so the placed size agrees with the
+            // thumbnail and low-resolution art triggers the warning.
+            var dpi = getEmbeddedDpiForUrl(url) || parseFloat(s.settings && s.settings.product_data &&
+                s.settings.product_data.option && s.settings.product_data.option.dpi) || 150;
             var widthIn = Math.round((probe.naturalWidth / dpi) * 1000) / 1000;
             var heightIn = Math.round((probe.naturalHeight / dpi) * 1000) / 1000;
 

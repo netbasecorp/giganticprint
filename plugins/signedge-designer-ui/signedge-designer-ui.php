@@ -189,6 +189,22 @@ function sg_dui_inject_js() {
         . '?v=' . sg_dui_asset_ver( 'assets/js/override.js' ) . '"></script>' . "\n";
 }
 
+// Phone order flow: every selector is scoped to body.sg-m-on / body.sg-m-adv / #sg-m,
+// which only mobile.js (viewport <= 768 px at load) creates, so wider screens are untouched.
+add_action( 'nbd_extra_js', 'sg_dui_inject_mobile_css', 6 );
+function sg_dui_inject_mobile_css() {
+    echo '<link rel="stylesheet" id="sg-dui-mobile-css" href="'
+        . esc_url( SG_DUI_URL . 'assets/css/mobile.css' )
+        . '?v=' . sg_dui_asset_ver( 'assets/css/mobile.css' ) . '" />' . "\n";
+}
+
+add_action( 'nbd_extra_js', 'sg_dui_inject_mobile_js', 11 );
+function sg_dui_inject_mobile_js() {
+    echo '<script id="sg-dui-mobile-js" src="'
+        . esc_url( SG_DUI_URL . 'assets/js/mobile.js' )
+        . '?v=' . sg_dui_asset_ver( 'assets/js/mobile.js' ) . '"></script>' . "\n";
+}
+
 /* -----------------------------------------------------------------------
    AJAX: inline login (guest users — nopriv)
 ----------------------------------------------------------------------- */

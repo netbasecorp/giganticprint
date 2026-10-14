@@ -1455,6 +1455,7 @@
     // Keep the bar (and the low-res banner under it) inside the visible canvas
     // region: right of the sidebar, left of the summary panel, centred there.
     function positionArtBars() {
+        if (window.SG_DUI_M && window.SG_DUI_M.active) return; // mobile.js lays the bar out itself
         var bar = sgArtBar.el;
         var parent = bar && bar.parentNode;
         if (!parent || !bar.classList.contains('is-visible')) return;
@@ -1631,6 +1632,7 @@
     }
 
     function focusUploadTile() {
+        if (window.SG_DUI_M && window.SG_DUI_M.active && window.SG_DUI_M.focusUpload()) return; // mobile.js
         if (!window.jQuery) return;
         var jq = window.jQuery;
         jq('#nav-photos').triggerHandler('click');
@@ -4139,5 +4141,11 @@
         div.appendChild(document.createTextNode(str || ''));
         return div.innerHTML;
     }
+
+    // Internals for mobile.js (phone order flow).
+    window.SG_DUI_INT = {
+        getDesignScope: getDesignScope, getArtItem: getArtItem, countFilledStages: countFilledStages,
+        openPhotoUpload: openPhotoUpload, injectSummaryPanel: injectSummaryPanel, updatePrice: updatePrice
+    };
 
 })();

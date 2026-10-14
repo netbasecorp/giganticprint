@@ -6,7 +6,7 @@ set -euo pipefail
 . "$(dirname "$0")/_common.sh"
 DRY=0; [ "${1:-}" = "--dry-run" ] && DRY=1
 [ "$(id -u)" -eq 0 ] || { echo "run as root" >&2; exit 1; }
-[ -d "$REPO/.git" ] && [ -d "$WPC" ] || { echo "bad REPO/WPC" >&2; exit 1; }
+[ -e "$REPO/.git" ] && [ -d "$WPC" ] || { echo "bad REPO/WPC" >&2; exit 1; }
 if [ -n "$(git -C "$REPO" status --porcelain)" ]; then echo "WARN: repo has uncommitted changes (deploying the working tree)" >&2; fi
 TS=$(date -u +%Y%m%dT%H%M%SZ)
 CHANGED=()

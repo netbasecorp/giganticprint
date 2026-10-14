@@ -114,7 +114,13 @@
             <li><a href="<?php echo esc_url( wc_get_account_endpoint_url( 'orders' ) ); ?>"><?php esc_html_e( 'Order history', 'storecmsmart' ); ?></a></li>
             <?php endif; ?>
             <?php if ( function_exists( 'wc_get_page_id' ) ) : ?>
-            <li><a href="<?php echo esc_url( get_permalink( wc_get_page_id( 'myaccount' ) ) ); ?>"><?php esc_html_e( 'Image Zone', 'storecmsmart' ); ?></a></li>
+            <?php
+            $_iz_url = get_permalink( wc_get_page_id( 'myaccount' ) );
+            if ( is_user_logged_in() && class_exists( 'PCS_Company_Images' ) && class_exists( 'PCS_B2B_Portal' ) && PCS_Company_Images::user_store_ids( get_current_user_id() ) ) {
+                $_iz_url = PCS_B2B_Portal::url( 'images' );
+            }
+            ?>
+            <li><a href="<?php echo esc_url( $_iz_url ); ?>"><?php esc_html_e( 'Image Zone', 'storecmsmart' ); ?></a></li>
             <?php endif; ?>
             <li><a href="#b2b"><?php esc_html_e( 'Apply for B2B', 'storecmsmart' ); ?></a></li>
             <li><a href="<?php echo esc_url( get_permalink( get_page_by_path( 'track-order' ) ) ?: '#' ); ?>"><?php esc_html_e( 'Track order', 'storecmsmart' ); ?></a></li>

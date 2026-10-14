@@ -50,40 +50,18 @@ class PCS_Ajax {
         }
 
         $order = wc_get_order( $order_id );
-        if ( ! $order || $order->get_customer_id() !== get_current_user_id() ) {
+        if ( ! $order || ! PCS_Reorder::user_can_reorder( $order, get_current_user_id() ) ) {
             wp_send_json_error( array( 'message' => 'Order not found.' ) );
         }
 
-        $added   = 0;
-        $skipped = 0;
+        /* Same code as the one-click button: rebuilds each line with its options and original art */
+        $result = PCS_Reorder::add_order_to_cart( $order );
+        $msg    = PCS_Reorder::summary( $result );
 
-        foreach ( $order->get_items() as $item ) {
-            $product_id   = $item->get_product_id();
-            $variation_id = $item->get_variation_id();
-            $quantity     = $item->get_quantity();
-            $product      = wc_get_product( $variation_id ?: $product_id );
-
-            if ( ! $product || ! $product->is_purchasable() || ! $product->is_in_stock() ) {
-                $skipped++;
-                continue;
-            }
-
-            $result = WC()->cart->add_to_cart( $product_id, $quantity, $variation_id );
-            if ( $result ) {
-                $added++;
-            } else {
-                $skipped++;
-            }
-        }
-
-        if ( $added > 0 ) {
-            $msg = sprintf( '%d item%s added to cart.', $added, $added > 1 ? 's' : '' );
-            if ( $skipped > 0 ) {
-                $msg .= sprintf( ' %d item%s skipped (unavailable).', $skipped, $skipped > 1 ? 's' : '' );
-            }
+        if ( $result['added'] > 0 ) {
             wp_send_json_success( array( 'message' => $msg, 'cart_url' => wc_get_cart_url() ) );
         } else {
-            wp_send_json_error( array( 'message' => 'No items could be added (products may be unavailable).' ) );
+            wp_send_json_error( array( 'message' => '' !== $msg ? $msg : 'No items could be added (products may be unavailable).' ) );
         }
     }
 

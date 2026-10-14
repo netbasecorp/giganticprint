@@ -137,9 +137,12 @@ $privacy = $draft . '
 $access = $draft . '
 <h2>Accessibility</h2>
 <p>We want everyone to be able to order from this website. If you have trouble using any part of it, tell us at hoyle@giganticprints.com or 772-429-8818 and we will help you place your order.</p>';
-GP_Data::post_upsert( 'page', 'terms', 'Terms of Service', $terms );
+$terms_id = GP_Data::post_upsert( 'page', 'terms', 'Terms of Service', $terms );
 GP_Data::post_upsert( 'page', 'refund-policy', 'Refund Policy', $refund, 'publish', 'refund_returns' );
-GP_Data::post_upsert( 'page', 'privacy-policy', 'Privacy Policy', $privacy );
+$privacy_id = GP_Data::post_upsert( 'page', 'privacy-policy', 'Privacy Policy', $privacy );
 GP_Data::post_upsert( 'page', 'accessibility', 'Accessibility', $access );
 GP_Data::post_upsert( 'page', 'track-order', 'Track your order', '<p>Enter your order number and the e-mail address you used to place the order.</p>[woocommerce_order_tracking]' );
+// checkout notice 'I agree to the Terms and Conditions and Privacy Policy' links
+if ( ! empty( $terms_id ) ) { GP_Data::option_set( 'woocommerce_terms_page_id', (string) $terms_id ); }
+if ( ! empty( $privacy_id ) ) { GP_Data::option_set( 'wp_page_for_privacy_policy', (string) $privacy_id ); }
 GP_Data::finish();

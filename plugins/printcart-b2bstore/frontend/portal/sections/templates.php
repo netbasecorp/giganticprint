@@ -62,7 +62,7 @@ $tp_store = PCS_DB::get_store_by_id( $tp_store_id );
 </div>
 
 <script>
-(function () {
+document.addEventListener('DOMContentLoaded', function () { // PCS_FE is localized in the footer, after this inline script
   var root = document.getElementById('pcs-tp');
   if (!root || typeof PCS_FE === 'undefined') { return; }
   var storeId = root.getAttribute('data-store');
@@ -177,5 +177,5 @@ $tp_store = PCS_DB::get_store_by_id( $tp_store_id );
   }
 
   load();
-})();
+});
 </script>

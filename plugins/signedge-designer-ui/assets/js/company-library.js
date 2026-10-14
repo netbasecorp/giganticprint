@@ -119,6 +119,7 @@
     }
 
     function load() {
+        refreshRefs();
         setMsg('Loading your company images...', false);
         request('gp_iz_list', function (err, data) {
             if (err) { setMsg(err, true); return; }
@@ -126,6 +127,27 @@
             render(data.items || []);
         });
     }
+
+    // Angular may re-render the Photos tab and replace our node by a clone without listeners: always use the live node
+    function refreshRefs() {
+        var b = document.getElementById('sg-iz');
+        if (!b) { return false; }
+        block = b;
+        msg = b.querySelector('.sg-iz-msg');
+        grid = b.querySelector('.sg-iz-grid');
+        return !!(msg && grid);
+    }
+
+    document.addEventListener('click', function (e) {
+        var t = e.target;
+        while (t && t !== document) {
+            if (t.className && typeof t.className === 'string' && /\bsg-iz-head\b/.test(t.className)) {
+                if (refreshRefs()) { toggle(); }
+                return;
+            }
+            t = t.parentNode;
+        }
+    });
 
     function toggle() {
         var open = /\bsg-iz-open\b/.test(block.className);
@@ -144,7 +166,6 @@
         head.type = 'button';
         head.appendChild(el('span', '', 'Your company images'));
         head.appendChild(el('span', 'sg-iz-caret', '▼'));
-        head.addEventListener('click', toggle);
         var body = el('div', 'sg-iz-body');
         msg = el('div', 'sg-iz-msg');
         msg.style.display = 'none';

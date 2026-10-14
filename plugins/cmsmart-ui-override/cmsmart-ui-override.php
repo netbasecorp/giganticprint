@@ -81,7 +81,7 @@ class Cmsmart_UI_Override {
                 'gp-linear-pricing',
                 CMSMART_UI_OVERRIDE_URL . 'assets/js/gp-linear-pricing.js',
                 array( 'jquery' ),
-                GP_LINEAR_PRICING_VERSION,
+                GP_LINEAR_PRICING_VERSION . '.' . (int) @filemtime( CMSMART_UI_OVERRIDE_PATH . 'assets/js/gp-linear-pricing.js' ),
                 true
             );
             wp_add_inline_script(
@@ -534,5 +534,5 @@ function gp_linear_pricing_designer_js() {
         . wp_json_encode( GP_Linear_Pricing::js_config(), JSON_HEX_TAG | JSON_HEX_AMP ) . ';</script>' . "\n";
     echo '<script id="gp-linear-pricing-js" src="'
         . esc_url( CMSMART_UI_OVERRIDE_URL . 'assets/js/gp-linear-pricing.js' )
-        . '?v=' . rawurlencode( GP_LINEAR_PRICING_VERSION ) . '"></script>' . "\n";
+        . '?v=' . rawurlencode( GP_LINEAR_PRICING_VERSION . '.' . (int) @filemtime( CMSMART_UI_OVERRIDE_PATH . 'assets/js/gp-linear-pricing.js' ) ) . '"></script>' . "\n";
 }

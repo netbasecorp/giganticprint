@@ -67,6 +67,13 @@ if ( 'cleanup' === $mode ) {
 		if ( $oid && ( $o = wc_get_order( $oid ) ) ) { $o->delete( true ); echo "deleted order $oid\n"; }
 		PCS_Quotes::delete( (int) $qid ); echo "deleted quote $qid\n";
 	}
+	// orders created for the fixture users by the e2e quote acceptance (staging has no real orders)
+	foreach ( array( 'gp_test_b2c', 'gp_test_b2b', 'gp_test_reseller' ) as $login ) {
+		$u = get_user_by( 'login', $login );
+		if ( ! $u ) { continue; }
+		foreach ( wc_get_orders( array( 'customer_id' => $u->ID, 'limit' => -1, 'status' => 'any' ) ) as $o ) { $oid = $o->get_id(); $o->delete( true ); echo "deleted order $oid of $login
+"; }
+	}
 	$store = gp_fx_find_store();
 	if ( $store ) {
 		$wpdb->delete( $wpdb->prefix . 'pcs_b2b_members', array( 'store_id' => $store->id ) );

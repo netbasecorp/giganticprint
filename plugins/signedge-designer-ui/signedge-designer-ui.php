@@ -213,10 +213,18 @@ function sg_dui_handle_login() {
 ----------------------------------------------------------------------- */
 add_action( 'wp_ajax_sg_b2b_apply', 'sg_dui_handle_b2b_apply' );
 function sg_dui_handle_b2b_apply() {
-    check_ajax_referer( 'sg_b2b_apply', '_nonce' );
+    $nonce = isset( $_POST['_nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['_nonce'] ) ) : '';
+    if ( ! $nonce || ! wp_verify_nonce( $nonce, 'sg_b2b_apply' ) ) {
+        wp_send_json_error( array( 'message' => 'Security check failed. Please reload the page and try again.' ), 403 );
+    }
 
     if ( ! is_user_logged_in() ) {
         wp_send_json_error( array( 'message' => 'You must be logged in to apply.' ) );
+    }
+
+    // Option is unset on some sites: only an explicit '0' / 'no' disables self registration.
+    if ( in_array( strtolower( (string) get_option( 'pcs_b2b_self_register', '1' ) ), array( '0', 'no' ), true ) ) {
+        wp_send_json_error( array( 'message' => 'B2B self-registration is currently closed. Please contact us to open a B2B account.' ) );
     }
 
     if ( ! class_exists( 'PCS_DB' ) ) {
@@ -230,7 +238,9 @@ function sg_dui_handle_b2b_apply() {
         wp_send_json_error( array( 'message' => 'You have already submitted a B2B application.' ) );
     }
 
-    $company_name = sanitize_text_field( isset( $_POST['company_name'] ) ? $_POST['company_name'] : '' );
+    $post = wp_unslash( $_POST );
+
+    $company_name = sanitize_text_field( isset( $post['company_name'] ) ? $post['company_name'] : '' );
     if ( empty( $company_name ) ) {
         wp_send_json_error( array( 'message' => 'Company name is required.' ) );
     }
@@ -240,12 +250,12 @@ function sg_dui_handle_b2b_apply() {
         'user_id'        => $user_id,
         'company_name'   => $company_name,
         'company_slug'   => sanitize_title( $company_name ),
-        'industry'       => sanitize_text_field( isset( $_POST['industry'] )       ? $_POST['industry']       : '' ),
-        'contact_name'   => sanitize_text_field( isset( $_POST['contact_name'] )   ? $_POST['contact_name']   : $user->display_name ),
-        'contact_email'  => sanitize_email(      isset( $_POST['contact_email'] )  ? $_POST['contact_email']  : $user->user_email ),
-        'contact_phone'  => sanitize_text_field( isset( $_POST['contact_phone'] )  ? $_POST['contact_phone']  : '' ),
-        'website'        => esc_url_raw(         isset( $_POST['website'] )        ? $_POST['website']        : '' ),
-        'monthly_volume' => sanitize_text_field( isset( $_POST['monthly_volume'] ) ? $_POST['monthly_volume'] : '' ),
+        'industry'       => sanitize_text_field( isset( $post['industry'] )       ? $post['industry']       : '' ),
+        'contact_name'   => sanitize_text_field( isset( $post['contact_name'] )   ? $post['contact_name']   : $user->display_name ),
+        'contact_email'  => sanitize_email(      isset( $post['contact_email'] )  ? $post['contact_email']  : $user->user_email ),
+        'contact_phone'  => sanitize_text_field( isset( $post['contact_phone'] )  ? $post['contact_phone']  : '' ),
+        'website'        => esc_url_raw(         isset( $post['website'] )        ? $post['website']        : '' ),
+        'monthly_volume' => sanitize_text_field( isset( $post['monthly_volume'] ) ? $post['monthly_volume'] : '' ),
         'tier'           => get_option( 'pcs_b2b_default_tier', 'b2b_a' ),
         'status'         => 'pending',
     );

@@ -475,15 +475,21 @@
     // the NBO options scope, which can still be empty for a moment after
     // the tab DOM itself already exists.
     function decideDefaultPhotosTab(attempt) {
+        // B5: upload-first for EVERY product. The Photos tab is our upload tab (upload tile, company Image Zone,
+        // company templates); art that is uploaded sets the product size itself (auto-size from pixels/dpi), so
+        // there is no reason to make the customer configure the size first. The decision used to depend on
+        // hasDimensionField(), which is false while the options AJAX is still loading (4-10 s on this host):
+        // after the retries ran out the tab flipped to Photos for some products and stayed on Printing for
+        // others, depending on timing. Now: wait (up to ~45 s) until the options are ready, then always open
+        // Photos/Upload; if the options never arrive, still open it (nothing else can be done on that page).
         var nboScope = getNboScope();
-        var ready = nboScope && Array.isArray(nboScope.fields) && nboScope.fields.length > 0;
-        if (!ready && (attempt || 0) < 20) {
-            setTimeout(function () { decideDefaultPhotosTab((attempt || 0) + 1); }, 300);
+        var ready = nboScope && Array.isArray(nboScope.fields) && nboScope.fields.length > 0 &&
+            nboScope.nbd_fields && Object.keys(nboScope.nbd_fields).length > 0 && window.nbOption && window.nbOption.initialed;
+        if (!ready && (attempt || 0) < 90) {
+            setTimeout(function () { decideDefaultPhotosTab((attempt || 0) + 1); }, 500);
             return;
         }
-        if (!hasDimensionField()) {
-            tryOpenPhotosTabDefault();
-        }
+        tryOpenPhotosTabDefault();
     }
 
     // Separated from initPhotosTabFirst because the click has to actually

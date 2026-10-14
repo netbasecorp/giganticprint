@@ -367,6 +367,9 @@ class PCS_Company_Templates {
             if ( ! self::thumb_url_allowed( $src ) ) {
                 return new WP_Error( 'gp_thumb_host', 'This image host is not allowed.' );
             }
+            if ( ! function_exists( 'wp_tempnam' ) ) {
+                require_once ABSPATH . 'wp-admin/includes/file.php';
+            }
             $tmp = wp_tempnam( 'gpthumb' );
             if ( ! $tmp ) {
                 return new WP_Error( 'gp_thumb_tmp', 'Could not create a temporary file.' );

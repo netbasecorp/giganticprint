@@ -47,7 +47,8 @@ async function tab(page, name) {
   try { await page.locator(`text=${name}`).first().click({ timeout: 4000, force: true }); await page.waitForTimeout(900); } catch (e) {}
 }
 async function pickOption(page, text) {
-  const el = page.getByText(text, { exact: false }).first();
+  let el = page.getByText(text, { exact: false }).first();
+  if (!(await el.isVisible().catch(() => false))) { await tab(page, 'PRINTING'); el = page.getByText(text, { exact: false }).first(); }
   await el.scrollIntoViewIfNeeded();
   await el.click({ force: true, timeout: 5000 });
   await page.waitForTimeout(1800);
@@ -64,6 +65,8 @@ async function dims(page) {
 }
 async function setSize(page, w, h) {
   const ins = page.locator('input.nbo-dimension');
+  // the designer opens on the Photos (upload) tab: the size inputs live on the PRINTING tab
+  if (!(await ins.first().isVisible().catch(() => false))) await tab(page, 'PRINTING');
   for (const [i, v] of [[0, w], [1, h]]) {
     const el = ins.nth(i);
     await el.scrollIntoViewIfNeeded();
@@ -79,6 +82,18 @@ function num(s) { // "$16.63" | "16,63 $" | "$1,234.50" -> number
   if (/,\d{1,2}$/.test(t)) t = t.replace(/\./g, '').replace(',', '.'); else t = t.replace(/,/g, '');
   const n = parseFloat(t); return isNaN(n) ? null : n;
 }
+// remove every line of the persistent cart of the logged-in user (so a test sees exactly the line it adds)
+async function emptyCart(page) {
+  await page.goto(BASE + '/shopping-cart/', { waitUntil: 'load' });
+  for (let i = 0; i < 30; i++) {
+    const rm = page.locator('.cart_item a.remove, .cart_item .product-remove a').first();
+    if (!(await rm.count())) break;
+    await rm.click({ force: true }).catch(() => {});
+    await page.waitForTimeout(2000);
+    await page.waitForLoadState('load').catch(() => {});
+  }
+  return (await page.locator('.cart_item').count()) === 0;
+}
 function authFile(login) { return path.join('auth', login + '.json'); }
 async function loginContext(browser, login, opts = {}) {
   const ctx = await browser.newContext(opts);
@@ -86,4 +101,4 @@ async function loginContext(browser, login, opts = {}) {
   if (fs.existsSync(f)) await ctx.addCookies(JSON.parse(fs.readFileSync(f, 'utf8')));
   return ctx;
 }
-module.exports = { BASE, waitReady, pickOption, shot, killTour, openDesigner, tab, price, dims, setSize, num, loginContext, shotPath };
+module.exports = { BASE, waitReady, pickOption, shot, killTour, openDesigner, tab, price, dims, setSize, num, loginContext, shotPath, emptyCart };

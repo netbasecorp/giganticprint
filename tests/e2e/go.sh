@@ -8,7 +8,7 @@ if ! docker ps --format '{{.Names}}' | grep -qx gp-e2e; then
   docker run -d --name gp-e2e --ipc=host --memory 2g --cpus 1.5 -v /srv/gp-dev/e2e:/work -w /work mcr.microsoft.com/playwright:v1.48.0-jammy sleep infinity >/dev/null
 fi
 if [ -f /root/.secrets/gp-test-users.txt ]; then
-  for u in gp_test_b2c gp_test_b2b gp_test_reseller; do
+  for u in gp_test_b2c gp_test_b2b gp_test_reseller gp_test_staff; do
     /srv/gp-dev/scripts/test-users.sh login "$u" > "auth/$u.json.tmp" 2>/dev/null && mv "auth/$u.json.tmp" "auth/$u.json" || rm -f "auth/$u.json.tmp"
   done
   chmod 600 auth/*.json 2>/dev/null || true

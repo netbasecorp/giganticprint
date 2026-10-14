@@ -48,6 +48,8 @@ class SG_Cart {
         $out = array();
         foreach ( $data as $idx => $frame ) {
             if ( ! is_array( $frame ) ) continue;
+            // core stores sides as frame_0, frame_1 ...: key by the number only
+            $idx = preg_match( '/(\d+)$/', (string) $idx, $mi ) ? $mi[1] : $idx;
             if ( isset( $frame['objects'] ) && is_array( $frame['objects'] ) ) {
                 $out[ (string) $idx ] = count( $frame['objects'] ) > 0;
             } elseif ( isset( $frame['layers'] ) && is_array( $frame['layers'] ) ) {

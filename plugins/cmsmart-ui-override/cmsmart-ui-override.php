@@ -65,16 +65,32 @@ class Cmsmart_UI_Override {
             'cmsmart-ui-override',
             CMSMART_UI_OVERRIDE_URL . 'assets/css/override.css',
             array( 'cui-google-fonts' ),
-            '1.5.2'
+            '1.5.3'
         );
 
         wp_enqueue_script(
             'cmsmart-ui-override',
             CMSMART_UI_OVERRIDE_URL . 'assets/js/override.js',
             array( 'jquery' ),
-            '1.5.2',
+            '1.5.3',
             true
         );
+
+        if ( class_exists( 'GP_Linear_Pricing' ) ) {
+            wp_register_script(
+                'gp-linear-pricing',
+                CMSMART_UI_OVERRIDE_URL . 'assets/js/gp-linear-pricing.js',
+                array( 'jquery' ),
+                GP_LINEAR_PRICING_VERSION,
+                true
+            );
+            wp_add_inline_script(
+                'gp-linear-pricing',
+                'window.GP_LINEAR = ' . wp_json_encode( GP_Linear_Pricing::js_config(), JSON_HEX_TAG | JSON_HEX_AMP ) . ';',
+                'before'
+            );
+            wp_enqueue_script( 'gp-linear-pricing' );
+        }
     }
 
     /**
@@ -501,3 +517,18 @@ class Cmsmart_UI_Override {
 }
 
 new Cmsmart_UI_Override();
+
+// Pole pocket / rope per linear foot (server hooks + designer script).
+define( 'GP_LINEAR_PRICING_VERSION', '1.0.0' );
+require_once CMSMART_UI_OVERRIDE_PATH . 'includes/class-gp-linear-pricing.php';
+add_action( 'plugins_loaded', array( 'GP_Linear_Pricing', 'init' ) );
+
+// Designer page: globals first, then the script (same markup style as signedge-designer-ui).
+add_action( 'nbd_extra_js', 'gp_linear_pricing_designer_js', 4 );
+function gp_linear_pricing_designer_js() {
+    echo '<script id="gp-linear-config">window.GP_LINEAR = '
+        . wp_json_encode( GP_Linear_Pricing::js_config(), JSON_HEX_TAG | JSON_HEX_AMP ) . ';</script>' . "\n";
+    echo '<script id="gp-linear-pricing-js" src="'
+        . esc_url( CMSMART_UI_OVERRIDE_URL . 'assets/js/gp-linear-pricing.js' )
+        . '?v=' . rawurlencode( GP_LINEAR_PRICING_VERSION ) . '"></script>' . "\n";
+}

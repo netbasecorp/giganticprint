@@ -136,6 +136,40 @@ class GP_Data {
 		return 0;
 	}
 
+
+	/* ---- posts / pages (created or updated by slug) ---- */
+	public static function post_upsert( $post_type, $slug, $title, $content, $status = 'publish', $old_slug = '' ) {
+		global $wpdb;
+		$id = (int) $wpdb->get_var( $wpdb->prepare( "SELECT ID FROM {$wpdb->posts} WHERE post_type = %s AND post_name = %s AND post_status <> 'trash' LIMIT 1", $post_type, $slug ) );
+		if ( ! $id && $old_slug ) {
+			$id = (int) $wpdb->get_var( $wpdb->prepare( "SELECT ID FROM {$wpdb->posts} WHERE post_type = %s AND post_name = %s AND post_status <> 'trash' LIMIT 1", $post_type, $old_slug ) );
+		}
+		if ( $id ) {
+			$old = $wpdb->get_row( $wpdb->prepare( "SELECT post_title, post_content, post_status, post_name FROM {$wpdb->posts} WHERE ID = %d", $id ), ARRAY_A );
+			if ( $old['post_title'] === $title && $old['post_content'] === $content && $old['post_status'] === $status && $old['post_name'] === $slug ) {
+				self::say( "  $post_type $slug (#$id): unchanged" );
+				return $id;
+			}
+			self::say( "  $post_type #$id: '" . $old['post_title'] . "' (" . $old['post_status'] . ', ' . $old['post_name'] . ") -> '$title' ($status, $slug)" );
+			if ( self::writing() ) {
+				self::$ops[] = array( 'type' => 'post_update', 'id' => $id, 'old' => $old );
+				wp_update_post( wp_slash( array( 'ID' => $id, 'post_title' => $title, 'post_content' => $content, 'post_status' => $status, 'post_name' => $slug ) ) );
+			}
+			return $id;
+		}
+		self::say( "  create $post_type $slug ('$title', $status)" );
+		if ( self::writing() ) {
+			$new = wp_insert_post( wp_slash( array( 'post_type' => $post_type, 'post_name' => $slug, 'post_title' => $title, 'post_content' => $content, 'post_status' => $status ) ) );
+			if ( ! is_wp_error( $new ) && $new ) { self::$ops[] = array( 'type' => 'post_created', 'id' => (int) $new ); return (int) $new; }
+		}
+		return 0;
+	}
+
+	/* ---- WooCommerce shipping zone created by a script (deleted again on restore) ---- */
+	public static function note_zone_created( $zone_id ) {
+		self::$ops[] = array( 'type' => 'wc_zone_created', 'zone_id' => (int) $zone_id );
+	}
+
 	public static function flush_caches() {
 		global $wpdb;
 		$wpdb->query( "DELETE FROM {$wpdb->options} WHERE option_name LIKE '\\_transient\\_nbo\\_%' OR option_name LIKE '\\_transient\\_timeout\\_nbo\\_%' OR option_name LIKE '\\_transient\\_wc\\_product\\_loop%' OR option_name LIKE '\\_transient\\_gp\\_from\\_%'" );
@@ -189,6 +223,18 @@ class GP_Data {
 					wp_update_term( $op['term_id'], $op['taxonomy'], array( 'name' => $op['old']['name'], 'slug' => $op['old']['slug'] ) );
 					update_term_meta( $op['term_id'], 'order', $op['old']['order'] );
 					self::say( 'restored term ' . $op['term_id'] );
+					break;
+				case 'post_update':
+					wp_update_post( wp_slash( array( 'ID' => $op['id'], 'post_title' => $op['old']['post_title'], 'post_content' => $op['old']['post_content'], 'post_status' => $op['old']['post_status'], 'post_name' => $op['old']['post_name'] ) ) );
+					self::say( 'restored post #' . $op['id'] );
+					break;
+				case 'post_created':
+					wp_delete_post( $op['id'], true );
+					self::say( 'deleted created post #' . $op['id'] );
+					break;
+				case 'wc_zone_created':
+					if ( class_exists( 'WC_Shipping_Zone' ) ) { $z = new WC_Shipping_Zone( (int) $op['zone_id'] ); $z->delete(); }
+					self::say( 'deleted created shipping zone #' . $op['zone_id'] );
 					break;
 				case 'term_created':
 					wp_delete_term( $op['term_id'], $op['taxonomy'] );

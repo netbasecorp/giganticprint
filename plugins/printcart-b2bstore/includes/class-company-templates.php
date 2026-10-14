@@ -27,6 +27,8 @@ class PCS_Company_Templates {
         add_action( 'wp_ajax_gp_tpl_rename', array( __CLASS__, 'ajax_rename' ) );
         add_action( 'wp_ajax_gp_tpl_clone',  array( __CLASS__, 'ajax_clone' ) );
         add_action( 'wp_ajax_gp_tpl_delete', array( __CLASS__, 'ajax_delete' ) );
+        add_action( 'wp_ajax_gp_img_thumb',  array( __CLASS__, 'ajax_img_thumb' ) );
+        add_action( 'pcs_store_deleted',     array( __CLASS__, 'purge_store' ) );
     }
 
     /* ---------------------------------------------------------------- */
@@ -308,6 +310,193 @@ class PCS_Company_Templates {
     public static function purge_store( $store_id ) {
         global $wpdb;
         $wpdb->delete( self::table(), array( 'store_id' => absint( $store_id ) ), array( '%d' ) );
+    }
+
+    /* ---------------------------------------------------------------- */
+    /* Same-origin image proxy for template thumbnails (cloud art)        */
+    /* ---------------------------------------------------------------- */
+
+    const THUMB_PROXY_MAX    = 800;        // longest side of the proxied image
+    const THUMB_PROXY_BYTES  = 62914560;   // 60 MB download cap
+    const THUMB_PROXY_PIXELS = 200000000;  // refuse images over 200 megapixels
+    const THUMB_RATE_MAX     = 120;        // proxied images per user ...
+    const THUMB_RATE_WINDOW  = 600;        // ... per 10 minutes
+
+    /** Hosts the proxy may download from (filter pcs_thumb_hosts). */
+    public static function thumb_hosts() {
+        $hosts = apply_filters( 'pcs_thumb_hosts', array( 'files.printcart.com' ) );
+        $out   = array();
+        foreach ( (array) $hosts as $h ) {
+            $h = strtolower( trim( (string) $h ) );
+            if ( '' !== $h ) {
+                $out[] = $h;
+            }
+        }
+        return $out;
+    }
+
+    /** https URL, no credentials, default port, host on the allowlist. */
+    public static function thumb_url_allowed( $url ) {
+        if ( ! is_string( $url ) || '' === $url || strlen( $url ) > 2000 || preg_match( '/[\x00-\x20\x7f]/', $url ) ) {
+            return false;
+        }
+        $p = wp_parse_url( $url );
+        if ( ! is_array( $p ) || empty( $p['scheme'] ) || empty( $p['host'] ) || 'https' !== strtolower( $p['scheme'] ) ) {
+            return false;
+        }
+        if ( isset( $p['user'] ) || isset( $p['pass'] ) || ( isset( $p['port'] ) && 443 !== (int) $p['port'] ) ) {
+            return false;
+        }
+        return in_array( strtolower( $p['host'] ), self::thumb_hosts(), true );
+    }
+
+    /**
+     * Downscale an image (local file path or allowlisted https URL) to at most $max px on the longest side,
+     * transparency flattened on white, as JPEG.
+     *
+     * @return array|WP_Error array( 'bytes' => binary string, 'mime' => 'image/jpeg', 'width' => int, 'height' => int )
+     */
+    public static function make_thumb( $src, $max = 0 ) {
+        $max = $max > 0 ? min( (int) $max, self::THUMB_PROXY_MAX ) : self::THUMB_PROXY_MAX;
+        if ( ! class_exists( 'Imagick' ) ) {
+            return new WP_Error( 'gp_thumb_env', 'Image processing is not available.' );
+        }
+        $tmp   = '';
+        $local = '';
+        if ( is_string( $src ) && 0 === strpos( $src, 'https://' ) ) {
+            if ( ! self::thumb_url_allowed( $src ) ) {
+                return new WP_Error( 'gp_thumb_host', 'This image host is not allowed.' );
+            }
+            if ( ! function_exists( 'wp_tempnam' ) ) {
+                require_once ABSPATH . 'wp-admin/includes/file.php';
+            }
+            $tmp = wp_tempnam( 'gpthumb' );
+            if ( ! $tmp ) {
+                return new WP_Error( 'gp_thumb_tmp', 'Could not create a temporary file.' );
+            }
+            $res = wp_safe_remote_get( $src, array(
+                'timeout'             => 20,
+                'redirection'         => 0,
+                'stream'              => true,
+                'filename'            => $tmp,
+                'limit_response_size' => self::THUMB_PROXY_BYTES,
+                'user-agent'          => 'GigPrintsThumb/1.0',
+            ) );
+            if ( is_wp_error( $res ) || 200 !== (int) wp_remote_retrieve_response_code( $res ) ) {
+                @unlink( $tmp );
+                return new WP_Error( 'gp_thumb_fetch', 'Could not download the image.' );
+            }
+            clearstatcache( true, $tmp );
+            $size = (int) @filesize( $tmp );
+            if ( $size <= 0 || $size >= self::THUMB_PROXY_BYTES ) {
+                @unlink( $tmp );
+                return new WP_Error( 'gp_thumb_size', 'The image is empty or larger than 60 MB.' );
+            }
+            $local = $tmp;
+        } elseif ( is_string( $src ) && is_file( $src ) ) {
+            $local = $src;
+        } else {
+            return new WP_Error( 'gp_thumb_src', 'No image source.' );
+        }
+
+        $out = self::resize_local( $local, $max );
+        if ( '' !== $tmp ) {
+            @unlink( $tmp );
+        }
+        return $out;
+    }
+
+    private static function resize_local( $path, $max ) {
+        $allowed = array( 'PNG', 'JPEG', 'GIF', 'WEBP' );
+        $im      = null;
+        try {
+            Imagick::setResourceLimit( Imagick::RESOURCETYPE_MEMORY, 268435456 );
+            Imagick::setResourceLimit( Imagick::RESOURCETYPE_MAP, 536870912 );
+            Imagick::setResourceLimit( Imagick::RESOURCETYPE_TIME, 20 );
+
+            $probe = new Imagick();
+            $probe->pingImage( $path );
+            $fmt = strtoupper( (string) $probe->getImageFormat() );
+            $w   = (int) $probe->getImageWidth();
+            $h   = (int) $probe->getImageHeight();
+            $probe->clear();
+            if ( ! in_array( $fmt, $allowed, true ) ) {
+                return new WP_Error( 'gp_thumb_type', 'This is not a supported image.' );
+            }
+            if ( $w < 1 || $h < 1 || $w * $h > self::THUMB_PROXY_PIXELS ) {
+                return new WP_Error( 'gp_thumb_dim', 'The image dimensions are not supported.' );
+            }
+
+            $im = new Imagick();
+            $im->setBackgroundColor( new ImagickPixel( 'white' ) );
+            $im->readImage( $path . '[0]' );
+            $im->setImageBackgroundColor( new ImagickPixel( 'white' ) );
+            if ( $im->getImageAlphaChannel() ) {
+                $im->setImageAlphaChannel( Imagick::ALPHACHANNEL_REMOVE );
+            }
+            $im = $im->mergeImageLayers( Imagick::LAYERMETHOD_FLATTEN );
+            if ( Imagick::COLORSPACE_CMYK === $im->getImageColorspace() ) {
+                $im->transformImageColorspace( Imagick::COLORSPACE_SRGB );
+            }
+            if ( max( (int) $im->getImageWidth(), (int) $im->getImageHeight() ) > $max ) {
+                $im->thumbnailImage( $max, $max, true );
+            }
+            $im->setImageFormat( 'jpeg' );
+            $im->setImageCompressionQuality( 85 );
+            $im->stripImage();
+            $bytes = $im->getImageBlob();
+            $ow    = (int) $im->getImageWidth();
+            $oh    = (int) $im->getImageHeight();
+            $im->clear();
+            if ( '' === $bytes ) {
+                return new WP_Error( 'gp_thumb_fail', 'Could not process the image.' );
+            }
+            return array( 'bytes' => $bytes, 'mime' => 'image/jpeg', 'width' => $ow, 'height' => $oh );
+        } catch ( Throwable $e ) {
+            if ( $im instanceof Imagick ) {
+                $im->clear();
+            }
+            return new WP_Error( 'gp_thumb_type', 'This is not a supported image.' );
+        }
+    }
+
+    /** GET/POST gp_img_thumb: u = allowlisted https image URL; returns a downscaled JPEG (members of an approved company only). */
+    public static function ajax_img_thumb() {
+        self::check_nonce();
+        $uid = get_current_user_id();
+        $sid = self::resolve_store( $uid, isset( $_REQUEST['store_id'] ) ? absint( $_REQUEST['store_id'] ) : 0 );
+        if ( ! $sid ) {
+            wp_send_json_error( array( 'message' => 'Not available for your account.' ), 403 );
+        }
+        $u = isset( $_REQUEST['u'] ) ? trim( (string) wp_unslash( $_REQUEST['u'] ) ) : '';
+        if ( ! self::thumb_url_allowed( $u ) ) {
+            wp_send_json_error( array( 'message' => 'This image host is not allowed.' ), 400 );
+        }
+        $key   = 'gp_thumb_rl_' . $uid;
+        $count = (int) get_transient( $key );
+        if ( $count >= self::THUMB_RATE_MAX ) {
+            wp_send_json_error( array( 'message' => 'Too many requests. Please wait a few minutes.' ), 429 );
+        }
+        set_transient( $key, $count + 1, self::THUMB_RATE_WINDOW );
+
+        $res = self::make_thumb( $u );
+        if ( is_wp_error( $res ) ) {
+            $code = $res->get_error_code();
+            wp_send_json_error( array( 'message' => $res->get_error_message() ), in_array( $code, array( 'gp_thumb_fetch', 'gp_thumb_env' ), true ) ? 502 : 415 );
+        }
+        while ( ob_get_level() > 0 ) {
+            ob_end_clean();
+        }
+        nocache_headers();
+        header( 'Cache-Control: private, max-age=3600' );
+        header( 'Pragma:' );
+        header( 'Expires:' );
+        header( 'Vary: Cookie' );
+        header( 'X-Content-Type-Options: nosniff' );
+        header( 'Content-Type: ' . $res['mime'] );
+        header( 'Content-Length: ' . strlen( $res['bytes'] ) );
+        echo $res['bytes']; // phpcs:ignore WordPress.Security.EscapeOutput
+        exit;
     }
 
     /* ---------------------------------------------------------------- */

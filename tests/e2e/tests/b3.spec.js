@@ -21,11 +21,11 @@ const USERS = [['gp_test_b2c', 17.68, 25.0, 6.63], ['gp_test_b2b', 15.91, 22.5, 
 
 for (const [login, banner, acrylic, pageDefault] of USERS) {
   test(`one discount only: ${login} sees banner ${banner} and acrylic ${acrylic} (designer, product page, cart)`, async ({ browser }) => {
-    test.skip(!!FX && login === 'gp_test_b2c', 'gp_test_b2c is a company member while the fixture exists (see the member test)');
     const ctx = await G.loginContext(browser, login, { viewport: { width: 1440, height: 900 } });
     const page = await ctx.newPage();
     page.on('dialog', d => d.accept());
     try {
+      expect(await G.emptyCart(page), 'cart emptied').toBeTruthy();
       // acrylic 4x4 in: base price 25.00 (the base used to be discounted twice)
       expect(await G.openDesigner(page, 1208)).toBeTruthy();
       await G.setSize(page, 4, 4);
@@ -59,9 +59,9 @@ for (const [login, banner, acrylic, pageDefault] of USERS) {
   });
 }
 
-test('company member gets the company discount (status active)', async ({ browser }) => {
+test('company member (gp_test_staff) gets the company discount (status active)', async ({ browser }) => {
   test.skip(!FX, 'fixture missing');
-  const ctx = await G.loginContext(browser, 'gp_test_b2c', { viewport: { width: 1440, height: 900 } });
+  const ctx = await G.loginContext(browser, 'gp_test_staff', { viewport: { width: 1440, height: 900 } });
   const page = await ctx.newPage();
   try {
     await page.goto(`${G.BASE}/create-your-own/?product_id=1168&view=m`, { waitUntil: 'domcontentloaded' });
@@ -72,7 +72,7 @@ test('company member gets the company discount (status active)', async ({ browse
 
 test('company member sees the discounted price in the designer and in the cart', async ({ browser }) => {
   test.skip(!FX, 'fixture missing');
-  const ctx = await G.loginContext(browser, 'gp_test_b2c', { viewport: { width: 1440, height: 900 } });
+  const ctx = await G.loginContext(browser, 'gp_test_staff', { viewport: { width: 1440, height: 900 } });
   const page = await ctx.newPage();
   page.on('dialog', d => d.accept());
   try {

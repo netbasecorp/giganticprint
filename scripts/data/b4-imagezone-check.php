@@ -56,7 +56,7 @@ try {
 		gp_b4iz_assert( 'prerequisites for the apply part', false );
 	} else {
 		$owner    = get_user_by( 'login', 'gp_test_b2b' );
-		$member   = get_user_by( 'login', 'gp_test_b2c' );
+		$member   = get_user_by( 'login', 'gp_test_staff' );
 		$reseller = get_user_by( 'login', 'gp_test_reseller' );
 		gp_b4iz_assert( 'test users exist', $owner && $member && $reseller );
 

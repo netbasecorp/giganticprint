@@ -83,16 +83,6 @@ $roles = array(
         <span style="font-size:22px;opacity:.5;">🏷️</span>
       </div>
     </div>
-    <div class="pcs-pcard pcs-pcard-stat">
-      <div style="display:flex;justify-content:space-between;align-items:flex-start;">
-        <div>
-          <div class="pcs-pstat-label">PAYMENT TERMS</div>
-          <div class="pcs-pstat-value" style="font-size:22px;"><?php echo esc_html( $store->payment_terms ?: 'Prepay' ); ?></div>
-          <div class="pcs-pstat-delta">Store default</div>
-        </div>
-        <span style="font-size:22px;opacity:.5;">💳</span>
-      </div>
-    </div>
   </div>
 
   <!-- Filter + member count -->

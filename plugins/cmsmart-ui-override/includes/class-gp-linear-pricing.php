@@ -25,6 +25,51 @@ class GP_Linear_Pricing {
 	}
 
 	/**
+	 * Default editable rates.
+	 *
+	 * @return array
+	 */
+	public static function default_rates() {
+		return array(
+			'pole_rate'  => 1.00,
+			'pole_setup' => 10.00,
+			'rope_rate'  => 1.00,
+		);
+	}
+
+	/**
+	 * Sanitise a rates array: numbers >= 0, max 9999, 2 decimals; missing keys fall back to the defaults.
+	 *
+	 * @param mixed $input Raw value.
+	 * @return array
+	 */
+	public static function sanitize_rates( $input ) {
+		$defaults = self::default_rates();
+		$input    = is_array( $input ) ? $input : array();
+		$out      = array();
+		foreach ( $defaults as $key => $default ) {
+			if ( ! isset( $input[ $key ] ) || ! is_scalar( $input[ $key ] ) || '' === trim( (string) $input[ $key ] ) ) {
+				$out[ $key ] = $default;
+				continue;
+			}
+			$raw = (string) $input[ $key ];
+			$raw = function_exists( 'wc_format_decimal' ) ? wc_format_decimal( $raw ) : $raw;
+			$val = floatval( $raw );
+			$out[ $key ] = round( min( 9999, max( 0, $val ) ), 2 );
+		}
+		return $out;
+	}
+
+	/**
+	 * Current rates (option gp_linear_rates, defaults when missing).
+	 *
+	 * @return array
+	 */
+	public static function rates() {
+		return self::sanitize_rates( get_option( 'gp_linear_rates', array() ) );
+	}
+
+	/**
 	 * Pricing rules. Patterns are bare regex sources (no delimiters, case-insensitive) shared with the JS mirror.
 	 *
 	 * 'measure'  width     = banner width in feet
@@ -34,12 +79,13 @@ class GP_Linear_Pricing {
 	 * @return array
 	 */
 	public static function rules() {
+		$rates = self::rates();
 		$rules = array(
 			'pole' => array(
 				'title'   => 'pole\s*pocket',
 				'measure' => 'width',
-				'rate'    => 1.00,
-				'setup'   => 10.00,
+				'rate'    => $rates['pole_rate'],
+				'setup'   => $rates['pole_setup'],
 				'options' => array(
 					array( '^\s*no\b', 0 ),
 					array( 'top\s*(?:&|&amp;|and)\s*bottom', 2 ),
@@ -50,7 +96,7 @@ class GP_Linear_Pricing {
 			'rope' => array(
 				'title'   => 'rope',
 				'measure' => 'perimeter',
-				'rate'    => 1.00,
+				'rate'    => $rates['rope_rate'],
 				'setup'   => 0.00,
 				'options' => array(
 					array( '^\s*no\b', 0 ),
@@ -119,7 +165,7 @@ class GP_Linear_Pricing {
 	 * @param array  $rules Rules.
 	 * @return string Rule key or ''.
 	 */
-	private static function kind_for_title( $title, $rules ) {
+	public static function kind_for_title( $title, $rules ) {
 		$title = html_entity_decode( stripslashes( (string) $title ), ENT_QUOTES, 'UTF-8' );
 		foreach ( $rules as $kind => $rule ) {
 			if ( is_array( $rule ) && ! empty( $rule['title'] ) && 1 === @preg_match( self::rx( $rule['title'] ), $title ) ) {
@@ -329,6 +375,7 @@ class GP_Linear_Pricing {
 	 * @return array
 	 */
 	public static function js_config() {
-		return array( 'rules' => self::rules() );
+		$symbol = function_exists( 'get_woocommerce_currency_symbol' ) ? html_entity_decode( get_woocommerce_currency_symbol(), ENT_QUOTES, 'UTF-8' ) : '$';
+		return array( 'rules' => self::rules(), 'symbol' => $symbol );
 	}
 }

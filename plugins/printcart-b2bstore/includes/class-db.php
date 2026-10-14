@@ -157,8 +157,14 @@ class PCS_DB {
 
     public static function delete_store( $id ) {
         global $wpdb;
-        $wpdb->delete( $wpdb->prefix . 'pcs_b2b_stores', array( 'id' => absint( $id ) ), array( '%d' ) );
-        $wpdb->delete( $wpdb->prefix . 'pcs_b2b_members', array( 'store_id' => absint( $id ) ), array( '%d' ) );
+        $id = absint( $id );
+        if ( ! $id ) {
+            return;
+        }
+        /* company data (Image Zone, templates, private products, settings, ...) hooks in here while the store row still exists */
+        do_action( 'pcs_store_deleted', $id );
+        $wpdb->delete( $wpdb->prefix . 'pcs_b2b_stores', array( 'id' => $id ), array( '%d' ) );
+        $wpdb->delete( $wpdb->prefix . 'pcs_b2b_members', array( 'store_id' => $id ), array( '%d' ) );
     }
 
     /* ---------------------------------------------------------------- */

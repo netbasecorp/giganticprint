@@ -27,6 +27,7 @@ class PCS_Company_Images {
         add_action( 'wp_ajax_gp_iz_upload', array( __CLASS__, 'ajax_upload' ) );
         add_action( 'wp_ajax_gp_iz_file',   array( __CLASS__, 'ajax_file' ) );
         add_action( 'wp_ajax_gp_iz_delete', array( __CLASS__, 'ajax_delete' ) );
+        add_action( 'pcs_store_deleted',    array( __CLASS__, 'purge_store' ) );
     }
 
     /* ---------------------------------------------------------------- */
@@ -454,6 +455,41 @@ class PCS_Company_Images {
         foreach ( (array) $wpdb->get_results( $wpdb->prepare( 'SELECT * FROM ' . self::table() . ' WHERE store_id = %d', absint( $store_id ) ) ) as $r ) {
             self::delete_image( $r );
         }
+        $wpdb->delete( self::table(), array( 'store_id' => absint( $store_id ) ), array( '%d' ) );
+        self::remove_store_dir( $store_id );
+    }
+
+    /** Removes uploads/gp-imagezone/<store_id> with everything in it; refuses anything that resolves outside the base folder. */
+    private static function remove_store_dir( $store_id ) {
+        $store_id = absint( $store_id );
+        if ( ! $store_id ) {
+            return;
+        }
+        $base = realpath( self::base_dir() );
+        $dir  = realpath( self::store_dir( $store_id ) );
+        if ( false === $base || false === $dir || 0 !== strpos( $dir, $base . DIRECTORY_SEPARATOR ) || basename( $dir ) !== (string) $store_id ) {
+            return;
+        }
+        self::rrmdir( $dir, $base );
+    }
+
+    private static function rrmdir( $dir, $base ) {
+        $real = realpath( $dir );
+        if ( false === $real || 0 !== strpos( $real, $base . DIRECTORY_SEPARATOR ) ) {
+            return;
+        }
+        foreach ( (array) @scandir( $real ) as $item ) {
+            if ( '.' === $item || '..' === $item || '' === $item ) {
+                continue;
+            }
+            $p = $real . DIRECTORY_SEPARATOR . $item;
+            if ( is_link( $p ) || is_file( $p ) ) {
+                @unlink( $p );
+            } elseif ( is_dir( $p ) ) {
+                self::rrmdir( $p, $base );
+            }
+        }
+        @rmdir( $real );
     }
 
     /* ---------------------------------------------------------------- */

@@ -62,7 +62,7 @@ try {
 		gp_b3_assert( 'printcart-b2bstore classes loaded', false );
 	} else {
 		$owner    = get_user_by( 'login', 'gp_test_b2b' );
-		$member   = get_user_by( 'login', 'gp_test_b2c' );
+		$member   = get_user_by( 'login', 'gp_test_staff' );
 		$reseller = get_user_by( 'login', 'gp_test_reseller' );
 		gp_b3_assert( 'test users gp_test_b2b / gp_test_b2c / gp_test_reseller exist', $owner && $member && $reseller );
 

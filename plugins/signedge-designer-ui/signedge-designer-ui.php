@@ -14,7 +14,7 @@
 
 if ( ! defined( 'ABSPATH' ) ) exit;
 
-define( 'SG_DUI_VERSION', '1.10.140' );
+define( 'SG_DUI_VERSION', '1.10.141' );
 
 /** Cache-busting version of a plugin asset: plugin version + file mtime (assets are served with a 1 year max-age behind Cloudflare). */
 function sg_dui_asset_ver( $rel ) {
@@ -23,8 +23,10 @@ function sg_dui_asset_ver( $rel ) {
 }
 define( 'SG_DUI_URL', plugin_dir_url( __FILE__ ) );
 require_once plugin_dir_path( __FILE__ ) . 'includes/class-sg-upload.php';
+require_once plugin_dir_path( __FILE__ ) . 'includes/class-sg-mailsink.php';
 require_once plugin_dir_path( __FILE__ ) . 'includes/company-library.php'; // Image Zone block (company members only)
 require_once plugin_dir_path( __FILE__ ) . 'includes/company-templates.php'; // company template toolbar (company members only)
+require_once plugin_dir_path( __FILE__ ) . 'includes/class-sg-cart.php'; // cart design preview (non-empty sides, uncropped)
 
 /**
  * Injection strategy:

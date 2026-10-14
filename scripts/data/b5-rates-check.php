@@ -32,6 +32,7 @@ try {
 	gp_rc( 'admin page class loaded and hooked', class_exists( 'GP_Linear_Admin' ) && false !== has_action( 'admin_post_gp_linear_rates_save' ) && false !== has_action( 'admin_menu', array( 'GP_Linear_Admin', 'add_menu' ) ) );
 	gp_rc( 'admin save handler is admin-post only (no nopriv)', false === has_action( 'admin_post_nopriv_gp_linear_rates_save' ) );
 	$prev = get_current_user_id();
+	require_once ABSPATH . 'wp-admin/includes/template.php';
 	wp_set_current_user( 1 );
 	ob_start();
 	GP_Linear_Admin::render();

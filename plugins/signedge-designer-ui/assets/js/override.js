@@ -948,7 +948,18 @@
 
         var original = scope.addImageFromUrl;
         scope.addImageFromUrl = function (dataImg, extenal, ilr, maskId) {
-            if (tryAutoSizeThenAdd(scope, dataImg, extenal, ilr, maskId, original)) return;
+            var url = (dataImg && typeof dataImg === 'object') ? (dataImg.url || dataImg.src) : dataImg;
+            var isPhoto = !!url && !/\.svg(\?|$)/i.test(url);
+            if (isPhoto && tryAutoSizeThenAdd(scope, dataImg, extenal, ilr, maskId, original)) {
+                sgPlacingStart();
+                return;
+            }
+            // No dimension field: the canvas size is fixed, so keep the
+            // ratio and fit the art inside the print area (mask fills and
+            // SVG art keep core behaviour).
+            if (isPhoto && typeof maskId === 'undefined') {
+                return addThenFit(scope, original, [dataImg, extenal, ilr, maskId]);
+            }
             return original.call(scope, dataImg, extenal, ilr, maskId);
         };
     }
@@ -1004,7 +1015,8 @@
         if (!url) return false;
 
         var fallbackToNormalAdd = function () {
-            original.call(scope, dataImg, extenal, ilr, maskId);
+            if (typeof maskId === 'undefined') addThenFit(scope, original, [dataImg, extenal, ilr, maskId]);
+            else original.call(scope, dataImg, extenal, ilr, maskId);
         };
 
         var probe = new Image();
@@ -1101,6 +1113,9 @@
             setTimeout(function () {
                 waitForFreshCanvasThenAdd(scope, dataImg, extenal, ilr, maskId, original, oldCanvas, attempt + 1);
             }, 300);
+        } else {
+            sgPlacingEnd();
+            revealStagesAfterResize();
         }
     }
 
@@ -1119,14 +1134,9 @@
         var objects = canvas.getObjects();
         if (objects.length > countBefore) {
             var addedItem = objects[objects.length - 1];
-            function stretch() {
-                if (typeof scope.fitToStage === 'function') scope.fitToStage(undefined, addedItem);
-            }
-            if (scope.$$phase || (scope.$root && scope.$root.$$phase)) {
-                scope.$evalAsync(stretch);
-            } else {
-                scope.$apply(stretch);
-            }
+            // Canvas was just sized to this image's ratio: stretch == fit.
+            applyArtMode(scope, 'stretch', addedItem);
+            setTimeout(sgPlacingEnd, 700);
             // The dimension field driving this whole flow can size the
             // canvas to something much larger than the default — at 100%
             // zoom that can overlap the left sidebar and/or the summary
@@ -1142,6 +1152,9 @@
             setTimeout(function () {
                 waitForObjectAddedThenStretch(scope, canvas, countBefore, attempt + 1);
             }, 300);
+        } else {
+            sgPlacingEnd();
+            revealStagesAfterResize();
         }
     }
 
@@ -1329,6 +1342,209 @@
     }
 
     /* ----------------------------------------------------------------
+       ART PLACEMENT HELPERS (shared by auto-place, art bar, checks)
+       sgArt.mode is the fit mode last applied to the art on the active
+       stage: 'stretch' | 'fit' | 'center' (null = placed some other way).
+    ---------------------------------------------------------------- */
+    var sgArt = { mode: null, placing: false, placingTimer: null };
+    var sgAutoPlacedItems = [];
+
+    function sgInDigest(scope) {
+        return !!(scope && (scope.$$phase || (scope.$root && scope.$root.$$phase)));
+    }
+
+    function sgRunInScope(scope, fn) {
+        try {
+            if (scope && typeof scope.$evalAsync === 'function') scope.$evalAsync(fn);
+            else fn();
+        } catch (e) { /* never throw into the digest */ }
+    }
+
+    function getDesignScope() {
+        try {
+            if (!window.angular) return null;
+            var el = document.querySelector('[ng-controller=designCtrl]') || document.querySelector('[ng-controller]');
+            return el ? (angular.element(el).scope() || null) : null;
+        } catch (e) { return null; }
+    }
+
+    function isArtImage(o) {
+        var t = o && typeof o.get === 'function' ? o.get('type') : '';
+        return t === 'image' || t === 'custom-image';
+    }
+
+    // The art the bar acts on: the selected image, else the newest image.
+    function getArtItem(canvas) {
+        if (!canvas || typeof canvas.getObjects !== 'function') return null;
+        var active = typeof canvas.getActiveObject === 'function' ? canvas.getActiveObject() : null;
+        if (isArtImage(active)) return active;
+        var objs = canvas.getObjects();
+        for (var i = objs.length - 1; i >= 0; i--) {
+            if (isArtImage(objs[i])) return objs[i];
+        }
+        return null;
+    }
+
+    // Enabled + published dimension field, same visibility rule as
+    // tryAutoSizeThenAdd. Returns { nbo, field, live } or null.
+    function findDimensionField(nbo) {
+        nbo = nbo || getNboScope();
+        if (!nbo || !nbo.fields || !nbo.nbd_fields) return null;
+        for (var i = 0; i < nbo.fields.length; i++) {
+            var f = nbo.fields[i];
+            if (f && f.nbd_type === 'dimension') {
+                var live = nbo.nbd_fields[f.id];
+                if (live && live.enable && live.published) return { nbo: nbo, field: f, live: live };
+            }
+        }
+        return null;
+    }
+
+    function getProductDpi(scope) {
+        var s = scope || getDesignScope();
+        var d = s && s.settings && s.settings.product_data && s.settings.product_data.option &&
+            parseFloat(s.settings.product_data.option.dpi);
+        return d > 0 ? d : 150;
+    }
+
+    // Print-area size in inches: the dimension field when there is one,
+    // otherwise the product side's real size converted from the unit.
+    function getPrintAreaInches(scope) {
+        var dim = findDimensionField();
+        if (dim) {
+            var w = parseFloat(dim.live.width), h = parseFloat(dim.live.height);
+            if (w > 0 && h > 0) return { w: w, h: h };
+        }
+        try {
+            var side = scope.settings.product_data.product[scope.currentStage];
+            var k = { 'in': 1, cm: 1 / 2.54, mm: 1 / 25.4, ft: 12 }[scope.settings.nbdesigner_dimensions_unit];
+            if (!k && scope.settings.nbdesigner_dimensions_unit === 'px') k = 1 / getProductDpi(scope);
+            var rw = parseFloat(side.real_width), rh = parseFloat(side.real_height);
+            if (k && rw > 0 && rh > 0) return { w: rw * k, h: rh * k };
+        } catch (e) { /* no size info */ }
+        return null;
+    }
+
+    function fmtIn(n) {
+        return String(Math.round(n * 100) / 100);
+    }
+
+    // Applies a fit mode to the art. Geometry is immediate; the Angular
+    // bookkeeping (corners, render, undo state) runs through $evalAsync.
+    function applyArtMode(scope, mode, item) {
+        try {
+            var stage = scope.stages[scope.currentStage];
+            var canvas = stage && stage.canvas;
+            item = item || getArtItem(canvas);
+            if (!canvas || !item || !item.width || !item.height) return false;
+            var ratio = stage.states.scaleRange[stage.states.currentScaleIndex].ratio;
+            var maxW = canvas.width / ratio, maxH = canvas.height / ratio;
+            var sx, sy;
+            if (mode === 'stretch') {
+                sx = maxW / item.width;
+                sy = maxH / item.height;
+            } else if (mode === 'fit') {
+                sx = sy = Math.min(maxW / item.width, maxH / item.height);
+            } else {
+                var area = getPrintAreaInches(scope);
+                if (!area) return false;
+                sx = sy = (maxW / area.w) / getProductDpi(scope);
+            }
+            item.set({
+                left: item.get('originX') === 'center' ? maxW / 2 : 0,
+                top: item.get('originY') === 'center' ? maxH / 2 : 0,
+                scaleX: sx,
+                scaleY: sy
+            });
+            canvas.viewportCenterObjectH(item);
+            canvas.viewportCenterObjectV(item);
+            item.setCoords();
+            sgArt.mode = mode;
+            sgRunInScope(scope, function () {
+                if (typeof scope.updateCorners === 'function') scope.updateCorners();
+                if (typeof scope.renderStage === 'function') scope.renderStage();
+                if (typeof scope.afterObjectModify === 'function') scope.afterObjectModify();
+            });
+            return true;
+        } catch (e) {
+            console.warn('[SG-ART] applyArtMode failed', e);
+            return false;
+        }
+    }
+
+    function clearCoreStageLoading() {
+        try {
+            if (window.jQuery) {
+                window.jQuery('.loading-workflow').removeClass('nbd-show');
+                window.jQuery('body, .nbd-mode-vista').removeClass('nbd-onloading');
+            }
+            var s = getDesignScope();
+            if (s) s.stageOnload = false;
+        } catch (e) { /* cosmetic */ }
+    }
+
+    // The add-to-canvas phase (image load/resize) — drives the progress
+    // overlay and the core loading-state cleanup. Safety timeout so a
+    // failed load can never leave it on forever.
+    function sgPlacingStart() {
+        sgArt.placing = true;
+        clearTimeout(sgArt.placingTimer);
+        sgArt.placingTimer = setTimeout(sgPlacingEnd, 25000);
+    }
+
+    function sgPlacingEnd() {
+        sgArt.placing = false;
+        clearTimeout(sgArt.placingTimer);
+        sgArt.placingTimer = null;
+        clearCoreStageLoading();
+    }
+
+    // Used where no dimension field drives the canvas size: add through the
+    // untouched original, then fit the new object inside the print area.
+    function addThenFit(scope, original, args) {
+        var stage = scope.stages && scope.stages[scope.currentStage];
+        var countBefore = stage && stage.canvas ? stage.canvas.getObjects().length : 0;
+        sgPlacingStart();
+        var result = original.apply(scope, args);
+        waitForObjectAddedThenFit(scope, countBefore, 0);
+        return result;
+    }
+
+    function waitForObjectAddedThenFit(scope, countBefore, attempt) {
+        var stage = scope.stages && scope.stages[scope.currentStage];
+        var objects = stage && stage.canvas ? stage.canvas.getObjects() : [];
+        if (objects.length > countBefore) {
+            var added = objects[objects.length - 1];
+            if (isArtImage(added)) applyArtMode(scope, 'fit', added);
+            setTimeout(sgPlacingEnd, 700);
+            return;
+        }
+        if (attempt < 30) {
+            setTimeout(function () { waitForObjectAddedThenFit(scope, countBefore, attempt + 1); }, 300);
+        } else {
+            sgPlacingEnd();
+        }
+    }
+
+    // Post-upload placement: same path as a manual thumbnail click.
+    function sgAutoPlaceUploaded(scope) {
+        var arr = scope.resource && scope.resource.upload && scope.resource.upload.data;
+        var item = arr && arr[arr.length - 1];
+        if (!item || sgAutoPlacedItems.indexOf(item) !== -1) return;
+        sgAutoPlacedItems.push(item);
+        sgPlacingStart();
+        setTimeout(function () {
+            try {
+                scope.resource.addImageContext = 'manual';
+                scope.addImageFromUrl(item, false, item.ilr);
+            } catch (e) {
+                console.warn('[SG-ART] auto-place failed', e);
+                sgPlacingEnd();
+            }
+        }, 0);
+    }
+
+    /* ----------------------------------------------------------------
        UPLOADED-IMAGE LIBRARY CARDS
        Core only renders a bare thumbnail per uploaded file (.mansory-item
        inside #nbd-upload-wrap — see tab-photo.php: just an <img>, no
@@ -1368,6 +1584,7 @@
     // We wrap both on every [ng-controller] found, in case more than one
     // instance is genuinely live; harmless no-ops on the rest.
     var sgUploadNameQueue = [];
+    var sgJustStored = false; // true between storeUploadFile() and core's follow-up addImage()
     var sgUploadCaptureByIndex = {}; // keyed by absolute resource.upload.data index, not push order
 
     function initUploadCaptureHook(attempt) {
@@ -1397,7 +1614,7 @@
                         // this is the SAME object storeUploadFile() will shift
                         // off the queue, so mutating .dpi later is visible
                         // wherever that reference ends up (sgUploadCapture).
-                        var entry = { name: file.name, dpi: null };
+                        var entry = { name: file.name, dpi: null, first: idx === 0 };
                         sgUploadNameQueue.push(entry);
                         if (typeof file.arrayBuffer === 'function') {
                             file.arrayBuffer().then(function (buf) {
@@ -1413,6 +1630,10 @@
                     var result = originalStore.apply(this, arguments);
                     var url = (data && typeof data === 'object') ? (data.src || data.url) : data;
                     var queued = sgUploadNameQueue.length ? sgUploadNameQueue.shift() : null;
+                    // Core calls addImage() synchronously right after this; only
+                    // the first file of a batch is auto-placed (see addImage wrapper).
+                    sgJustStored = !queued || queued.first;
+                    setTimeout(function () { sgJustStored = false; }, 0);
                     // uploadedAt is stamped HERE — the instant this upload actually
                     // completes — not later when decorateItem() happens to render
                     // it (that could be a real "now", wrongly shown for restored/
@@ -1455,30 +1676,24 @@
                     return result;
                 };
 
-                // Core behaviour: uploadFile() auto-places every uploaded photo
-                // onto the canvas immediately (app-modern.min.js:2518,
-                // `$scope.addImage(data, false, true)` — no maskId). signs365.com
-                // instead just shows the uploaded thumbnail and only adds it when
-                // the customer clicks it. addImage() itself can't tell which
-                // caller invoked it — but every deliberate click-to-add entry
-                // point in the core plugin's own templates (tab-photo.php: the
-                // upload thumbnail, Photos search results, Facebook/Instagram/
-                // Dropbox items, the Image URL insert button) already sets
-                // `resource.addImageContext = 'manual'` immediately before
-                // calling addImageFromUrl → addImage, synchronously, before
-                // addImage's async fabric.Image.fromURL load even starts — so
-                // that flag is still reliably readable the instant addImage is
-                // entered. Skip the call only when it's neither that manual
-                // context nor a mask-fill (maskId defined — e.g. uploading
-                // directly into a selected template placeholder, which should
-                // still auto-fill as before).
+                // Core's uploadFile() calls addImage(data, false, true) right after
+                // storeUploadFile() on every successful upload. Deliberate adds
+                // (thumbnail click etc.) set `resource.addImageContext = 'manual'`
+                // first. For the automatic call we do NOT add directly: we hand the
+                // stored item to addImageFromUrl (auto-size + fit) for the first
+                // file of a batch; other files stay as thumbnails. A maskId
+                // (upload straight into a template placeholder) passes through.
                 if (typeof scope.addImage === 'function' && !scope.__sgManualAddOnlyWrapped) {
                     scope.__sgManualAddOnlyWrapped = true;
                     var originalAddImage = scope.addImage;
                     scope.addImage = function (data, showLoading, hideLoading, additionalTitle, additionalValue, maskId) {
                         if (typeof maskId === 'undefined' &&
                             (!scope.resource || scope.resource.addImageContext !== 'manual')) {
-                            return; // automatic post-upload add — suppressed, thumbnail already shown by storeUploadFile
+                            if (sgJustStored) {
+                                sgJustStored = false;
+                                sgAutoPlaceUploaded(scope);
+                            }
+                            return; // thumbnail already shown by storeUploadFile; placement (if any) is async
                         }
                         return originalAddImage.apply(this, arguments);
                     };

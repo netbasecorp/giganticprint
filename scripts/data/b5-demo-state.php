@@ -7,7 +7,7 @@
  * finalize (idempotent):
  *  - per test user: keeps the ONE given order (set to Completed), deletes every other order of the test users and the
  *    design folders of the deleted orders; removes the fixture quote 'GP test quote'
- *  - company 'Demo Signs Co': one Image Zone image ('Demo logo.png'), one template ('Demo banner template', product 1168,
+ *  - company 'Demo Signs Co': one Image Zone image ('Demo Signs Co logo.png'), one template ('Demo banner template', product 1168,
  *    made from the design of the b2b sample order), private product 1263 assigned
  *  - carts of the test users emptied (persistent cart + WooCommerce session rows), login sessions cleared
  *  sweep [--apply]: lists (default) or removes test leftovers of 2026-10-14: checkout drafts, design folders / generated download zips
@@ -19,7 +19,10 @@ require __DIR__ . '/_lib.php';
 global $wpdb;
 $mode = '';
 $keep = array();
+$refresh = in_array( '--refresh', $argv, true );
+$logo = '';
 foreach ( array_slice( $argv, 1 ) as $a ) {
+	if ( 0 === strpos( $a, '--logo=' ) ) { $logo = substr( $a, 7 ); continue; }
 	if ( 0 === strpos( $a, '--' ) ) { continue; }
 	if ( false !== strpos( $a, '=' ) ) { list( $l, $id ) = explode( '=', $a, 2 ); $keep[ $l ] = (int) $id; }
 	elseif ( '' === $mode ) { $mode = $a; }
@@ -119,13 +122,20 @@ $owner = get_user_by( 'login', 'gp_test_b2b' );
 gp_ds_ok( 'company Demo Signs Co exists', (bool) $store );
 if ( $store && $owner ) {
 	$sid = (int) $store->id;
+	if ( $refresh ) {
+		foreach ( $wpdb->get_col( $wpdb->prepare( 'SELECT id FROM ' . PCS_Company_Images::table() . ' WHERE store_id = %d', $sid ) ) as $iid ) { PCS_Company_Images::delete_image( PCS_Company_Images::get( $iid ) ); echo "  refresh: removed Image Zone image #$iid
+"; }
+		$n_t = $wpdb->delete( PCS_Company_Templates::table(), array( 'store_id' => $sid ) );
+		echo "  refresh: removed $n_t template(s)
+";
+	}
 	// Image Zone image
 	$have = (int) $wpdb->get_var( $wpdb->prepare( 'SELECT COUNT(*) FROM ' . PCS_Company_Images::table() . ' WHERE store_id = %d', $sid ) );
 	if ( 0 === $have ) {
-		$src = ABSPATH . 'wp-content/uploads/2025/12/logo.png';
+		$src = ( $logo && is_file( $logo ) ) ? $logo : ABSPATH . 'wp-content/uploads/2025/12/logo.png';
 		$tmp = '/tmp/gp-demo-logo-' . getmypid() . '.png';
 		gp_ds_ok( 'sample logo source exists', is_file( $src ) && copy( $src, $tmp ) );
-		$item = PCS_Company_Images::store_file( $tmp, 'Demo logo.png', $sid, $owner->ID );
+		$item = PCS_Company_Images::store_file( $tmp, 'Demo Signs Co logo.png', $sid, $owner->ID );
 		@unlink( $tmp );
 		gp_ds_ok( 'Image Zone image stored', is_array( $item ) && ! empty( $item['id'] ) );
 	} else { echo "  Image Zone already holds $have image(s)\n"; }

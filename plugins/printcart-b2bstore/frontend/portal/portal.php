@@ -130,7 +130,7 @@ $portal_base   = PCS_B2B_Portal::url( '' );
     /** @var WP_User $user */
 
     /* Allow any section file, including order-detail */
-    $allowed = array( 'overview', 'orders', 'order-detail', 'quotes', 'quote-request', 'quote-view', 'store', 'team', 'approvals', 'images', 'templates', 'apply', 'profile' );
+    $allowed = array( 'overview', 'orders', 'order-detail', 'quotes', 'quote-request', 'quote-view', 'store', 'team', 'images', 'templates', 'apply', 'profile' ); // 'approvals' hidden (Phase 2)
     $safe_current = in_array( $current, $allowed, true ) ? $current : 'overview';
     $section_file = PCS_PLUGIN_DIR . 'frontend/portal/sections/' . $safe_current . '.php';
 

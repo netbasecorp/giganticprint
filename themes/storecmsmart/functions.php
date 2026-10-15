@@ -812,15 +812,19 @@ add_action( 'wp_footer', function () {
     <script>
     (function () {
         var url = '<?php echo $design_url; ?>';
+        // "Upload design" (#startUpload) goes to the same designer, Photos tab on the upload drop zone
+        // (the core plugin's own upload popup has no preview).
+        var uploadUrl = url + '&sg_start=upload';
         function patchDesignButtons() {
-            var btns = document.querySelectorAll('#triggerDesign, #startDesign, .nbdesign-button.start-design');
+            var btns = document.querySelectorAll('#triggerDesign, #startDesign, .nbdesign-button.start-design, #startUpload, .nbdesign-button.upload-design');
             btns.forEach(function (btn) {
                 if (btn.dataset.sgPatched) return;
                 btn.dataset.sgPatched = '1';
+                var isUpload = btn.id === 'startUpload' || btn.classList.contains('upload-design');
                 btn.addEventListener('click', function (e) {
                     e.preventDefault();
                     e.stopImmediatePropagation();
-                    window.location.href = url;
+                    window.location.href = isUpload ? uploadUrl : url;
                 }, true);
             });
         }

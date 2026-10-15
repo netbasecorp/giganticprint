@@ -50,6 +50,7 @@ $size  = filesize( $real );
 $etag  = '"' . substr( hash( 'sha256', $real . '|' . $mtime . '|' . $size ), 0, 24 ) . '"';
 $max   = min( 86400, max( 60, $exp - time() ) );
 header( 'Cache-Control: private, max-age=' . $max );
+header( 'Expires: ' . gmdate( 'D, d M Y H:i:s', time() + $max ) . ' GMT' ); // an explicit Expires stops the host's image default (120 days) being added
 header( 'ETag: ' . $etag );
 header( 'Last-Modified: ' . gmdate( 'D, d M Y H:i:s', $mtime ) . ' GMT' );
 header( 'X-Content-Type-Options: nosniff' );

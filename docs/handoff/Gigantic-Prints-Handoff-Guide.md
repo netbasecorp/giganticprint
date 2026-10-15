@@ -1,9 +1,92 @@
 # Gigantic Prints online store - Handoff Guide
 
-Version 1.2 · prepared for **Hoyle Fabrio, SignEdge Graphics** by the **Printcart team**.
+Version 1.2 · prepared for **Hoyle Fabrio, SignEdge Graphics** by **Printcart, a division of Netbase JSC**.
 Store: giganticprints.com (staging address: giganticprints.printcart.com). Hosting is managed by Printcart.
 
 <!-- Internal notes are HTML comments; build_pdf.py strips them. Screenshot list: capture/shots.json (id = file name). -->
+
+## About Netbase JSC and Printcart
+
+<div class="profile">
+<div class="pf-head"><img class="pf-logo-nb" src="assets/netbase-logo.png" alt="Netbase JSC"></div>
+<p class="pf-lead"><strong>Netbase JSC</strong> is a Hanoi-based technology company that has designed, built and run e-commerce and web-to-print systems since 2012. It started with e-commerce products, added consulting and outsourcing services in 2016, and today delivers remotely, in English, to clients in the United States, Europe and Asia-Pacific. Contracts and invoices are issued by Netbase JSC.</p>
+<div class="pf-stats">
+<div><b>2012</b><span>founded in Hanoi, Vietnam</span></div>
+<div><b>500+</b><span>clients served</span></div>
+<div><b>80</b><span>countries with clients</span></div>
+<div><b>50+</b><span>custom web-to-print platforms delivered</span></div>
+</div>
+<div class="pf-cols">
+<div>
+<h4>How Netbase delivers</h4>
+<ul>
+<li>Delivery teams of 3 to 30 people: business analysts, project managers, solution architects, developers, QA and UI/UX designers.</li>
+<li>Work usually starts one to two weeks after discovery; most projects are fixed-price after discovery.</li>
+<li>Commerce platforms: WooCommerce, Shopify, Magento 2, Laravel and headless commerce; cloud on AWS, Google Cloud and Cloudflare.</li>
+<li>ISO 27001 certified and SOC 2 Type II attested; contributors work under NDA, and NDAs and DPAs are available.</li>
+<li>You own the intellectual property created in custom development.</li>
+</ul>
+</div>
+<div>
+<h4>Results for print businesses</h4>
+<ul>
+<li><strong>4over4</strong> (USA): revenue +82% within six months, conversion +48%, average order value +35%.</li>
+<li><strong>USticker</strong>: +40% conversion for design-tool users, online-order revenue +15%.</li>
+<li><strong>Indieprint</strong> (Melbourne): design errors -28%.</li>
+<li><strong>Geo-Tek IT Solutions</strong> (Cyprus): revenue +36% in the first quarter.</li>
+</ul>
+<p class="pf-note">Recognised as a Top Software Development Company (GoodFirms) and listed among top web developers by Clutch and Wadline.</p>
+</div>
+</div>
+<h4>Business divisions</h4>
+<div class="pf-divs">
+<div class="pf-div pf-hl"><b>Printcart</b><span>Web-to-print and print-on-demand platform. 2,000+ stores.</span></div>
+<div class="pf-div"><b>CMSmart</b><span>E-commerce stores and product customizers. 7,000+ stores launched.</span></div>
+<div class="pf-div"><b>Cloodo</b><span>AI-powered digital workplace: CRM, HRM, cloud ERP.</span></div>
+<div class="pf-div"><b>Poslor</b><span>Operating system for real estate: listings, leads, deals.</span></div>
+<div class="pf-div"><b>Storelly</b><span>D2C SaaS platform for direct-selling brands.</span></div>
+</div>
+</div>
+
+<div class="profile pf-pc">
+<div class="pf-head"><img class="pf-logo-pc" src="assets/printcart-logo.png" alt="Printcart"><span class="pf-tag">a division of Netbase JSC</span></div>
+<p class="pf-lead"><strong>Printcart</strong> is the web-to-print division of Netbase JSC. The online designer, the price matrix and the print-ready file output in your store run on the Printcart platform, which is maintained and improved by a dedicated product team.</p>
+<div class="pf-stats">
+<div><b>2,000+</b><span>stores worldwide</span></div>
+<div><b>10 years</b><span>of service</span></div>
+<div><b>3</b><span>platforms: WooCommerce, Shopify, Wix</span></div>
+<div><b>12,400+</b><span>vector cliparts</span></div>
+</div>
+<div class="pf-cols">
+<div>
+<h4>What the platform gives a print shop</h4>
+<ul>
+<li>Online designer with print sides, bleed and safe zones, and a print-ready PDF for every order.</li>
+<li>Dynamic price matrix: prices by size, material and options, as your banners are priced by the square foot.</li>
+<li>AI print tools billed per use: background removal, image upscaling and print-file preflight.</li>
+<li>REST API, webhooks and JavaScript SDKs for custom storefronts and integrations.</li>
+</ul>
+</div>
+<div>
+<h4>What it means for Gigantic Prints</h4>
+<ul>
+<li>Your store is built on a platform already used by thousands of print stores, not on one-off code.</li>
+<li>Platform updates and security fixes continue to reach your store.</li>
+<li>Custom work for your business, such as the B2B portal and the upload-first flow, is delivered by Netbase engineering and documented in this guide.</li>
+<li>One accountable company for platform, custom work, hosting and support.</li>
+</ul>
+</div>
+</div>
+</div>
+
+<div class="pf-contact">
+<b>Netbase Business Application And Solution Joint Stock Company (Netbase JSC)</b><br>
+No. 18, Lane 445/46 Lac Long Quan Street, Tay Ho Ward, Hanoi City, Vietnam<br>
+netbasejsc.com · printcart.com · project@netbasejsc.com · ceo@printcart.com · WhatsApp +84 937 869 689<br>
+Chairman and CEO: David Nguyen Quang Huy · Payment to Netbase JSC by company bank transfer or PayPal Business
+</div>
+
+<div style="page-break-after: always"></div>
 
 ## How to read this guide
 
@@ -572,7 +655,7 @@ Printcart does the technical steps marked **(Printcart)**; you do the steps mark
 | 8 | **Test order:** place one real order with a small print file; check the order e-mails, the download links in the order, the PayPal invoice you send, and the confirmation page. Then cancel or refund it. | you + Printcart | [ ] |
 | 9 | **Remove the demo data:** the sample companies (**Demo Signs Co**, **Demo Reseller Co**) with their Image Zone image, template and the product assigned to Demo Signs Co; the demo customer accounts and their sample orders (#2046 to #2049); sample quotes and invitations. | Printcart | [ ] |
 | 10 | **Public pages:** unpublish pages that are not part of your store (sample and placeholder pages). | Printcart | [ ] |
-| 11 | **Designer licence:** the Printcart team activates the designer licence for giganticprints.com. | Printcart | [ ] |
+| 11 | **Designer licence:** Printcart activates the designer licence for giganticprints.com. | Printcart | [ ] |
 | 12 | **Updates and backup:** all software updates installed, a fresh backup taken and a restore test noted. | Printcart | [ ] |
 | 13 | **Sign-off:** the person who approves the go-live confirms in writing (Part 5, question 6). | you | [ ] |
 | 14 | **After go-live:** check the first real orders the same day and tell us about anything unexpected. | you | [ ] |
@@ -624,11 +707,13 @@ After go-live the store is hosted and looked after by **Printcart**.
 
 **How to ask for help**
 
-- Write to the Printcart support address you were given, with a short description, the page address, and a screenshot if possible. For an order, add the order number.
+- Write to **ceo@printcart.com** or message **WhatsApp +84 937 869 689**, with a short description, the page address, and a screenshot if possible. For an order, add the order number.
 - Reports about orders that cannot be placed are looked at first.
-- For any change to prices or products you can make yourself, use Part 3. If you are unsure, ask us before you change anything on the live store.
+- For any change to prices or products you can make yourself, use Part 3. If you are unsure, ask Printcart before you change anything on the live store.
 
-*Printcart team*
+**David Nguyen Quang Huy**  
+Chief Executive Officer, Printcart · Netbase JSC  
+ceo@printcart.com · WhatsApp +84 937 869 689
 
 ---
 
@@ -669,4 +754,6 @@ Tick each line when you have tried it on the staging store (https://giganticprin
 
 Not part of this release (see 1.3): item list, chat and FAQ, Super Admin Custom Order Form, accounting export, additional payment methods.
 
-*Printcart team*
+**David Nguyen Quang Huy**  
+Chief Executive Officer, Printcart · Netbase JSC  
+ceo@printcart.com · WhatsApp +84 937 869 689

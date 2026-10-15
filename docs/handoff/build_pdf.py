@@ -47,6 +47,27 @@ nav.toc { page-break-after: always; }
 nav.toc ul { list-style: none; padding-left: 0; margin: 0; } nav.toc ul ul { padding-left: 6mm; }
 nav.toc { font-size: 10pt; line-height: 1.38; } nav.toc h2 { margin-top: 2mm; }
 a { color: #0b57d0; text-decoration: none; }
+
+.profile { page-break-inside: avoid; margin: 2mm 0 6mm; }
+.profile.pf-pc { page-break-before: always; }
+.pf-head { display: flex; align-items: center; gap: 4mm; margin: 2mm 0 3mm; }
+.pf-logo-nb { height: 10mm; } .pf-logo-pc { height: 11mm; }
+.pf-tag { font-size: 9.5pt; color: #5b636b; border-left: 1px solid #c9d1db; padding-left: 4mm; }
+.pf-lead { font-size: 11pt; line-height: 1.55; }
+.pf-stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 3mm; margin: 4mm 0 5mm; }
+.pf-stats div { background: #f3f6fb; border-top: 3px solid #4f7cc4; padding: 3mm 3mm 2.5mm; }
+.pf-stats b { display: block; font-size: 18pt; line-height: 1.1; color: #2b333d; }
+.pf-stats span { display: block; font-size: 8.5pt; color: #5b636b; margin-top: 1mm; }
+.pf-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 6mm; }
+.pf-cols h4, .profile h4 { color: #2b333d; margin: 2mm 0 1.5mm; }
+.pf-cols ul { padding-left: 4.5mm; margin: 0; font-size: 9.5pt; } .pf-cols li { margin-bottom: 1.2mm; }
+.pf-note { font-size: 8.5pt; color: #5b636b; }
+.pf-divs { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 2.5mm; width: calc(100% - 1mm); }
+.pf-div { border: 1px solid #d5dbe3; padding: 2.5mm; font-size: 8.5pt; color: #4a525b; }
+.pf-div b { display: block; font-size: 10pt; color: #2b333d; margin-bottom: 1mm; }
+.pf-div.pf-hl { border: 1.5px solid #4f7cc4; background: #f3f6fb; }
+.pf-contact { margin-top: 4mm; padding: 3mm 4mm; border-left: 3px solid #2b333d; background: #f6f7f9; font-size: 8.8pt; line-height: 1.6; color: #4a525b; page-break-inside: avoid; }
+.pf-contact b { color: #2b333d; }
 """
 
 COVER_CSS = """
@@ -55,7 +76,9 @@ COVER_CSS = """
 body { margin: 0; font-family: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; color: #1b1f24; -webkit-print-color-adjust: exact; }
 .page { width: 210mm; height: 297mm; position: relative; overflow: hidden; }
 .band { position: absolute; top: 0; left: 0; right: 0; height: 9mm; background: #4f7cc4; }
-.logo { position: absolute; top: 30mm; left: 22mm; height: 17mm; }
+.logos { position: absolute; top: 28mm; left: 22mm; right: 22mm; display: flex; align-items: center; gap: 9mm; }
+.logos img.nb { height: 12mm; } .logos img.pc { height: 14mm; } .logos .bar { width: 0.4mm; height: 16mm; background: #c9d1db; }
+.division { position: absolute; top: 50mm; left: 22mm; font-size: 9.5pt; color: #5b636b; letter-spacing: .02em; }
 .title { position: absolute; top: 92mm; left: 22mm; right: 22mm; }
 .title .kicker { font-size: 11pt; letter-spacing: .12em; text-transform: uppercase; color: #4f7cc4; font-weight: 600; }
 .title h1 { font-size: 30pt; line-height: 1.15; margin: 4mm 0 5mm; color: #2b333d; }
@@ -76,21 +99,30 @@ COMPANY = {
 DOC_TITLE = "Gigantic Prints Online Store"
 DOC_SUB = "Handoff Guide — shopper and administrator instructions"
 LOGO = HERE / "assets" / "printcart-logo.png"
+NB_LOGO = HERE / "assets" / "netbase-logo.png"
 
 
-def logo_uri():
-    return "data:image/png;base64," + base64.b64encode(LOGO.read_bytes()).decode()
+def logo_uri(path=LOGO):
+    mime = mimetypes.guess_type(path.name)[0] or "image/png"
+    return f"data:{mime};base64," + base64.b64encode(path.read_bytes()).decode()
+
+
+def inline_assets(markup):
+    """Raw-HTML blocks in the markdown reference assets/<file>; embed them so the HTML/PDF is self-contained."""
+    return re.sub(r'src="(assets/[^"]+)"', lambda m: f'src="{logo_uri(HERE / m.group(1))}"', markup)
 
 
 def cover_html(version, date):
     c = COMPANY
     return f"""<!doctype html><html lang="en"><head><meta charset="utf-8"><style>{COVER_CSS}</style></head><body><div class="page">
 <div class="band"></div>
-<img class="logo" src="{logo_uri()}" alt="Printcart">
+<div class="logos"><img class="nb" src="{logo_uri(NB_LOGO)}" alt="Netbase JSC"><div class="bar"></div><img class="pc" src="{logo_uri()}" alt="Printcart"></div>
+<div class="division">Printcart is the web-to-print division of Netbase JSC</div>
 <div class="title"><div class="kicker">Project handoff</div><h1>{DOC_TITLE}</h1><div class="sub">{DOC_SUB}</div></div>
 <div class="meta">
 <div><b>Prepared for</b>Hoyle Fabrio, SignEdge Graphics / Gigantic Prints</div>
-<div><b>Prepared by</b>Printcart team</div>
+<div><b>Prepared by</b>Printcart, a division of Netbase JSC</div>
+<div><b>Project lead</b>David Nguyen Quang Huy, CEO</div>
 <div><b>Store</b>giganticprints.com (staging: giganticprints.printcart.com)</div>
 <div><b>Version</b>{html.escape(version)} · {html.escape(date)}</div>
 </div>
@@ -101,7 +133,8 @@ def cover_html(version, date):
 def header_template(version):
     return (f'<div style="width:100%;margin:0 15mm;padding-bottom:2mm;border-bottom:0.6px solid #c9d1db;display:flex;'
             f'justify-content:space-between;align-items:flex-end;font-family:Segoe UI,Arial,sans-serif;font-size:8px;color:#5b636b;-webkit-print-color-adjust:exact">'
-            f'<img src="{logo_uri()}" style="height:5.5mm"><span>{DOC_TITLE} · Handoff Guide v{html.escape(version)}</span></div>')
+            f'<img src="{logo_uri()}" style="height:5.5mm"><span style="display:flex;align-items:flex-end;gap:3mm">{DOC_TITLE} · Handoff Guide v{html.escape(version)}'
+            f'<img src="{logo_uri(NB_LOGO)}" style="height:3.6mm"></span></div>')
 
 
 def footer_template():
@@ -155,7 +188,7 @@ def build(a, email):
 
     text = re.sub(r"!\[([^\]]*)\]\(([^)]+)\)", stash_img, text)
     md = markdown.Markdown(extensions=["tables", "toc", "sane_lists", "attr_list"], extension_configs={"toc": {"toc_depth": "2-3"}})
-    body = md.convert(text)
+    body = inline_assets(md.convert(text))
     for k, v in stash.items():
         body = body.replace(f"<p>{k}</p>", v).replace(k, v)
     toc = f'<nav class="toc"><h2>Contents</h2>{md.toc}</nav>'

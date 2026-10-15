@@ -655,7 +655,7 @@ Printcart does the technical steps marked **(Printcart)**; you do the steps mark
 | 8 | **Test order:** place one real order with a small print file; check the order e-mails, the download links in the order, the PayPal invoice you send, and the confirmation page. Then cancel or refund it. | you + Printcart | [ ] |
 | 9 | **Remove the demo data:** the sample companies (**Demo Signs Co**, **Demo Reseller Co**) with their Image Zone image, template and the product assigned to Demo Signs Co; the demo customer accounts and their sample orders (#2046 to #2049); sample quotes and invitations. | Printcart | [ ] |
 | 10 | **Public pages:** unpublish pages that are not part of your store (sample and placeholder pages). | Printcart | [ ] |
-| 11 | **Designer licence:** Printcart activates the designer licence for giganticprints.com. | Printcart | [ ] |
+| 11 | **Designer licence:** already active for giganticprints.com and the staging address (Enterprise, no expiry): all designer features and unlimited print-file downloads. Nothing to do. | Printcart | [x] |
 | 12 | **Updates and backup:** all software updates installed, a fresh backup taken and a restore test noted. | Printcart | [ ] |
 | 13 | **Sign-off:** the person who approves the go-live confirms in writing (Part 5, question 6). | you | [ ] |
 | 14 | **After go-live:** check the first real orders the same day and tell us about anything unexpected. | you | [ ] |

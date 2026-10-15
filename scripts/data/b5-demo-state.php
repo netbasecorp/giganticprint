@@ -7,7 +7,7 @@
  * finalize (idempotent):
  *  - per test user: keeps the ONE given order (set to Completed), deletes every other order of the test users and the
  *    design folders of the deleted orders; removes the fixture quote 'GP test quote'
- *  - company 'Demo Signs Co': one Image Zone image ('Demo logo.png'), one template ('Demo banner template', product 1168,
+ *  - company 'Demo Signs Co': one Image Zone image ('Demo Signs Co logo.png'), one template ('Demo banner template', product 1168,
  *    made from the design of the b2b sample order), private product 1263 assigned
  *  - carts of the test users emptied (persistent cart + WooCommerce session rows), login sessions cleared
  *  sweep [--apply]: lists (default) or removes test leftovers of 2026-10-14: checkout drafts, design folders / generated download zips
@@ -19,7 +19,10 @@ require __DIR__ . '/_lib.php';
 global $wpdb;
 $mode = '';
 $keep = array();
+$refresh = in_array( '--refresh', $argv, true );
+$logo = '';
 foreach ( array_slice( $argv, 1 ) as $a ) {
+	if ( 0 === strpos( $a, '--logo=' ) ) { $logo = substr( $a, 7 ); continue; }
 	if ( 0 === strpos( $a, '--' ) ) { continue; }
 	if ( false !== strpos( $a, '=' ) ) { list( $l, $id ) = explode( '=', $a, 2 ); $keep[ $l ] = (int) $id; }
 	elseif ( '' === $mode ) { $mode = $a; }
@@ -119,20 +122,28 @@ $owner = get_user_by( 'login', 'gp_test_b2b' );
 gp_ds_ok( 'company Demo Signs Co exists', (bool) $store );
 if ( $store && $owner ) {
 	$sid = (int) $store->id;
+	if ( $refresh ) {
+		foreach ( $wpdb->get_col( $wpdb->prepare( 'SELECT id FROM ' . PCS_Company_Images::table() . ' WHERE store_id = %d', $sid ) ) as $iid ) {
+			PCS_Company_Images::delete_image( PCS_Company_Images::get( $iid ) );
+			echo '  refresh: removed Image Zone image #' . $iid . "
+";
+		}
+	}
 	// Image Zone image
 	$have = (int) $wpdb->get_var( $wpdb->prepare( 'SELECT COUNT(*) FROM ' . PCS_Company_Images::table() . ' WHERE store_id = %d', $sid ) );
 	if ( 0 === $have ) {
-		$src = ABSPATH . 'wp-content/uploads/2025/12/logo.png';
+		$src = ( $logo && is_file( $logo ) ) ? $logo : ABSPATH . 'wp-content/uploads/2025/12/logo.png';
 		$tmp = '/tmp/gp-demo-logo-' . getmypid() . '.png';
 		gp_ds_ok( 'sample logo source exists', is_file( $src ) && copy( $src, $tmp ) );
-		$item = PCS_Company_Images::store_file( $tmp, 'Demo logo.png', $sid, $owner->ID );
+		$item = PCS_Company_Images::store_file( $tmp, 'Demo Signs Co logo.png', $sid, $owner->ID );
 		@unlink( $tmp );
 		gp_ds_ok( 'Image Zone image stored', is_array( $item ) && ! empty( $item['id'] ) );
 	} else { echo "  Image Zone already holds $have image(s)\n"; }
 	gp_ds_ok( 'Image Zone has exactly one image', 1 === (int) $wpdb->get_var( $wpdb->prepare( 'SELECT COUNT(*) FROM ' . PCS_Company_Images::table() . ' WHERE store_id = %d', $sid ) ) );
 	// template made from the design of the b2b sample order
 	$has_tpl = (int) $wpdb->get_var( $wpdb->prepare( 'SELECT COUNT(*) FROM ' . PCS_Company_Templates::table() . ' WHERE store_id = %d', $sid ) );
-	if ( 0 === $has_tpl ) {
+	$tpl_id  = (int) $wpdb->get_var( $wpdb->prepare( 'SELECT MIN(id) FROM ' . PCS_Company_Templates::table() . ' WHERE store_id = %d', $sid ) );
+	if ( 0 === $has_tpl || $refresh ) { // refresh keeps the template id (handoff screenshots link ?gp_tpl=<id>)
 		$cfg = null; $thumb = '';
 		$o = isset( $keep['gp_test_b2b'] ) ? wc_get_order( $keep['gp_test_b2b'] ) : null;
 		if ( $o ) {
@@ -156,7 +167,7 @@ if ( $store && $owner ) {
 		}
 		gp_ds_ok( 'design of the b2b sample order available for the template', is_array( $cfg ) );
 		if ( is_array( $cfg ) ) {
-			$t = PCS_Company_Templates::save( $sid, $owner->ID, 'Demo banner template', 1168, wp_json_encode( $cfg ), $thumb );
+			$t = PCS_Company_Templates::save( $sid, $owner->ID, 'Demo banner template', 1168, wp_json_encode( $cfg ), $thumb, $tpl_id );
 			gp_ds_ok( 'template saved', is_array( $t ) && ! empty( $t['id'] ) );
 		}
 	} else { echo "  company already has $has_tpl template(s)\n"; }
@@ -166,6 +177,11 @@ if ( $store && $owner ) {
 	gp_ds_ok( 'private product 1263 assigned to Demo Signs Co', in_array( 1263, array_map( 'intval', $wpdb->get_col( $wpdb->prepare( 'SELECT product_id FROM ' . PCS_Private_Products::table() . ' WHERE store_id = %d', $sid ) ) ), true ) );
 }
 
+echo "-- retail tiers" . PHP_EOL;
+foreach ( array( 'gp_test_b2c', 'gp_test_staff' ) as $l ) { // the automatic returning tier (5%) must not stick to the demo retail users
+	$u = get_user_by( 'login', $l );
+	if ( $u && 'b2c' !== get_user_meta( $u->ID, '_pcs_tier', true ) ) { update_user_meta( $u->ID, '_pcs_tier', 'b2c' ); echo "  $l tier reset to b2c" . PHP_EOL; }
+}
 echo "-- carts and sessions\n";
 foreach ( GP_DS_USERS as $l ) {
 	$u = get_user_by( 'login', $l );

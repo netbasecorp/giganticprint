@@ -27,6 +27,7 @@ require_once plugin_dir_path( __FILE__ ) . 'includes/class-sg-mailsink.php';
 require_once plugin_dir_path( __FILE__ ) . 'includes/company-library.php'; // Image Zone block (company members only)
 require_once plugin_dir_path( __FILE__ ) . 'includes/company-templates.php'; // company template toolbar (company members only)
 require_once plugin_dir_path( __FILE__ ) . 'includes/class-sg-cart.php'; // cart design preview (non-empty sides, uncropped)
+require_once plugin_dir_path( __FILE__ ) . 'includes/class-sg-order.php'; // order-level design flag for block-checkout orders
 
 /**
  * Injection strategy:

@@ -51,7 +51,7 @@ $iz_store = PCS_DB::get_store_by_id( $iz_store_id );
 .pcs-iz-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 16px; }
 .pcs-iz-card { background: #fff; border: 1px solid #e5e7eb; border-radius: 12px; overflow: hidden; display: flex; flex-direction: column; box-shadow: 0 1px 3px rgba(0,0,0,.05); min-width: 0; }
 .pcs-iz-thumb { background: #f3f4f6; height: 170px; display: flex; align-items: center; justify-content: center; }
-.pcs-iz-thumb img { max-width: 100%; max-height: 100%; display: block; }
+.pcs-iz-thumb img { width: 100%; height: 100%; object-fit: contain; display: block; }
 .pcs-iz-body { padding: 12px 14px; font-size: 12px; color: #4b5563; flex: 1; }
 .pcs-iz-name { font-size: 13px; font-weight: 600; color: #111827; word-break: break-all; margin-bottom: 4px; }
 .pcs-iz-body div { margin-top: 2px; }
@@ -125,7 +125,7 @@ document.addEventListener('DOMContentLoaded', function () { // PCS_FE is localiz
     var t = el('div', 'pcs-iz-thumb');
     var img = document.createElement('img');
     img.alt = it.name;
-    img.loading = 'lazy';
+    // no lazy loading: a lazy <img> without a size is 0 x 0 inside this flex box, never enters the viewport and stays blank
     img.src = it.thumb;
     t.appendChild(img);
     c.appendChild(t);

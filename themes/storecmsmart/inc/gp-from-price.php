@@ -146,7 +146,13 @@ function gp_from_price_compute( $product ) {
 
 add_filter( 'woocommerce_get_price_html', function ( $price, $product ) {
 	if ( is_admin() && ! wp_doing_ajax() ) {
-		return $price;
+		// wp-admin: only the Products list shows the same "From" price as the catalog (it used to print "From $0.00").
+		// The product's own price meta stays 0 on purpose: it is the ADDITIVE base of the option-set price, so filling it
+		// with the cheapest configuration would charge that amount twice. Cached per option-set save (see gp_from_price_compute).
+		$screen = function_exists( 'get_current_screen' ) ? get_current_screen() : null;
+		if ( ! $screen || 'edit-product' !== $screen->id ) {
+			return $price;
+		}
 	}
 	if ( ! $product instanceof WC_Product || ! class_exists( 'NBD_FRONTEND_PRINTING_OPTIONS' ) ) {
 		return $price;

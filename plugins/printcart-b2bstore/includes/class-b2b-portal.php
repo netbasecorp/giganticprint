@@ -17,7 +17,7 @@ class PCS_B2B_Portal {
         'orders'        => array( 'label' => 'Orders',         'icon' => '📦', 'b2b_only' => false ),
         'store'         => array( 'label' => 'B2B Store',      'icon' => '🏢', 'b2b_only' => true  ),
         'team'          => array( 'label' => 'Teams',          'icon' => '👥', 'b2b_only' => true  ),
-        'approvals'     => array( 'label' => 'Approval Queue', 'icon' => '✅', 'b2b_only' => true  ),
+        // 'approvals' (Approval Queue) is hidden: not in the customer's requirements, listed as a Phase 2 idea (view kept in frontend/portal/sections/approvals.php).
         'images'        => array( 'label' => 'Image Zone',     'icon' => '🖼️', 'b2b_only' => true  ),
         'templates'     => array( 'label' => 'Templates',      'icon' => '📐', 'b2b_only' => true  ),
     );

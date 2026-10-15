@@ -1,6 +1,6 @@
 # Gigantic Prints online store - Handoff Guide
 
-Version 1.1 · prepared for **Hoyle Fabrio, SignEdge Graphics** by the **Printcart team**.
+Version 1.2 · prepared for **Hoyle Fabrio, SignEdge Graphics** by the **Printcart team**.
 Store: giganticprints.com (staging address: giganticprints.printcart.com). Hosting is managed by Printcart.
 
 <!-- Internal notes are HTML comments; build_pdf.py strips them. Screenshot list: capture/shots.json (id = file name). -->
@@ -45,7 +45,6 @@ Nobody needs an account to start designing. An account is needed when the order 
 | 22 | Register as B2C, ask for B2B, administrator approves, B2B profile | Delivered. **Apply for B2B** form, approval in the admin, company portal with team and invitations. |
 | 23 | Private products per client; private template library; reorder in one click with the old art | Delivered. Products assigned to one company are hidden from everyone else; company **Templates** (save, rename, clone, delete, start an order); **Reorder** keeps the options and the original art. |
 | 24 | Image Zone | Delivered as the company's private image library in the company portal and in the designer's Photos tab. |
-| 29 | Phone and tablet | Delivered for phones (390 px wide screens): every page fits the screen and the whole order flow works on a phone. Tablets use the desktop layout. |
 | 9 | Footer with contact, Terms | Delivered. Footer links open **Terms of Service**, **Privacy**, **Refund Policy**, **Accessibility** and **Track your order**. The four legal pages are drafts for you to review (see Part 5). |
 | - | Print-ready files | Delivered. In the admin you download PNG, PDF (without watermark), SVG and JPG for every order (see 3.8). |
 | - | Security for accounts | Business invitations are tied to the invited e-mail; quote accept/decline needs a signed-in click; five failed logins lock the login name for 15 minutes; guest checkout is off; user names are not exposed. |
@@ -283,23 +282,7 @@ Products that Printcart assigns to your company in the admin appear in the shop 
 
 **Check:** the same 24 x 16 in banner costs less for a company than for a retail customer, and the cart shows the same amount as the designer.
 
-### 2.16 Ordering from a phone
-
-On a phone every page fits the screen (no sideways scrolling) and the designer is replaced by a phone order flow: **upload your file**, see the preview at real size, set the size, choose options, and press the sticky **Add to Cart** bar that shows the live price.
-
-![60 Home page on a phone](images/60-mobile-home.png)
-
-![61 Phone menu](images/61-mobile-menu.png)
-
-![62 Phone order flow](images/62-mobile-order-flow.png)
-
-![63 Art preview on a phone](images/63-mobile-upload-preview.png)
-
-![64 Options and the sticky Add to Cart bar](images/64-mobile-options-price.png)
-
-![65 Cart on a phone](images/65-mobile-cart.png)
-
-### 2.17 Footer pages
+### 2.16 Footer pages
 
 The footer links to **Terms**, **Privacy**, **Refund policy**, **Accessibility** and **Track order**. The four legal pages are drafts: a banner on each page tells you to review the wording before go-live (Part 5, question 5).
 
@@ -681,7 +664,6 @@ Tick each line when you have tried it on the staging store (https://giganticprin
 | [ ] | Products only for one client | the product assigned to Demo Signs Co: `/product/foamcore-single-sided/` (member vs visitor) |
 | [ ] | Checkout completes; shipping and payment choice | `/checkout/` (**Pickup**, **Pay by invoice**) |
 | [ ] | Footer with contact, Terms and Conditions | `/terms/` and the footer |
-| [ ] | Works on a phone and iPad | open the store on your phone: `/`, the designer, the cart |
 | [ ] | Print-ready files for every order | admin: **WooCommerce > Orders** > order > **Customer Design** |
 | [ ] | Rates of pole pocket and rope can be changed | admin: `/wp-admin/admin.php?page=gp-linear-rates` |
 

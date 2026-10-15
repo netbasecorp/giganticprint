@@ -120,6 +120,8 @@
 
     function load() {
         refreshRefs();
+        var pre = CFG.items; CFG.items = null; // embedded in the page on first load
+        if (pre) { loaded = true; render(pre); return; }
         setMsg('Loading your company images...', false);
         request('gp_iz_list', function (err, data) {
             if (err) { setMsg(err, true); return; }

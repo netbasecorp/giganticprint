@@ -25,6 +25,7 @@ function sg_dui_iz_globals() {
         'ajaxUrl' => admin_url( 'admin-ajax.php' ),
         'nonce'   => wp_create_nonce( 'pcs_ajax' ),
         'storeId' => $store_id,
+        'items'   => PCS_Company_Images::list_for_store( $store_id, get_current_user_id() ), // first paint without an admin-ajax round trip
     ) ) . ';</script>' . "\n";
 }
 

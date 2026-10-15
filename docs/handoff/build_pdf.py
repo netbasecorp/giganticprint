@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 """Render docs/handoff/Gigantic-Prints-Handoff-Guide.md to HTML and PDF (Markdown -> HTML -> Chromium page.pdf).
 
-    python build_pdf.py [--md Gigantic-Prints-Handoff-Guide.md] [--out dist] [--no-pdf]
+    python build_pdf.py [--md Gigantic-Prints-Handoff-Guide.md] [--out dist] [--no-pdf] [--email]
+
+--email also writes <name>-email.pdf: same content, screenshots shrunk (max 1000 px wide) and JPEG-compressed (quality 62) for e-mail attachments.
 
 Needs: pip install markdown playwright ; python -m playwright install chromium
 Images are read from ./images (paths in the markdown are relative to this folder) and embedded in the HTML as data URIs,
@@ -10,6 +12,7 @@ so dist/*.html is a single self-contained file. A screenshot that is not capture
 import argparse
 import base64
 import html
+import io
 import mimetypes
 import re
 from pathlib import Path
@@ -46,24 +49,32 @@ a { color: #0b57d0; text-decoration: none; }
 """
 
 
+COMPRESS = False
+
+
 def embed(match, base: Path, missing: list):
     alt, src = match.group(1), match.group(2)
     p = (base / src).resolve()
     if p.is_file():
         mime = mimetypes.guess_type(p.name)[0] or "image/png"
-        data = base64.b64encode(p.read_bytes()).decode()
+        raw = p.read_bytes()
+        if COMPRESS:
+            from PIL import Image
+            im = Image.open(io.BytesIO(raw)).convert("RGB")
+            if im.width > 1000:
+                im = im.resize((1000, round(im.height * 1000 / im.width)), Image.LANCZOS)
+            buf = io.BytesIO()
+            im.save(buf, "JPEG", quality=62, optimize=True)
+            raw, mime = buf.getvalue(), "image/jpeg"
+        data = base64.b64encode(raw).decode()
         return f'<figure><img alt="{html.escape(alt)}" src="data:{mime};base64,{data}"><figcaption>{html.escape(alt)}</figcaption></figure>'
     missing.append(src)
     return f'<figure><div class="missing">Screenshot to be added: {html.escape(src)}</div><figcaption>{html.escape(alt)}</figcaption></figure>'
 
 
-def main():
-    ap = argparse.ArgumentParser()
-    ap.add_argument("--md", default=str(HERE / "Gigantic-Prints-Handoff-Guide.md"))
-    ap.add_argument("--out", default=str(HERE / "dist"))
-    ap.add_argument("--no-pdf", action="store_true")
-    a = ap.parse_args()
-
+def build(a, email):
+    global COMPRESS
+    COMPRESS = email
     md_path = Path(a.md)
     text = md_path.read_text(encoding="utf-8")
     text = re.sub(r"<!--.*?-->", "", text, flags=re.S)  # internal draft notes never reach the customer
@@ -86,7 +97,7 @@ def main():
 
     out = Path(a.out)
     out.mkdir(parents=True, exist_ok=True)
-    html_path = out / (md_path.stem + ".html")
+    html_path = out / (md_path.stem + ("-email" if email else "") + ".html")
     html_path.write_text(doc, encoding="utf-8")
     print("html:", html_path, f"({len(missing)} screenshot(s) not captured yet)")
     for m in missing:
@@ -95,7 +106,7 @@ def main():
         return
     from playwright.sync_api import sync_playwright
 
-    pdf_path = out / (md_path.stem + ".pdf")
+    pdf_path = out / (md_path.stem + ("-email" if email else "") + ".pdf")
     with sync_playwright() as pw:
         browser = pw.chromium.launch()
         try:
@@ -111,6 +122,22 @@ def main():
         finally:
             browser.close()
     print("pdf:", pdf_path)
+
+
+def main():
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--md", default=str(HERE / "Gigantic-Prints-Handoff-Guide.md"))
+    ap.add_argument("--out", default=str(HERE / "dist"))
+    ap.add_argument("--no-pdf", action="store_true")
+    ap.add_argument("--email", action="store_true", help="also build the small e-mail PDF")
+    a = ap.parse_args()
+
+    build(a, False)
+    if a.email:
+        build(a, True)
+        (Path(a.out) / (Path(a.md).stem + '-email.html')).unlink(missing_ok=True)
+
+
 
 
 if __name__ == "__main__":

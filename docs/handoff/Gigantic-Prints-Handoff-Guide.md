@@ -1,6 +1,6 @@
 # Gigantic Prints online store - Handoff Guide
 
-Version 1.0 · prepared for **Hoyle Fabrio, SignEdge Graphics** by the **Printcart team**.
+Version 1.1 · prepared for **Hoyle Fabrio, SignEdge Graphics** by the **Printcart team**.
 Store: giganticprints.com (staging address: giganticprints.printcart.com). Hosting is managed by Printcart.
 
 <!-- Internal notes are HTML comments; build_pdf.py strips them. Screenshot list: capture/shots.json (id = file name). -->
@@ -59,7 +59,7 @@ These items from your list are **not part of this release**. They are good candi
 - **Super Admin Custom Order Form** for orders that come by phone or e-mail (planned as Phase 2). The quote module can be reused for it.
 - **Chat widget, FAQs and how-to videos** in the header and footer.
 - **Other payment methods, accounting export (for example QuickBooks) and Apple Pay**: separate quotes, planned together with you.
-- **Approval Queue** for orders of team members (the menu entry exists in the company portal and is marked **Coming soon**).
+- **Team order approvals** (Phase 2 idea): a team member's order waits for the company owner's approval before it goes to production.
 - Fine tuning of text, images, About us, blog and gallery content with your material.
 
 ---
@@ -233,7 +233,6 @@ After approval a B2B client works in the company portal (**B2B Portal** in the h
 - **Teams**: invite colleagues by e-mail. An invited person must register with that same e-mail address; they then share the company discount and the company's Image Zone. The page shows the seats used (for example 2 / 5) and the role of each member (**Admin**, **Member**).
 - **Image Zone**: the company's own library of artwork (logos, photos). Press **Upload** (PNG, JPG, TIF, PDF, AI or EPS, up to 100 MB per file). Each card shows the file name, pixels, DPI, the print size at that DPI, file size, who uploaded it, and a **Delete** button. **Use in the designer** opens the designer; the same images appear in the **Photos** tab of the designer for company members, where one click places an image. The files are private to your company.
 - **Templates**: the company's private template library (see 2.13).
-- **Approval Queue** is reserved for a later release (**Coming soon**).
 - **Request quote / My quotes** and **My Account** (Dashboard, Orders, My Profile).
 
 ![50 Company portal overview](images/50-portal-overview.png)
@@ -338,7 +337,7 @@ A **combined product** is one product that contains its variants as options: for
 
 ![77 Setting PCDesigner](images/77-admin-product-designer-settings.png)
 
-> The **Price** column in the products list can show "From $0.00". The real prices come from the option set (3.3) and are shown correctly in the shop.
+> The **Price** column of the products list shows the same **From $...** price as the shop catalog. It is updated when you save an option set (3.3).
 
 **Add a new product**
 
@@ -469,7 +468,7 @@ Below the ladder you find **Quantity-Based Discounts** (extra discount for large
 
 ### 3.8 Orders and the print-ready files
 
-1. **WooCommerce > Orders** lists all orders. Click an order number to open it: customer, billing and shipping address, the items with all chosen options, the shipping method (for example **Pickup - Fort Pierce, FL**), the payment method (**Pay by invoice**), the status, notes, and on the right the box **Customer Design**. For an order that contains art, that box opens the design of each line (the sample orders in the screenshots contain no art file, so their box says "No design or upload file in this order").
+1. **WooCommerce > Orders** lists all orders. Click an order number to open it: customer, billing and shipping address, the items with all chosen options, the shipping method (for example **Pickup - Fort Pierce, FL**), the payment method (**Pay by invoice**), the status, notes, and on the right the box **Customer Design**. For an order that contains art, that box lists the design files of each line and opens them (see step 3).
 2. Set the status as the order moves on (**Processing**, **Completed**, ...). The customer receives the matching e-mail. **Pay by invoice** orders start as **On hold**: send the PayPal invoice, then set **Processing** when you begin production.
 3. In the box **Customer Design** open the design of the order line. The page **Detail product design** has the tabs **Resource**, **Create PDF**, **Download design** and **PDF Layout**. On **Download design** you find **SVG**, **PNG (High quality images)**, **JPG (CMYK with ICC profile)** and **PDF**, each with a **Download** button (the PDF has no watermark). **Resource** gives the customer's original uploaded files.
 4. Download the files, print, then complete the order.
@@ -588,11 +587,12 @@ Printcart does the technical steps marked **(Printcart)**; you do the steps mark
 | 6 | **Legal pages:** read the drafts of **Terms of Service**, **Privacy Policy**, **Refund Policy** and **Accessibility**, correct them (or send your own text) and remove the draft banner. | you | [ ] |
 | 7 | **Sender e-mail:** set the from address in **WP Mail SMTP** and **WooCommerce > Settings > Emails**, and the **Recipients** for design notifications in **PC Designer > Settings**, to addresses on your domain. Send a test e-mail. | you + Printcart | [ ] |
 | 8 | **Test order:** place one real order with a small print file; check the order e-mails, the download links in the order, the PayPal invoice you send, and the confirmation page. Then cancel or refund it. | you + Printcart | [ ] |
-| 9 | **Remove the demo data:** the sample companies (**Demo Signs Co**, **Demo Reseller Co**) with their Image Zone image, template and the product assigned to Demo Signs Co; the demo customer accounts and their sample orders (#2027 to #2030); sample quotes and invitations. | Printcart | [ ] |
+| 9 | **Remove the demo data:** the sample companies (**Demo Signs Co**, **Demo Reseller Co**) with their Image Zone image, template and the product assigned to Demo Signs Co; the demo customer accounts and their sample orders (#2046 to #2049); sample quotes and invitations. | Printcart | [ ] |
 | 10 | **Public pages:** unpublish pages that are not part of your store (sample and placeholder pages). | Printcart | [ ] |
-| 11 | **Updates and backup:** all software updates installed, a fresh backup taken and a restore test noted. | Printcart | [ ] |
-| 12 | **Sign-off:** the person who approves the go-live confirms in writing (Part 5, question 6). | you | [ ] |
-| 13 | **After go-live:** check the first real orders the same day and tell us about anything unexpected. | you | [ ] |
+| 11 | **Designer licence:** the Printcart team activates the designer licence for giganticprints.com. | Printcart | [ ] |
+| 12 | **Updates and backup:** all software updates installed, a fresh backup taken and a restore test noted. | Printcart | [ ] |
+| 13 | **Sign-off:** the person who approves the go-live confirms in writing (Part 5, question 6). | you | [ ] |
+| 14 | **After go-live:** check the first real orders the same day and tell us about anything unexpected. | you | [ ] |
 
 Where to untick the search engine box (step 2):
 

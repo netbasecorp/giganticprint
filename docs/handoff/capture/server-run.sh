@@ -1,11 +1,11 @@
 #!/bin/bash
-# Runs the screenshot capture on the staging host (as root), inside the long-lived e2e container (default name gp-e2e2, override with GP_CONTAINER).
+# Runs the screenshot capture on the staging host (as root), inside the long-lived e2e container (default name gp-e2e4, override with GP_CONTAINER).
 # Internal tool. Usage (on the host):  server-run.sh [capture.mjs args]      e.g.  server-run.sh --batch now
 #   input : /srv/gp-dev/handoff/capture/   (shots.json, capture.mjs, make-fixtures.mjs, admin-login.php)  <- put there by sync-and-run.sh
 #   output: /srv/gp-dev/handoff/images/    (PNG + _capture-report.json)
 # Never creates a container and never uses --rm. Create it once by hand (see README), stop it when done (docker stop), never remove it.
 set -uo pipefail
-GP_CONTAINER="${GP_CONTAINER:-gp-e2e2}"
+GP_CONTAINER="${GP_CONTAINER:-gp-e2e4}"
 H=/srv/gp-dev/handoff
 PHP=/opt/cpanel/ea-php82/root/usr/bin/php
 docker ps --format '{{.Names}}' | grep -qx ${GP_CONTAINER} || { echo "${GP_CONTAINER} is not running; create it once: docker run -d --name ${GP_CONTAINER} --ipc=host --memory 2g --cpus 1.5 -v /srv/gp-dev/e2e:/work -w /work mcr.microsoft.com/playwright:v1.48.0-jammy sleep infinity" >&2; exit 2; }

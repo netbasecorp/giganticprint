@@ -836,7 +836,7 @@
       "auth": "b2b",
       "url": "${BASE}/b2b-portal/?section=images",
       "caption": "Image Zone: upload files (PNG, JPG, TIF, PDF, AI, EPS up to 100 MB each); each card shows pixels, DPI and print size.",
-      "waitMs": 9000,
+      "waitMs": 12000,
       "highlight": [
         {
           "sel": "button:has-text('Upload')",
@@ -845,6 +845,14 @@
         {
           "sel": "button:has-text('Delete')",
           "label": "2"
+        }
+      ],
+      "actions": [
+        {
+          "evaluate": "new Promise(r=>{const t0=Date.now();const iv=setInterval(()=>{const im=[...document.querySelectorAll('img')].filter(i=>/Demo/.test(i.alt||''));if((im.length&&im.every(i=>i.complete&&i.naturalWidth>0))||Date.now()-t0>90000){clearInterval(iv);r()}},500)})"
+        },
+        {
+          "wait": 500
         }
       ]
     },
@@ -966,7 +974,10 @@
           "click": "text=Your company images >> visible=true"
         },
         {
-          "wait": 7000
+          "evaluate": "new Promise(r=>{const t0=Date.now();const iv=setInterval(()=>{const im=[...document.querySelectorAll('img')].filter(i=>/Demo/.test(i.alt||''));if((im.length&&im.every(i=>i.complete&&i.naturalWidth>0))||Date.now()-t0>90000){clearInterval(iv);r()}},500)})"
+        },
+        {
+          "wait": 500
         },
         {
           "mouseAway": true
@@ -1480,13 +1491,13 @@
       "auth": "admin",
       "url": "${URL:order_edit_b2c}",
       "waitMs": 8000,
-      "caption": "Order screen: customer, addresses, items with all chosen options, shipping, payment, status and notes; the Customer Design box is on the right.",
+      "caption": "Order screen: customer, addresses, items with all chosen options, shipping, payment, status and notes; the Customer Design box on the right lists the design files.",
       "viewport": "desktop",
       "batch": "final",
       "actions": [],
       "highlight": [
         {
-          "sel": "text=Payment via Pay by invoice >> visible=true",
+          "sel": ".postbox:has(h2:has-text('Customer Design'))",
           "label": "1"
         }
       ]

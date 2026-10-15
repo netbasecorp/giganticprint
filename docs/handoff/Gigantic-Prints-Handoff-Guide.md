@@ -163,7 +163,7 @@ These items from your list are **not part of this release**. They are good candi
 
 1. Open a product, for example **Banner**. The page shows photos, the description and the configuration panel with the **Total price**.
 2. Material (13oz, 15oz, 18oz, single or double sided) is an option of the same product, not a separate product.
-3. Press **Start Design**, or use **Upload design** / **Custom design** at the bottom of the product page.
+3. Press **Upload design** at the bottom of the product page to go straight to the designer with the upload box open (2.3). **Custom design** or **Start Design** opens the same designer for designing with templates, text and clipart.
 
 ![03 Product page](images/03-product-page.png)
 
@@ -177,7 +177,7 @@ The designer has four tabs on the left: **Photos** (upload; the designer opens h
 
 ### 2.3 Upload your art and see the preview at once
 
-1. In the designer stay on the **Photos** tab (it is the first tab).
+1. After **Upload design** the designer opens on the **Photos** tab with the upload box ready. From **Custom design**, stay on the **Photos** tab (it is the first tab).
 2. Drop your file on the box **Click or drop images here**, or click it and choose the file.
    Accepted file types and the size limit are written under the box: **png, jpg, svg, pdf, ai, eps, tiff** and **Max file size: 200 MB**.
 3. About a second after you choose the file a local preview shows the pixel size, the size in inches at the file's resolution and the file size, while a progress bar shows the upload.
@@ -725,7 +725,7 @@ Tick each line when you have tried it on the staging store (https://giganticprin
 |---|---|---|
 | [ ] | "One site" for visitors, B2C and B2B | `/` |
 | [ ] | Menu on top in Signs365 order: Banner, Rigid, Adhesive, Handheld, Magnet, Apparel, Misc | `/` (category bar) |
-| [ ] | "Upload on the configuration screen", the designer only optional | `/create-your-own/?product_id=1168` |
+| [ ] | "Upload on the configuration screen", the designer only optional | `/product/banner-13oz-single-sided/`, press **Upload design** (or `/create-your-own/?product_id=1168`) |
 | [ ] | "A PREVIEW of the art on the product with real measurements" | upload a file in the designer (above) |
 | [ ] | "The size of the item to be printed is based on the uploaded item" | same page, after the upload |
 | [ ] | "Change the size on the same screen", "center art or stretch to fit" | same page: **Stretch to fit**, **Fit (keep ratio)**, **Center**, W and H boxes |

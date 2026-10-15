@@ -401,6 +401,7 @@
         initDimensionFieldRestyle();
         initSourceTileActiveState();
         initSoleUploadSourceAutoOpen();
+        initStartUpload();
         initSaveGuard();
         // Phones need the summary panel too: mobile.js moves the Add to Cart
         // button, price and options out of it (the panel itself stays hidden).
@@ -1673,6 +1674,22 @@
         }
         flash();
         setTimeout(flash, 300); // the tile may only exist once the tab has rendered
+    }
+
+    // B8: the product page's "Upload design" card links here with &sg_start=upload. Once the designer is ready,
+    // show the Photos tab on the upload drop zone (once; the hidden file input is never clicked).
+    function initStartUpload(attempt) {
+        if (initStartUpload.done) return;
+        if (!/[?&]sg_start=upload(&|#|$)/.test(window.location.search)) return;
+        var ready = !!(document.getElementById('nav-photos') && document.getElementById('tab-photo') &&
+            window.jQuery && window.angular && window.nbOption && window.nbOption.initialed);
+        if (!ready) {
+            if ((attempt || 0) < 120) setTimeout(function () { initStartUpload((attempt || 0) + 1); }, 500);
+            return;
+        }
+        initStartUpload.done = true;
+        // let the default Photos-tab open (decideDefaultPhotosTab) settle first so it cannot toggle the tile shut again
+        setTimeout(focusUploadTile, 1500);
     }
 
     // true = go ahead and save

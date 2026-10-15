@@ -1,12 +1,9 @@
 # Gigantic Prints online store - Handoff Guide
 
-Prepared for **Hoyle Fabrio, SignEdge Graphics** by the **Printcart team**.
+Version 1.0 · prepared for **Hoyle Fabrio, SignEdge Graphics** by the **Printcart team**.
 Store: giganticprints.com (staging address: giganticprints.printcart.com). Hosting is managed by Printcart.
 
-<!-- DRAFT NOTES (never shown in the PDF; build_pdf.py strips HTML comments)
- B4-CHECK = wording or screenshot that must be confirmed after batch B4 is deployed (mobile, reorder, Image Zone, templates, private products, large-file preview).
- Screenshots: the capture list is docs/handoff/capture/shots.json (id = file name). batch "now" = captured; batch "b4" = captured in the final run.
--->
+<!-- Internal notes are HTML comments; build_pdf.py strips them. Screenshot list: capture/shots.json (id = file name). -->
 
 ## How to read this guide
 
@@ -16,8 +13,9 @@ Store: giganticprints.com (staging address: giganticprints.printcart.com). Hosti
 - **Part 4** is the checklist for the day the store goes live on giganticprints.com.
 - **Part 5** lists the questions we need you to answer.
 - **Part 6** describes how support and care work after go-live.
+- **Appendix A** is an acceptance checklist you can tick while you try the store.
 
-Words in **bold** are the exact labels you will see on screen. Red outlines and numbers in the screenshots point at the thing to look at. Lines that start with **Check:** tell you what you should see if everything works.
+Words in **bold** are the exact labels you will see on screen. Red outlines and numbers in the screenshots point at the thing to look at. Lines that start with **Check:** tell you what you should see if everything works. The screenshots show sample companies (Demo Signs Co, Demo Reseller Co) and sample people; they are not real customers.
 
 ---
 
@@ -29,25 +27,27 @@ One store for everybody: visitors, retail customers (B2C) and business clients (
 
 **Product -> upload your art (or design online) -> instant preview at the real size -> options and live price -> cart -> checkout.**
 
-Nobody needs an account to start designing. An account is needed when the order goes to the cart and checkout.
+Nobody needs an account to start designing. An account is needed when the order goes to checkout.
 
 ### 1.2 What was delivered, against your requirement list
 
 | # | Your requirement | What you get |
 |---|---|---|
-| 1 | One site for visitors, B2C and B2B; Product > Upload/Design (no login) > Cart (login or create account) > Checkout | Delivered. Designing and uploading work without login. Registration is open on **My Account**; checkout asks guests to log in or register. |
+| 1 | One site for visitors, B2C and B2B; Product > Upload/Design (no login) > Cart (login or create account) > Checkout | Delivered. Designing and uploading work without login. Registration is open on **My Account**; checkout asks guests to log in or register. Checkout completes with **Pay by invoice** (see 2.9). |
 | 2 | Price changes live with size and options; B2B sees the discounted price | Delivered. The price in the designer and on the product page follows size, material and options. Business clients see their own discounted price in the product page, designer and cart (the discount is applied once). |
-| 3 | A separate account per company; repeat 5%, B2B 10%, reseller 20% | Delivered. Tiers **Returning customer (5%)**, **B2B (10%)**, **Reseller (20%)**; companies have their own portal and team. |
-| 6, 17 | Customers mainly upload art; the designer is optional | Delivered. **Photos** tab in the designer, art is placed on the print area by itself. **Upload design** and **Custom design** buttons on the product page. |
-| 17-18 | Preview of the art at the real size; size taken from the uploaded file; change size on the same screen; center or stretch | Delivered. The size is read from the file (pixels and DPI). **Stretch to fit**, **Fit (keep ratio)** and **Center**, width and height boxes, and the price updates at once. |
-| 20 | Large files (20-200 MB and more), PDF, AI, PNG, JPG; resolution check | Delivered. Files up to **200 MB**; PNG, JPG, SVG, PDF, AI, EPS, TIFF. A **low resolution** warning appears when the art is below 100 dpi at the chosen size. The Add to Cart button is blocked while the print area is empty. |
+| 3 | A separate account per company; repeat 5%, B2B 10%, reseller 20% | Delivered. Tiers **Returning customer (5%)** (a customer moves there automatically after the second order), **B2B (10%)** and **Reseller (20%)**; every company has its own portal, team, Image Zone and templates. |
+| 6, 17 | Customers mainly upload art; the designer is optional | Delivered. The designer opens on **Photos** (upload first); the art is placed on the print area by itself. **Upload design** and **Custom design** buttons on the product page. |
+| 17-18 | Preview of the art at the real size; size taken from the uploaded file; change size on the same screen; center or stretch | Delivered. The size is read from the file (pixels and DPI). **Stretch to fit**, **Fit (keep ratio)** and **Center**, width and height boxes, and the price updates at once. A local preview appears about a second after you choose a file. |
+| 20 | Large files (20-200 MB and more), PDF, AI, PNG, JPG; resolution check | Delivered. Files up to **200 MB**; PNG, JPG, SVG, PDF, AI, EPS, TIFF. A **low resolution** warning appears when the art is below 100 dpi at the chosen size. Add to Cart is blocked while the print area is empty. |
 | 7, 15 | Header and category bar in Signs365 order | Delivered. **Banner, Rigid, Adhesive, Handheld, Magnet, Apparel, Misc**. A category without products shows **Coming soon**. |
-| 11-14, 26 | Products, options and prices from your price list (banner tiers, pole pocket, rope, acrylic minimum, magnets, apparel by linear inch, rush +100%) | Delivered and checked against your price list of 2026-06-18. Prices are shown in US format ($6.63) and catalog pages show **From $...**. |
+| 11-14, 26 | Products, options and prices from your price list (banner tiers, pole pocket, rope, acrylic minimum, magnets, apparel by linear inch, rush +100%) | Delivered and checked against your price list of 2026-06-18. Prices are shown in US format ($6.63), catalog pages show **From $...**. Pole pocket and rope rates have their own admin screen (see 3.4). |
 | 16 | Combined products (one Magnet product, banner weights as options) | Delivered for Banner (13oz, 15oz, 18oz single and double sided) and Magnet. Other families keep the product structure you approved. |
 | 22 | Register as B2C, ask for B2B, administrator approves, B2B profile | Delivered. **Apply for B2B** form, approval in the admin, company portal with team and invitations. |
-| 23 | Private products per client; private template library; reorder in one click with the old art | Delivered in the last build, see sections 2.12-2.14 and 3.9-3.10. <!-- B4-CHECK --> |
-| 24 | Image Zone | Delivered in the last build as the company's own image library, see 2.12. <!-- B4-CHECK --> |
-| 29 | Phone and tablet | Phone ordering (390 px wide screens) delivered in the last build, see 2.15. Tablet follows the desktop layout. <!-- B4-CHECK --> |
+| 23 | Private products per client; private template library; reorder in one click with the old art | Delivered. Products assigned to one company are hidden from everyone else; company **Templates** (save, rename, clone, delete, start an order); **Reorder** keeps the options and the original art. |
+| 24 | Image Zone | Delivered as the company's private image library in the company portal and in the designer's Photos tab. |
+| 29 | Phone and tablet | Delivered for phones (390 px wide screens): every page fits the screen and the whole order flow works on a phone. Tablets use the desktop layout. |
+| 9 | Footer with contact, Terms | Delivered. Footer links open **Terms of Service**, **Privacy**, **Refund Policy**, **Accessibility** and **Track your order**. The four legal pages are drafts for you to review (see Part 5). |
+| - | Print-ready files | Delivered. In the admin you download PNG, PDF (without watermark), SVG and JPG for every order (see 3.8). |
 | - | Security for accounts | Business invitations are tied to the invited e-mail; quote accept/decline needs a signed-in click; five failed logins lock the login name for 15 minutes; guest checkout is off; user names are not exposed. |
 
 ### 1.3 What is next
@@ -58,7 +58,8 @@ These items from your list are **not part of this release**. They are good candi
 - **Grommet positions** all sides / top / bottom / left / right / custom (today: **No grommets**, **Grommets - 4 corners only**, **Grommets - Every 2 ft**), and the **Webbing mesh** option.
 - **Super Admin Custom Order Form** for orders that come by phone or e-mail (planned as Phase 2). The quote module can be reused for it.
 - **Chat widget, FAQs and how-to videos** in the header and footer.
-- **QuickBooks export, Paymentech and Apple Pay** (outside the current scope; they can be planned separately).
+- **Other payment methods, accounting export (for example QuickBooks) and Apple Pay**: separate quotes, planned together with you.
+- **Approval Queue** for orders of team members (the menu entry exists in the company portal and is marked **Coming soon**).
 - Fine tuning of text, images, About us, blog and gallery content with your material.
 
 ---
@@ -88,19 +89,22 @@ These items from your list are **not part of this release**. They are good candi
 
 ![05 Upload design and Custom design buttons](images/05-product-upload-buttons.png)
 
-The designer has four tabs on the left: **Photos** (upload), **Printing** (all options of the product), **Text** and **Layers**. The live price and the **Add to Cart** button are always on the right. <!-- B4-CHECK: the tab the designer opens on (Printing before B4, Photos after) must be confirmed in the final run -->
+The designer has four tabs on the left: **Photos** (upload; the designer opens here), **Printing** (all options of the product), **Text** and **Layers**. The live price and the **Add to Cart** button are always on the right.
 
-![06 The designer: the Printing tab with all options, the live price on the right](images/06-designer-start.png)
+![06 The designer: Photos tab first, Printing tab for the options, live price on the right](images/06-designer-start.png)
 
 ### 2.3 Upload your art and see the preview at once
 
-1. In the designer open the **Photos** tab.
+1. In the designer stay on the **Photos** tab (it is the first tab).
 2. Drop your file on the box **Click or drop images here**, or click it and choose the file.
    Accepted file types and the size limit are written under the box: **png, jpg, svg, pdf, ai, eps, tiff** and **Max file size: 200 MB**.
-3. A progress bar shows the upload. When it is done the art is placed on the print area automatically and the product takes the size of your file (for example a 3600 x 2400 pixel file at 150 dpi becomes 24 x 16 in).
-4. The art bar above the print area shows **Actual size: 24 x 16 in**, and the rulers around the print area show inches.
+3. About a second after you choose the file a local preview shows the pixel size, the size in inches at the file's resolution and the file size, while a progress bar shows the upload.
+4. When the upload is done the art is placed on the print area automatically and the product takes the size of your file (for example a 3600 x 2400 pixel file at 150 dpi becomes 24 x 16 in).
+5. The art bar above the print area shows **Actual size: 24 x 16 in**, and the rulers around the print area show inches.
 
 ![10 Photos tab: drop zone, accepted types, 200 MB limit](images/10-upload-zone.png)
+
+![18 Local preview and progress right after choosing a big file](images/18-upload-instant-preview.png)
 
 ![11 Art placed on the print area, art bar with actual size](images/11-upload-art-placed.png)
 
@@ -137,10 +141,10 @@ To change the size, type a new number in **W** (width) or **H** (height). With *
 
 ### 2.6 Options and live price
 
-1. Stay on the **Printing** tab. Every option shows its label, the chosen value and the price effect (**Free** or an amount).
-2. Banner options: **Grommets**, **Pole Pocket**, **Welding / Hemming**, **Rope Reinforcement**, **Wind Slits**, **Rush Production (24-hour turnaround)** and **Print-Sides** (the material: 13oz, 15oz, 18oz single or double sided).
+1. Open the **Printing** tab. Every option shows its label, the chosen value and the price effect (**Free** or an amount).
+2. Banner options: **Grommets**, **Pole Pocket** (**No pole pocket**, **Top only**, **Bottom only**, **Top & Bottom**), **Welding / Hemming**, **Rope Reinforcement** (**No rope**, **Add rope**), **Wind Slits**, **Rush Production (24-hour turnaround)** and **Print-Sides** (the material: 13oz, 15oz, 18oz single or double sided).
 3. Under the material choices the size field shows **Width** and **Height** with plus and minus buttons, in inches (banner: width 1 to 60 in, height 1 to 1200 in). When art is uploaded these boxes are filled from the file.
-4. Pole pocket and rope are charged per linear foot of the size you chose; the price summary shows **Base price**, **Options**, **Quantity** and **Your price**.
+4. Pole pocket and rope are charged per linear foot of the size you chose (rates in 3.4); **Wind Slits** shows its flat charge in its label. The price summary shows **Base price**, **Options**, **Quantity** and **Your price**.
 5. When everything is right press **Add to Cart**.
 
 ![07 Type the size and choose options: the price follows](images/07-designer-options-live-price.png)
@@ -151,7 +155,7 @@ To change the size, type a new number in **W** (width) or **H** (height). With *
 
 ### 2.7 Design online (optional)
 
-You do not have to upload anything. The tabs on the left (**Photos, Printing, Text, Layers**) let a customer add text, images and shapes, or edit the uploaded art. Designs can be saved to finish later (**My designs**).
+You do not have to upload anything. The tabs on the left (**Photos, Printing, Text, Layers**) let a customer add text, images and shapes, or edit the uploaded art. Designs can be saved to finish later.
 
 ![20 Designer tools in the left column](images/20-designer-text-tools.png)
 
@@ -165,29 +169,44 @@ You do not have to upload anything. The tabs on the left (**Photos, Printing, Te
 
 ![21 Log in from inside the designer](images/21-login-in-designer.png)
 
-### 2.9 Cart and checkout
+### 2.9 Cart, checkout and order confirmation
 
-1. After **Add to Cart** the cart page shows each item with the thumbnail of the art, size, options and price.
+1. After **Add to Cart** the cart page shows each item with the preview of the art, size, options and price.
 2. Click **Proceed to Checkout**. A guest is asked to log in or register first.
-3. Check the contact, shipping and billing details, choose the shipping option and the payment method, and press **Place Order**. (Shipping options and payment methods are switched on during go-live, see Part 4.)
+3. Check **Contact information**, **Shipping address** and **Billing address**.
+4. Under **Shipping options** choose **Pickup - Fort Pierce, FL** (free) or **Ground shipping - quoted** (no charge at checkout; the shipping cost is quoted to you).
+5. Under **Payment options** choose **Pay by invoice**: you place the order now and receive a PayPal invoice before production starts.
+6. Press **Place Order**. The page **Thank you. Your order has been received.** shows the order number, total and payment method. A confirmation e-mail follows.
 
 ![30 The cart](images/30-cart.png)
+
+![30b Cart totals, shipping choice and Proceed to Checkout](images/30b-cart-totals.png)
 
 ![32 A guest is asked to log in or register](images/32-checkout-guest-login.png)
 
 ![31 Checkout](images/31-checkout.png)
 
+![33 Shipping options and Pay by invoice](images/33-checkout-shipping-payment.png)
+
+![34 Order received](images/34-order-received.png)
+
+**Check:** the order total equals the price shown in the designer plus the chosen shipping (no charge for the two shipping options). The order appears in **My Account > Orders**.
+
+To follow an order without logging in, use **Track order** in the footer: enter the order number and the billing e-mail.
+
+![35 Track your order](images/35-track-order.png)
+
 ### 2.10 My Account: orders, reorder, quotes
 
-The **My Account** menu has **Dashboard, Overview, Orders, Downloads, Addresses, Account details, My designs**, **Log out** and **Apply for B2B**.
+A retail customer's **My Account** page has the menu **Dashboard, Overview, Orders, Downloads, Addresses, Account details, My designs, Log out** and **Apply for B2B**. **Orders** and **Overview** open the portal pages **Orders & Invoices** and the overview with **Request quote**, **My quotes**, **My Profile**.
 
-- **Orders**: all orders with their status. **Reorder** puts the same items, options and the original art into a new cart. <!-- B4-CHECK -->
-- **My designs**: designs saved to finish later.
+- **Orders** (**Orders & Invoices**): all orders with status (**In production**, **Shipped**, **Delivered**), a **View** link for the invoice and the **Reorder** button. **Reorder** puts the same items, options and the original art into a new cart; you review it and check out. The same button is on the order confirmation page.
 - **Request quote** and **My quotes**: ask for a price on a special job; when you receive a quote you can **Accept** or **Decline** it while you are signed in.
+- **Returning customer:** after a customer's second order the account moves to **Returning customer (5%)** and the 5% discount is applied to the following carts.
 
 ![40 My Account menu](images/40-my-account-dashboard.png)
 
-![41 Orders list with Reorder](images/41-my-account-orders.png)
+![41 Orders & Invoices with the Reorder button](images/41-my-account-orders.png)
 
 ![42 My designs](images/42-my-designs.png)
 
@@ -198,7 +217,7 @@ The **My Account** menu has **Dashboard, Overview, Orders, Downloads, Addresses,
 ### 2.11 Ask to become a B2B client
 
 1. Log in, open **My Account** and click **Apply for B2B**.
-2. Fill in the form: **Company name**, **Business email**, **Contact name**, **Phone**, **Industry**, **Website**, expected monthly volume and a short description of the company.
+2. Fill in the form: **Company name**, **Business email**, **Contact name**, **Phone**, **Industry**, expected monthly volume and a short description of the company.
 3. Send it. The store tells you the application is under review.
 4. The page also shows the three tiers (**Returning customer (5%)**, **B2B (10%)**, **Reseller (20%)**); your administrator assigns the tier after approval. When your application is approved you receive an e-mail. From your next login you land in the company portal, and the company discount (for example 10%) is applied automatically in the product page, designer and cart.
 
@@ -209,11 +228,12 @@ The **My Account** menu has **Dashboard, Overview, Orders, Downloads, Addresses,
 After approval a B2B client works in the company portal (**B2B Portal** in the home page header, or the address /b2b-portal/). It has a left menu:
 
 - **Overview**: your tier and discount, orders, total spent and savings.
-- **Orders**: all orders of the company.
+- **Orders**: all orders of the company with **Reorder**.
 - **B2B Store**: the company profile.
-- **Teams**: invite colleagues by e-mail. An invited person must register with that same e-mail address; they then share the company discount. The owner can see and remove members.
-- **Image Zone**: the company's own library of artwork (logos, photos). Press **Upload** (PNG, JPG, TIF, PDF, AI or EPS, up to 100 MB per file); the files are private to your company. Each card has **Use in the designer** and a delete button. Company members also see the Image Zone in the **Photos** tab of the designer and can place an image with one click. <!-- B4-CHECK -->
-- **Templates**: the company's private template library. In the designer, a **Templates** bar offers **Save as company template** (you type a name) and a list **Load template...** (templates are kept per product; loading one replaces the art on the canvas after you confirm). The **Templates** page of the portal lists what your company saved. Other companies and the public never see them, and the public templates can be hidden for your company. <!-- B4-CHECK -->
+- **Teams**: invite colleagues by e-mail. An invited person must register with that same e-mail address; they then share the company discount and the company's Image Zone. The page shows the seats used (for example 2 / 5) and the role of each member (**Admin**, **Member**).
+- **Image Zone**: the company's own library of artwork (logos, photos). Press **Upload** (PNG, JPG, TIF, PDF, AI or EPS, up to 100 MB per file). Each card shows the file name, pixels, DPI, the print size at that DPI, file size, who uploaded it, and a **Delete** button. **Use in the designer** opens the designer; the same images appear in the **Photos** tab of the designer for company members, where one click places an image. The files are private to your company.
+- **Templates**: the company's private template library (see 2.13).
+- **Approval Queue** is reserved for a later release (**Coming soon**).
 - **Request quote / My quotes** and **My Account** (Dashboard, Orders, My Profile).
 
 ![50 Company portal overview](images/50-portal-overview.png)
@@ -224,30 +244,49 @@ After approval a B2B client works in the company portal (**B2B Portal** in the h
 
 ![53 Image Zone](images/53-portal-image-zone.png)
 
-![54 Template library](images/54-portal-templates.png)
+![58 The Image Zone in the Photos tab of the designer](images/58-designer-image-zone.png)
 
-![57 Templates bar in the designer](images/57-designer-company-templates.png)
+A team member who joined through the invitation shares the company discount: the designer shows it on the price (line **B2B · Team · 10% off**), see 2.15. Resellers get their 20% tier in the product page, designer and cart in the same way.
 
-![58 Image Zone in the Photos tab](images/58-designer-image-zone.png)
+### 2.13 Company templates and reorder
 
-### 2.13 Private products
+**Templates.** In the designer a company member sees a **Templates** bar with **Save as company template** and a list **Load template...**.
 
-Products that Printcart assigns to your company in the admin appear in the shop and in search only when a member of your company is logged in. For everybody else they do not exist (the product address shows a "page not found"). <!-- B4-CHECK -->
+1. Design or upload the art for a product, then press **Save as company template** and type a name.
+2. Templates belong to the product they were made for. To use one, choose it in **Load template...** (the art on the canvas is replaced after you confirm), or open the portal page **Templates** and press **Start order** on a card: the designer opens with that template loaded.
+3. On the **Templates** page each card also has **Rename**, **Clone** and **Delete**.
+4. Other companies and the public never see your templates. The administrator can also hide the public templates for your company.
 
-![55 A product assigned to the company](images/55-portal-private-products.png)
+![54 Templates: Start order, Rename, Clone, Delete](images/54-portal-templates.png)
 
-### 2.14 Prices for B2B clients
+![57 Start order from a template](images/57-designer-company-templates.png)
+
+**Reorder.** In the portal page **Orders** press **Reorder** next to an order: the same product, options and original art are put into a new cart. Prices are calculated again with today's price list and your discount.
+
+![59b Reorder in the company portal](images/59b-portal-reorder.png)
+
+### 2.14 Private products
+
+Products that Printcart assigns to your company in the admin appear in the shop and in search only when a member of your company is logged in. For everybody else they do not exist: the product address shows "page not found".
+
+![55 A product assigned to the company, seen by a member](images/55-portal-private-products.png)
+
+![59 The same product for a visitor](images/59-private-product-visitor.png)
+
+### 2.15 Prices for B2B clients
 
 1. Log in with a company account and open the designer, product page or cart.
 2. The price shown is already reduced by the company tier (for example 10% for B2B, 20% for Reseller). It is reduced once, never twice.
 
 ![56 B2B price in the designer](images/56-designer-b2b-price.png)
 
+![56b A team member sees the company discount in the designer](images/56b-designer-staff-price.png)
+
 **Check:** the same 24 x 16 in banner costs less for a company than for a retail customer, and the cart shows the same amount as the designer.
 
-### 2.15 Ordering from a phone
+### 2.16 Ordering from a phone
 
-On a phone (about 390 px wide) the store has no sideways scrolling and the designer is replaced by a phone order flow: upload, preview, size, options and a sticky **Add to Cart** button. <!-- B4-CHECK -->
+On a phone every page fits the screen (no sideways scrolling) and the designer is replaced by a phone order flow: **upload your file**, see the preview at real size, set the size, choose options, and press the sticky **Add to Cart** bar that shows the live price.
 
 ![60 Home page on a phone](images/60-mobile-home.png)
 
@@ -257,6 +296,16 @@ On a phone (about 390 px wide) the store has no sideways scrolling and the desig
 
 ![63 Art preview on a phone](images/63-mobile-upload-preview.png)
 
+![64 Options and the sticky Add to Cart bar](images/64-mobile-options-price.png)
+
+![65 Cart on a phone](images/65-mobile-cart.png)
+
+### 2.17 Footer pages
+
+The footer links to **Terms**, **Privacy**, **Refund policy**, **Accessibility** and **Track order**. The four legal pages are drafts: a banner on each page tells you to review the wording before go-live (Part 5, question 5).
+
+![36 A footer page with the draft banner](images/36-footer-legal.png)
+
 ---
 
 ## 3. Administrator guide (how to run the store)
@@ -265,7 +314,7 @@ On a phone (about 390 px wide) the store has no sideways scrolling and the desig
 
 1. Open **giganticprints.com/wp-admin** and sign in with your administrator account.
 2. The menu on the left is the whole store:
-   - **Products** and **WooCommerce** (orders, customers, coupons, settings),
+   - **Products** and **WooCommerce** (orders, customers, coupons, settings, **Banner extras pricing**),
    - **PC Designer** (the designer, **Printing Options** with sizes, options and prices),
    - **B2B & B2C** (companies, tiers, quotes),
    - **Pages**, **Posts**, **Media**, **Appearance** (menus), **Users**, **Settings**.
@@ -280,7 +329,7 @@ A **combined product** is one product that contains its variants as options: for
 
 1. Open **Products > All Products**.
 2. Click a product name to edit it: title, description, product image and gallery, **Product categories**.
-3. In the box **PCD options** the tab **Printing Option** holds the checkbox **Enable Printing option** and the link **Edit option**, which opens the option set of this product (see 3.3). The tab **Setting PCDesigner** holds **Enable Design**, **Enable Upload Design** and **Enable Upload Without Design**.
+3. In the box **PCD options** the tab **Printing Option** holds the checkbox **Enable Printing option** and the link **Edit option**, which opens the option set of this product (see 3.3). The box **Setting PCDesigner** holds **Enable Design**, **Enable Upload Design** and **Enable Upload Without Design**.
 4. Click **Update** to save.
 
 ![71 Products > All Products](images/71-admin-products-list.png)
@@ -336,16 +385,29 @@ Banner, vinyl and similar products are priced by area. The price table lives in 
 
 **Check after every change:** open the product in the shop, set a size that falls in the changed range and compare the price on screen with your price list (for example 24 x 16 in = 2.667 sq ft x your price per sq ft). Test the smallest range, the largest range and one size on each side of a range boundary.
 
-**An add-on (for example Pole Pocket, Rope Reinforcement, Wind Slits)**
+**Pole pocket and rope: Banner extras pricing**
 
-1. Open the option set, click the add-on field (for example **Pole Pocket ($1.00 per linear ft + $10 setup)**).
-2. Each choice (for example **No pole pocket**, **Top only**, **Bottom only**, **Top & Bottom**) has its own price line; change the amount or the label and press **Update**.
-3. Pole pocket and rope are special: they are priced per linear foot of the chosen size (pole pocket: width x number of sides, plus a setup fee; rope: perimeter). Their rates are kept in the store's code, not in the price line of the choice. **To change the rate or the setup fee of the pole pocket or the rope, ask the Printcart team** (it is a small change; we will make it editable on request, see Part 5).
-4. Rush production is an option that doubles the price of the item including its options.
+These two add-ons are charged per linear foot of the size the customer chooses, so their rates have their own screen:
 
-![76 An add-on field](images/76-admin-addon-field.png)
+1. Open **WooCommerce > Banner extras pricing**.
+2. Change one or more of:
+   - **Pole pocket: rate per linear ft** (charged per foot of banner width, per pocket side: **Top only** and **Bottom only** are one side, **Top & Bottom** is two sides),
+   - **Pole pocket: setup fee** (added whenever a pole pocket is chosen),
+   - **Rope reinforcement: rate per linear ft** (charged per foot of the banner perimeter).
+3. Press **Save changes**. The message **Banner extras pricing saved.** appears.
+4. Check a banner in the shop: for example 24 x 16 in with **Top & Bottom** = 2 sides x 2 ft x rate + setup fee.
 
-> The price you type in a field is in your shop currency (US dollars). Labels in brackets, such as "($1.00 per linear ft + $10 setup)", are text for the customer: if you change a rate, change the label too.
+![78 WooCommerce > Banner extras pricing](images/78-admin-banner-extras.png)
+
+> The wording in the label of the option (for example "Pole Pocket ($1.00 per linear ft + $10 setup)") is plain text for the customer. If you change a rate, change that label too in **PC Designer > Printing Options** (the field name).
+
+**Other add-ons (Grommets, Welding, Wind Slits, Rush, Print-Sides)**
+
+1. Open the option set, click the field (for example **Wind Slits**).
+2. Each choice has its own price line; change the amount or the label and press **Update**.
+3. **Rush Production** doubles the price of the item including its options.
+
+![76 An add-on field in the option set](images/76-admin-addon-field.png)
 
 **Quantity breaks**: the top of **Printing options** has **Quantity** with a **Quantity breaks** table (minimum quantity and discount per item). Leave it unless you want volume prices on a product.
 
@@ -356,7 +418,7 @@ Banner, vinyl and similar products are priced by area. The price table lives in 
 | Tier | Discount | Meaning |
 |---|---|---|
 | **B2C - Retail price** | 0% | Everybody else |
-| **Returning customer (5%)** | 5% | Customers who have ordered before (automatic after repeat orders) <!-- B4-CHECK --> |
+| **Returning customer (5%)** | 5% | A customer moves here automatically after the second order |
 | **B2B (10%)** | 10% | Approved business clients |
 | **Reseller (20%)** | 20% | Resellers |
 
@@ -387,15 +449,19 @@ Below the ladder you find **Quantity-Based Discounts** (extra discount for large
 
 ![83 B2B Stores](images/83-admin-b2b-stores.png)
 
-### 3.7 Company management and private products
+### 3.7 Company management, private products and templates
 
-1. **B2B & B2C > B2B Stores**, click a company. The detail page shows the owner, members, tier and orders.
-2. **Edit** changes the company name, address or tier. A company can be suspended: its members then lose the company prices.
+1. **B2B & B2C > B2B Stores**, click a company. The detail page shows company information, the team (seats used), recent orders, **B2B settings** (tier, payment terms note, team seats) and the account owner.
+2. **Edit store** changes the company name, address or tier. A company can be suspended: its members then lose the company prices.
 3. **Invite store** (button at the top of the list) invites a company by e-mail; invitations are bound to that e-mail address and appear in **B2B & B2C > Invitations**.
-4. **Private products**: in the company detail page the box **Private products** lists all products with a search field. Tick the products that only this company may see and buy and press **Save private products**. A product assigned to one or more companies is hidden from everyone else (shop, search, direct address, sitemap). Under the list, **Hide public templates for this company** removes the public template gallery from this company's designer. <!-- B4-CHECK -->
-5. **Customers** lists every customer with tier, orders and spend; **Customers > a name** lets you change a customer's tier by hand.
+4. **Private products**: in the company detail page the box **Private products** lists all products with a search field. Tick the products that only this company may see and buy and press **Save private products**. A product assigned to one or more companies is hidden from everyone else (shop, search, direct address, sitemap). **Currently assigned (n)** shows what is assigned.
+5. **Hide public templates for this company** (same box): removes the public template gallery from this company's designer, so the company only sees its own templates.
+6. **Customers** lists every customer with tier, orders and spend; **Customers > a name** lets you change a customer's tier by hand.
+7. **Deleting a company** also deletes its Image Zone files, its templates and its private product assignments. Orders and the customers' accounts stay.
 
-![84 Company detail with the Private products box](images/84-admin-store-detail.png)
+![84b Company detail: information, team, orders, settings](images/84b-admin-store-top.png)
+
+![84 Company detail: Private products and Hide public templates](images/84-admin-store-detail.png)
 
 ![85 Invitations](images/85-admin-invitations.png)
 
@@ -403,13 +469,16 @@ Below the ladder you find **Quantity-Based Discounts** (extra discount for large
 
 ### 3.8 Orders and the print-ready files
 
-1. **WooCommerce > Orders** lists all orders. Click an order number to open it.
-2. Each order line shows the options and a design block with the download links: **Download designs: PDF / PNG / SVG / JPG** and **Download upload files** (the customer's original files, at full size).
-3. Download the files, print, then set the order status (**Processing**, **Completed**, ...). The customer receives the matching e-mail.
+1. **WooCommerce > Orders** lists all orders. Click an order number to open it: customer, billing and shipping address, the items with all chosen options, the shipping method (for example **Pickup - Fort Pierce, FL**), the payment method (**Pay by invoice**), the status, notes, and on the right the box **Customer Design**. For an order that contains art, that box opens the design of each line (the sample orders in the screenshots contain no art file, so their box says "No design or upload file in this order").
+2. Set the status as the order moves on (**Processing**, **Completed**, ...). The customer receives the matching e-mail. **Pay by invoice** orders start as **On hold**: send the PayPal invoice, then set **Processing** when you begin production.
+3. In the box **Customer Design** open the design of the order line. The page **Detail product design** has the tabs **Resource**, **Create PDF**, **Download design** and **PDF Layout**. On **Download design** you find **SVG**, **PNG (High quality images)**, **JPG (CMYK with ICC profile)** and **PDF**, each with a **Download** button (the PDF has no watermark). **Resource** gives the customer's original uploaded files.
+4. Download the files, print, then complete the order.
 
 ![90 WooCommerce > Orders](images/90-admin-orders.png)
 
-![91 An order with the download links for the print files](images/91-admin-order-design-files.png)
+![91b An order in the admin](images/91b-admin-order-edit.png)
+
+![91 Detail product design: Download design](images/91-admin-order-design-files.png)
 
 **Check:** the downloaded PDF has the size of the order (for example 24 x 16 in) and contains the art as uploaded. File types offered for download can be limited in **PC Designer > Settings** (**Design file type download**).
 
@@ -432,7 +501,7 @@ Below the ladder you find **Quantity-Based Discounts** (extra discount for large
 
 ### 3.11 Pages, blog and gallery
 
-- **Pages > All Pages**: About us, Contact, Gallery, legal pages. Click a page to edit it; **Update** publishes.
+- **Pages > All Pages**: About us, Contact, Gallery and the legal pages (**Terms of Service**, **Privacy Policy**, **Refund Policy**, **Accessibility**) and **Track order**. Click a page to edit it; **Update** publishes. The legal pages start with a draft banner: delete the banner when you have reviewed and approved the text.
 - **Posts > All Posts**: blog articles. **Add Post** writes a new one; set **Categories** and a featured image.
 - **Gallery Items**: items of the Gallery page.
 - Photos: **Media > Library**.
@@ -449,7 +518,7 @@ Below the ladder you find **Quantity-Based Discounts** (extra discount for large
 
 ### 3.13 E-mail notifications
 
-- **Order e-mails** (new order, processing, completed, ...): **WooCommerce > Settings > Emails**. Click **Manage** next to an e-mail to change its subject, heading and recipients. The e-mails that go to the shop (**New order**, **Cancelled order**, **Failed order**) are currently addressed to a Printcart address: replace it with yours before go-live.
+- **Order e-mails** (new order, processing, completed, ...): **WooCommerce > Settings > Emails**. Click **Manage** next to an e-mail to change its subject, heading and recipients. The e-mails that go to the shop (**New order**, **Cancelled order**, **Failed order**) are addressed to the shop address: check that it is yours.
 - **Sender address and mail service**: **WP Mail SMTP**. The from address should be an address on your own domain.
 - **Design notifications** (a customer saved a design, designs approved): **PC Designer > Settings > General**, section **Notifications**; **Recipients** lists who receives them.
 - **B2B e-mails** (application received, approved, rejected, invitation, quote) are sent automatically by the store.
@@ -460,17 +529,34 @@ Below the ladder you find **Quantity-Based Discounts** (extra discount for large
 
 ![A4 Design notification settings](images/A4-admin-designer-notifications.png)
 
-### 3.14 Payment settings
+### 3.14 Payment settings and connecting PayPal
 
-**WooCommerce > Settings > Payments** lists the payment providers: **Accept payments with Woo**, **Take offline payments**, **PayPal** and **More payment options**. At the moment no payment method is switched on, so no customer can pay yet; this is finished in Part 4.
+**WooCommerce > Settings > Payments** lists the payment providers. Today:
 
-1. Click **Complete setup** next to **PayPal** (or **Manage** next to the provider you choose) and follow the steps: connect your own account.
-2. Use the **live** account of your own company only when you go live; until then keep the provider in test mode.
-3. After saving, open the cart and checkout once to see that the payment method is offered.
+- **Pay by invoice** is switched on: the customer places the order and you send a PayPal invoice before production. Click **Manage** to open its settings page (headed **Direct bank transfer**): the checkbox **Enable direct bank transfers**, and the fields **Title** ("Pay by invoice"), **Description** (shown at checkout) and **Instructions** (shown on the confirmation page and in the e-mail). **Account details** stays empty because no bank account is shown.
+- **PayPal** (WooCommerce PayPal Payments) is installed but **not connected**. You connect your own PayPal business account at go-live (steps below).
+- **Take offline payments** and **More payment options** list further methods; other providers (for example Paymentech) are separate projects.
 
 ![98 WooCommerce > Settings > Payments](images/98-admin-payments.png)
 
-### 3.15 Settings you may need
+![A8 Pay by invoice settings](images/A8-admin-pay-by-invoice.png)
+
+**Connect your PayPal account**
+
+1. **WooCommerce > Settings > Payments**, click **Complete setup** next to **PayPal** (or open the PayPal settings directly).
+2. On the page **Welcome to PayPal Payments** press **Activate PayPal Payments**, then follow the connection steps: sign in to your **PayPal business account** in the PayPal window and accept the permissions PayPal asks for. You enter your credentials only on PayPal's own pages, never in the store.
+3. Back in the store, switch **PayPal** on, and decide whether **Pay by invoice** stays available next to it.
+4. Open the cart and checkout once and check that the PayPal option appears; place a small test order and refund it.
+
+![A9 PayPal settings: connect your own account](images/A9-admin-paypal.png)
+
+### 3.15 Shipping
+
+**WooCommerce > Settings > Shipping** holds the shipping zone **United States** with two methods: **Pickup - Fort Pierce, FL** (free) and **Ground shipping - quoted** (charges nothing at checkout; you quote the cost to the customer). To change a rate or add a method open the zone and its method, edit the cost, and save. Add further zones for other countries if you ship there.
+
+![A7 WooCommerce > Settings > Shipping](images/A7-admin-shipping.png)
+
+### 3.16 Settings you may need
 
 - **PC Designer > Settings > Upload design**: allowed file types and limits. Leave them as delivered unless Printcart advises a change.
 - **Settings > General**: site title, administration e-mail.
@@ -497,15 +583,16 @@ Printcart does the technical steps marked **(Printcart)**; you do the steps mark
 | 1 | **Domain:** Printcart sends you the DNS records for giganticprints.com; you (or your DNS provider) change them. Keep your Google mail (MX) records exactly as they are. The store switches to the new address and the secure padlock (HTTPS) is checked. | you + Printcart | [ ] |
 | 2 | **Search engines:** in **Settings > Reading** untick **Discourage search engines from indexing this site** and press **Save Changes**. Until then the store is hidden from Google on purpose. | Printcart / you | [ ] |
 | 3 | **Passwords:** the administrator password that was sent to you by e-mail during the project must be changed. **Users > Profile > Set New Password**. Create a personal administrator account for each person and remove accounts you do not recognise. | you | [ ] |
-| 4 | **Payment:** in **WooCommerce > Settings > Payments** connect your own payment account (for example **PayPal > Complete setup**), switch test mode off, and check that checkout offers the payment method. Today no payment method is switched on. | you | [ ] |
-| 5 | **Sender e-mail:** set the from address in **WP Mail SMTP** and **WooCommerce > Settings > Emails**, and the **Recipients** for design notifications in **PC Designer > Settings**, to addresses on your domain, and replace the recipient of **New order**, **Cancelled order** and **Failed order** in **WooCommerce > Settings > Emails** (today a Printcart address). Send a test e-mail. | you + Printcart | [ ] |
-| 6 | **Legal pages:** publish **Terms and Conditions**, **Privacy Policy** and **Refund policy** and make the footer links point to them. | you + Printcart | [ ] |
-| 7 | **Shipping and tax:** in **WooCommerce > Settings > Shipping** add the shipping zones and rates you want (today checkout shows "No shipping options are available for this address" for a US address) and check **Tax**. | you + Printcart | [ ] |
-| 8 | **Test order:** place one real order with a small print file; check the order e-mails, the download links in the order, and the confirmation page. Then cancel or refund it. | you + Printcart | [ ] |
-| 9 | **Remove test data:** test accounts, the sample company, sample quotes and invitations and test orders are removed. | Printcart | [ ] |
+| 4 | **Payment:** connect your own PayPal business account (section 3.14: **WooCommerce > Settings > Payments > PayPal**), decide whether **Pay by invoice** stays, and check that checkout offers the payment method. | you | [ ] |
+| 5 | **Shipping:** check the zone **United States** (**Pickup - Fort Pierce, FL**, **Ground shipping - quoted**), set the rates and zones you want (3.15), and check **Tax**. | you + Printcart | [ ] |
+| 6 | **Legal pages:** read the drafts of **Terms of Service**, **Privacy Policy**, **Refund Policy** and **Accessibility**, correct them (or send your own text) and remove the draft banner. | you | [ ] |
+| 7 | **Sender e-mail:** set the from address in **WP Mail SMTP** and **WooCommerce > Settings > Emails**, and the **Recipients** for design notifications in **PC Designer > Settings**, to addresses on your domain. Send a test e-mail. | you + Printcart | [ ] |
+| 8 | **Test order:** place one real order with a small print file; check the order e-mails, the download links in the order, the PayPal invoice you send, and the confirmation page. Then cancel or refund it. | you + Printcart | [ ] |
+| 9 | **Remove the demo data:** the sample companies (**Demo Signs Co**, **Demo Reseller Co**) with their Image Zone image, template and the product assigned to Demo Signs Co; the demo customer accounts and their sample orders (#2027 to #2030); sample quotes and invitations. | Printcart | [ ] |
 | 10 | **Public pages:** unpublish pages that are not part of your store (sample and placeholder pages). | Printcart | [ ] |
 | 11 | **Updates and backup:** all software updates installed, a fresh backup taken and a restore test noted. | Printcart | [ ] |
-| 12 | **After go-live:** check the first real orders the same day and tell us about anything unexpected. | you | [ ] |
+| 12 | **Sign-off:** the person who approves the go-live confirms in writing (Part 5, question 6). | you | [ ] |
+| 13 | **After go-live:** check the first real orders the same day and tell us about anything unexpected. | you | [ ] |
 
 Where to untick the search engine box (step 2):
 
@@ -517,18 +604,20 @@ Where to untick the search engine box (step 2):
 
 Please answer these so we can finish the details.
 
-1. **Wind slits:** is the price **$0.50 per square foot** of the banner, or a **flat** amount per banner? Today the option charges a flat amount.
+1. **Wind slits:** is the price **$0.50 per square foot** of the banner, or a **flat** amount per banner? Today the option charges a flat $0.50 and its label says so.
 2. **Pole pocket setup fee:** is the **$10 setup** charged **per item**, or **once per order line** (one size on the order, whatever the quantity)? Today it is charged per item.
-3. **Grommets:** which positions do you want (all sides, top, bottom, left, right, custom) and should **Yes** be the default? Today the choices are **No grommets**, **4 corners only** and **Every 2 ft**, default **No grommets**.
-4. **Webbing mesh:** should it be an option? Please send the specification and the price.
-5. **Returning customer 5%:** after how many orders (or what spend) should a customer move to this tier? Today it follows the second paid order.
-6. **Resellers (20%):** how do you recognise a reseller: do you approve them yourself in **B2B Stores**?
-7. **Handheld and Misc:** which products belong in these two categories? Until they have products they show **Coming soon**.
-8. **Payment:** which payment provider do you want to use at go-live, and who creates the account?
-9. **Mail:** which address should orders, quotes and design notifications go to, and which address should customers see as the sender?
-10. **Legal text:** do you have Terms, Privacy and Refund texts, or should we prepare a draft for you to review?
-11. **Item list:** how important is the item list (several items with different art in one order)? It is the next big feature on your list.
-12. **Administrators:** who needs an administrator login and who only needs to process orders (Shop manager)?
+3. **Payment:** is PayPal the payment method you want at go-live, and who connects the PayPal business account? Other providers (for example Paymentech) and accounting export (for example QuickBooks) are separate projects; tell us if you want a proposal.
+4. **Shipping:** which shipping methods and rates do you want (pickup, ground shipping with a fixed or table rate, other countries)? Today there are **Pickup - Fort Pierce, FL** (free) and **Ground shipping - quoted** (no charge at checkout).
+5. **Legal pages:** please review the drafts of **Terms of Service**, **Privacy Policy**, **Refund Policy** and **Accessibility** (footer links) and send corrections or your own text.
+6. **Sign-off:** who approves the go-live on your side, and in which form (an e-mail with "Approved to go live" is enough)?
+7. **Grommets:** which positions do you want (all sides, top, bottom, left, right, custom) and should **Yes** be the default? Today the choices are **No grommets**, **4 corners only** and **Every 2 ft**, default **No grommets**.
+8. **Webbing mesh:** should it be an option? Please send the specification and the price.
+9. **Returning customer 5%:** today a customer moves to this tier after the second order. Is that the rule you want, or another one (number of orders, spend, time)?
+10. **Resellers (20%):** how do you recognise a reseller: do you approve them yourself in **B2B Stores**?
+11. **Handheld and Misc:** which products belong in these two categories? Until they have products they show **Coming soon**.
+12. **Mail:** which address should orders, quotes and design notifications go to, and which address should customers see as the sender?
+13. **Item list:** how important is the item list (several items with different art in one order)? It is the next big feature on your list.
+14. **Administrators:** who needs an administrator login and who only needs to process orders (Shop manager)?
 
 ---
 
@@ -555,5 +644,47 @@ After go-live the store is hosted and looked after by **Printcart**.
 - Write to the Printcart support address you were given, with a short description, the page address, and a screenshot if possible. For an order, add the order number.
 - Reports about orders that cannot be placed are looked at first.
 - For any change to prices or products you can make yourself, use Part 3. If you are unsure, ask us before you change anything on the live store.
+
+*Printcart team*
+
+---
+
+## Appendix A. Acceptance checklist
+
+Tick each line when you have tried it on the staging store (https://giganticprints.printcart.com). The paths are added to that address. Please send us the list with your notes.
+
+| Done | What you asked for (your words) | Where to try it |
+|---|---|---|
+| [ ] | "One site" for visitors, B2C and B2B | `/` |
+| [ ] | Menu on top in Signs365 order: Banner, Rigid, Adhesive, Handheld, Magnet, Apparel, Misc | `/` (category bar) |
+| [ ] | "Upload on the configuration screen", the designer only optional | `/create-your-own/?product_id=1168` |
+| [ ] | "A PREVIEW of the art on the product with real measurements" | upload a file in the designer (above) |
+| [ ] | "The size of the item to be printed is based on the uploaded item" | same page, after the upload |
+| [ ] | "Change the size on the same screen", "center art or stretch to fit" | same page: **Stretch to fit**, **Fit (keep ratio)**, **Center**, W and H boxes |
+| [ ] | Big files (20 MB up to 200 MB) in PDF, AI, PNG, JPG; warning for low resolution | same page: **Photos** tab |
+| [ ] | No preview without art: "Upload Artwork or Create New" | same page, press **Add to Cart** with an empty print area |
+| [ ] | The price changes while I choose size and options | `/product/banner-13oz-single-sided/` and the designer **Printing** tab |
+| [ ] | Banner: 13oz, 15oz, 18oz (double sided only 18oz), welding yes, rope no, pole pocket, wind slits, rush 100% | designer **Printing** tab |
+| [ ] | Rigid: Coroplast, PVC, Acrylic, Aluminum, J-Bond, Foamcore | `/product-category/rigid/` |
+| [ ] | Adhesive / vinyl types and laminate | `/product-category/adhesive/` |
+| [ ] | Magnets with preset sizes, one product | `/product-category/magnet/` |
+| [ ] | Apparel / DTF by linear inch | `/product-category/apparel/` |
+| [ ] | One "Magnets" product with sizes as options, banner weights as options | the two products above |
+| [ ] | Design without login; login or create an account for the cart and checkout | `/create-your-own/?product_id=1168`, then `/checkout/` |
+| [ ] | Register like a B2C customer | `/my-account/` |
+| [ ] | Ask to be upgraded to B2B | `/b2b-portal/?section=apply` (logged in) |
+| [ ] | Super Admin approves the request and the company gets its discount (10% B2B, 20% reseller, 5% returning) | admin: `/wp-admin/admin.php?page=printcart-stores-b2b` |
+| [ ] | B2B sees the discounted price once, in designer, product page and cart | any product, logged in as a company member |
+| [ ] | "Image Zone" for the company | `/b2b-portal/?section=images` |
+| [ ] | Private template library: save, edit, clone, use for an order | `/b2b-portal/?section=templates` |
+| [ ] | Reorder in one click with the old art | `/b2b-portal/?section=orders` (**Reorder**) |
+| [ ] | Products only for one client | the product assigned to Demo Signs Co: `/product/foamcore-single-sided/` (member vs visitor) |
+| [ ] | Checkout completes; shipping and payment choice | `/checkout/` (**Pickup**, **Pay by invoice**) |
+| [ ] | Footer with contact, Terms and Conditions | `/terms/` and the footer |
+| [ ] | Works on a phone and iPad | open the store on your phone: `/`, the designer, the cart |
+| [ ] | Print-ready files for every order | admin: **WooCommerce > Orders** > order > **Customer Design** |
+| [ ] | Rates of pole pocket and rope can be changed | admin: `/wp-admin/admin.php?page=gp-linear-rates` |
+
+Not part of this release (see 1.3): item list, chat and FAQ, Super Admin Custom Order Form, accounting export, additional payment methods.
 
 *Printcart team*

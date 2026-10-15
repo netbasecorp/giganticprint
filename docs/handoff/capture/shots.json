@@ -1,10 +1,10 @@
 {
-  "_readme": "id = NN-slug (file name images/<id>.png). viewport desktop|mobile. auth none|b2c|b2b|reseller|admin. batch now = areas B4 does not touch, b4 = capture again in the final run after batch B4 (needs: fixture = temporary company data from scripts/data/b3-fixture.php create; order = one test order placed on the store; no-company = capture BEFORE the fixture is created, the b2c test user must not belong to a company; clean-data = capture when the lists hold only the intended sample rows). designer:true waits for the designer to load. See capture/README.md for actions and highlight.",
+  "_readme": "id = NN-slug (file name images/<id>.png). viewport desktop|mobile. auth none|b2c|b2b|staff|reseller|admin (demo users, see README). batch final = every shot is captured against the current build. designer:true waits for the designer to load. ${URL:name} comes from demo-urls.php (existing demo orders). See capture/README.md for actions and highlight.",
   "baseUrl": "https://giganticprints.printcart.com",
   "shots": [
     {
       "id": "01-home-menu",
-      "batch": "now",
+      "batch": "final",
       "viewport": "desktop",
       "auth": "none",
       "url": "${BASE}/",
@@ -18,7 +18,7 @@
     },
     {
       "id": "02-category-from-price",
-      "batch": "now",
+      "batch": "final",
       "viewport": "desktop",
       "auth": "none",
       "url": "${BASE}/product-category/banner/",
@@ -36,7 +36,7 @@
     },
     {
       "id": "03-product-page",
-      "batch": "now",
+      "batch": "final",
       "viewport": "desktop",
       "auth": "none",
       "url": "${BASE}/product/banner-13oz-single-sided/",
@@ -45,7 +45,7 @@
     },
     {
       "id": "04-product-options-price",
-      "batch": "now",
+      "batch": "final",
       "viewport": "desktop",
       "auth": "none",
       "url": "${BASE}/product/banner-13oz-single-sided/",
@@ -77,7 +77,7 @@
     },
     {
       "id": "05-product-upload-buttons",
-      "batch": "now",
+      "batch": "final",
       "viewport": "desktop",
       "auth": "none",
       "url": "${BASE}/product/banner-13oz-single-sided/",
@@ -104,22 +104,23 @@
     },
     {
       "id": "06-designer-start",
-      "batch": "now",
+      "batch": "final",
       "viewport": "desktop",
       "auth": "none",
       "url": "${BASE}/create-your-own/?product_id=1168&view=m",
       "designer": true,
       "highlight": [
         {
-          "sel": ".main-tabs li.tab:has(.icon-nbd-package)",
+          "sel": "text=PHOTOS >> visible=true",
           "label": "1"
+        },
+        {
+          "sel": "text=PRINTING >> visible=true",
+          "label": "2"
         }
       ],
-      "caption": "The designer: tabs Photos, Printing, Text, Layers on the left; the Printing tab shows all options; live price on the right.",
+      "caption": "The designer opens on the Photos tab (upload first). The Printing tab holds all options; the live price is on the right.",
       "actions": [
-        {
-          "designerTab": "PRINTING"
-        },
         {
           "mouseAway": true
         }
@@ -127,12 +128,15 @@
     },
     {
       "id": "07-designer-options-live-price",
-      "batch": "now",
+      "batch": "final",
       "viewport": "desktop",
       "auth": "none",
       "url": "${BASE}/create-your-own/?product_id=1168&view=m",
       "designer": true,
       "actions": [
+        {
+          "designerTab": "PRINTING"
+        },
         {
           "setSize": [
             36,
@@ -160,12 +164,15 @@
     },
     {
       "id": "08-designer-material-choice",
-      "batch": "now",
+      "batch": "final",
       "viewport": "desktop",
       "auth": "none",
       "url": "${BASE}/create-your-own/?product_id=1168&view=m",
       "designer": true,
       "actions": [
+        {
+          "designerTab": "PRINTING"
+        },
         {
           "pickOption": "18oz Double-Sided"
         },
@@ -183,7 +190,7 @@
     },
     {
       "id": "10-upload-zone",
-      "batch": "b4",
+      "batch": "final",
       "viewport": "desktop",
       "auth": "none",
       "url": "${BASE}/create-your-own/?product_id=1168&view=m",
@@ -191,6 +198,9 @@
       "actions": [
         {
           "designerTab": "PHOTOS"
+        },
+        {
+          "mouseAway": true
         }
       ],
       "highlight": [
@@ -203,7 +213,7 @@
     },
     {
       "id": "11-upload-art-placed",
-      "batch": "b4",
+      "batch": "final",
       "viewport": "desktop",
       "auth": "none",
       "url": "${BASE}/create-your-own/?product_id=1168&view=m",
@@ -227,7 +237,7 @@
     },
     {
       "id": "12-art-stretch",
-      "batch": "b4",
+      "batch": "final",
       "viewport": "desktop",
       "auth": "none",
       "url": "${BASE}/create-your-own/?product_id=1168&view=m",
@@ -272,7 +282,7 @@
     },
     {
       "id": "13-art-fit",
-      "batch": "b4",
+      "batch": "final",
       "viewport": "desktop",
       "auth": "none",
       "url": "${BASE}/create-your-own/?product_id=1168&view=m",
@@ -317,7 +327,7 @@
     },
     {
       "id": "14-art-center",
-      "batch": "b4",
+      "batch": "final",
       "viewport": "desktop",
       "auth": "none",
       "url": "${BASE}/create-your-own/?product_id=1168&view=m",
@@ -362,7 +372,7 @@
     },
     {
       "id": "15-size-edit-live-price",
-      "batch": "b4",
+      "batch": "final",
       "viewport": "desktop",
       "auth": "none",
       "url": "${BASE}/create-your-own/?product_id=1168&view=m",
@@ -394,7 +404,7 @@
     },
     {
       "id": "16-low-dpi-warning",
-      "batch": "b4",
+      "batch": "final",
       "viewport": "desktop",
       "auth": "none",
       "url": "${BASE}/create-your-own/?product_id=1168&view=m",
@@ -414,7 +424,7 @@
     },
     {
       "id": "17-empty-canvas-blocked",
-      "batch": "b4",
+      "batch": "final",
       "viewport": "desktop",
       "auth": "none",
       "url": "${BASE}/create-your-own/?product_id=1168&view=m",
@@ -437,8 +447,37 @@
       "caption": "Add to Cart is blocked until the print area contains artwork."
     },
     {
+      "id": "18-upload-instant-preview",
+      "url": "${BASE}/create-your-own/?product_id=1168&view=m",
+      "designer": true,
+      "actions": [
+        {
+          "designerTab": "PHOTOS"
+        },
+        {
+          "upload": "input[type=file]",
+          "file": "/work/testimg/big-30mb.png"
+        },
+        {
+          "waitFor": "#sg-upload-progress",
+          "timeout": 15000
+        }
+      ],
+      "waitAfter": 900,
+      "highlight": [
+        {
+          "sel": ".sg-up-card",
+          "label": "1"
+        }
+      ],
+      "caption": "Right after you choose a big file the store shows a local preview with pixels, size in inches at the file's DPI and file size, while the upload continues.",
+      "viewport": "desktop",
+      "auth": "none",
+      "batch": "final"
+    },
+    {
       "id": "20-designer-text-tools",
-      "batch": "now",
+      "batch": "final",
       "viewport": "desktop",
       "auth": "none",
       "url": "${BASE}/create-your-own/?product_id=1168&view=m",
@@ -446,6 +485,12 @@
       "actions": [
         {
           "designerTab": "TEXT"
+        },
+        {
+          "wait": 1800
+        },
+        {
+          "mouseAway": true
         }
       ],
       "highlight": [
@@ -458,14 +503,14 @@
     },
     {
       "id": "21-login-in-designer",
-      "batch": "now",
+      "batch": "final",
       "viewport": "desktop",
       "auth": "none",
       "url": "${BASE}/create-your-own/?product_id=1168&view=m",
       "designer": true,
       "highlight": [
         {
-          "sel": "text=Log in >> visible=true",
+          "sel": "a:has-text('Log in') >> visible=true",
           "label": "1"
         }
       ],
@@ -473,7 +518,7 @@
     },
     {
       "id": "22-account-login-register",
-      "batch": "now",
+      "batch": "final",
       "viewport": "desktop",
       "auth": "none",
       "url": "${BASE}/my-account/",
@@ -481,9 +526,9 @@
     },
     {
       "id": "30-cart",
-      "batch": "now",
+      "batch": "final",
       "viewport": "desktop",
-      "auth": "none",
+      "auth": "b2c",
       "url": "${BASE}/create-your-own/?product_id=1168&view=m",
       "designer": true,
       "actions": [
@@ -496,7 +541,58 @@
         },
         {
           "waitFor": ".cart_item",
-          "timeout": 120000
+          "timeout": 240000
+        },
+        {
+          "scrollTo": ".cart_item"
+        },
+        {
+          "scrollBy": -60
+        },
+        {
+          "wait": 500
+        }
+      ],
+      "highlight": [
+        {
+          "sel": ".cart_item img >> nth=0",
+          "label": "1"
+        }
+      ],
+      "caption": "Cart: the preview of your art, size, options and price.",
+      "cleanup": [
+        {
+          "emptyCart": true
+        }
+      ]
+    },
+    {
+      "id": "30b-cart-totals",
+      "batch": "final",
+      "viewport": "desktop",
+      "auth": "b2c",
+      "url": "${BASE}/create-your-own/?product_id=1168&view=m",
+      "designer": true,
+      "actions": [
+        {
+          "designerUpload": "sample-banner-art.png"
+        },
+        {
+          "click": "#sg-add-to-cart-btn",
+          "force": true
+        },
+        {
+          "waitFor": ".cart_item",
+          "timeout": 240000
+        },
+        {
+          "scrollTo": "a.checkout-button"
+        },
+        {
+          "scrollBy": -520
+        },
+        {
+          "wait": 500
         }
       ],
       "highlight": [
@@ -505,16 +601,20 @@
           "label": "1"
         }
       ],
-      "caption": "Cart: your art, size, options and price, then Proceed to Checkout.",
-      "fullPage": true
+      "caption": "Cart totals: shipping choice and Proceed to Checkout.",
+      "cleanup": [
+        {
+          "emptyCart": true
+        }
+      ]
     },
     {
       "id": "31-checkout",
-      "batch": "now",
+      "batch": "final",
       "viewport": "desktop",
-      "auth": "b2b",
+      "auth": "b2c",
       "url": "${BASE}/create-your-own/?product_id=1168&view=m",
-      "caption": "Checkout: billing and shipping details, payment, place order.",
+      "caption": "Checkout: contact information, shipping address and billing address (shipping options and payment follow below).",
       "designer": true,
       "actions": [
         {
@@ -526,41 +626,123 @@
         },
         {
           "waitFor": ".cart_item",
-          "timeout": 120000
+          "timeout": 240000
         },
         {
           "goto": "${BASE}/checkout/"
         },
         {
-          "wait": 5000
+          "wait": 7000
         }
       ],
       "cleanup": [
         {
-          "goto": "${BASE}/shopping-cart/"
-        },
-        {
-          "click": "a.remove",
-          "force": true
-        },
-        {
-          "wait": 2500
+          "emptyCart": true
         }
-      ],
-      "fullPage": true
+      ]
     },
     {
       "id": "32-checkout-guest-login",
-      "batch": "now",
+      "url": "${BASE}/create-your-own/?product_id=1168&view=m",
+      "designer": true,
+      "actions": [
+        {
+          "designerUpload": "sample-banner-art.png"
+        },
+        {
+          "click": "#sg-add-to-cart-btn",
+          "force": true
+        },
+        {
+          "waitFor": ".cart_item",
+          "timeout": 240000
+        },
+        {
+          "goto": "${BASE}/checkout/"
+        },
+        {
+          "wait": 4000
+        }
+      ],
+      "cleanup": [
+        {
+          "emptyCart": true
+        }
+      ],
+      "caption": "A guest who goes to checkout is asked to log in or register first.",
       "viewport": "desktop",
       "auth": "none",
-      "url": "${BASE}/checkout/",
+      "batch": "final"
+    },
+    {
+      "id": "33-checkout-shipping-payment",
+      "auth": "b2c",
+      "url": "${BASE}/create-your-own/?product_id=1168&view=m",
+      "designer": true,
+      "actions": [
+        {
+          "designerUpload": "sample-banner-art.png"
+        },
+        {
+          "click": "#sg-add-to-cart-btn",
+          "force": true
+        },
+        {
+          "waitFor": ".cart_item",
+          "timeout": 240000
+        },
+        {
+          "goto": "${BASE}/checkout/"
+        },
+        {
+          "wait": 7000
+        },
+        {
+          "scrollTo": "text=Shipping options >> visible=true"
+        },
+        {
+          "scrollBy": -60
+        }
+      ],
+      "cleanup": [
+        {
+          "emptyCart": true
+        }
+      ],
+      "caption": "Shipping options (Pickup, Ground shipping - quoted) and the payment option Pay by invoice.",
+      "viewport": "desktop",
+      "batch": "final"
+    },
+    {
+      "id": "34-order-received",
+      "auth": "b2c",
+      "url": "${URL:order_received_b2c}",
       "waitMs": 3000,
-      "caption": "Guests are asked to log in or register before checkout."
+      "caption": "Order received: confirmation with the order number, payment method and the Reorder button.",
+      "viewport": "desktop",
+      "batch": "final"
+    },
+    {
+      "id": "35-track-order",
+      "url": "${BASE}/track-order/",
+      "waitMs": 2000,
+      "caption": "Track your order: enter the order number and billing e-mail.",
+      "viewport": "desktop",
+      "auth": "none",
+      "batch": "final"
+    },
+    {
+      "id": "36-footer-legal",
+      "url": "${BASE}/terms/",
+      "waitMs": 2000,
+      "caption": "Footer pages (Terms, Privacy, Refund policy, Accessibility, Track order): each opens a page; the draft banner tells you to review the wording.",
+      "viewport": "desktop",
+      "auth": "none",
+      "batch": "final"
     },
     {
       "id": "40-my-account-dashboard",
-      "batch": "b4",
+      "batch": "final",
       "viewport": "desktop",
       "auth": "b2c",
       "url": "${BASE}/my-account/",
@@ -570,147 +752,142 @@
           "label": "1"
         }
       ],
-      "caption": "My Account menu: Orders, Addresses, Account details, My designs, Apply for B2B.",
-      "needs": "no-company"
+      "caption": "My Account for a retail customer: Dashboard, Orders, Addresses, Account details, My designs, Apply for B2B.",
+      "waitMs": 4000
     },
     {
       "id": "41-my-account-orders",
-      "batch": "b4",
+      "batch": "final",
       "viewport": "desktop",
       "auth": "b2c",
-      "needs": "order",
-      "url": "${BASE}/my-account/orders/",
-      "caption": "Orders list with the Reorder button (art and options kept)."
+      "url": "${BASE}/b2b-portal/?section=orders",
+      "caption": "Orders & Invoices: every order with status, invoice link and the Reorder button (same options and the original art).",
+      "waitMs": 4000,
+      "highlight": [
+        {
+          "sel": "button:has-text('Reorder'), a:has-text('Reorder')",
+          "label": "1"
+        }
+      ]
     },
     {
       "id": "42-my-designs",
-      "batch": "b4",
+      "batch": "final",
       "viewport": "desktop",
       "auth": "b2c",
       "url": "${BASE}/my-account/my-designs/",
-      "caption": "My designs: designs you saved to finish later.",
-      "needs": "no-company"
+      "caption": "My designs: designs you saved to finish later."
     },
     {
       "id": "43-apply-b2b",
-      "batch": "b4",
+      "batch": "final",
       "viewport": "desktop",
       "auth": "b2c",
       "url": "${BASE}/b2b-portal/?section=apply",
-      "caption": "Apply for B2B: company details form.",
-      "needs": "no-company"
+      "caption": "Apply for B2B: company details form."
     },
     {
       "id": "44-request-quote",
-      "batch": "b4",
+      "batch": "final",
       "viewport": "desktop",
       "auth": "b2c",
       "url": "${BASE}/b2b-portal/?section=quote-request",
-      "caption": "Request quote form.",
-      "needs": "no-company"
+      "caption": "Request quote form."
     },
     {
       "id": "45-my-quotes",
-      "batch": "b4",
+      "batch": "final",
       "viewport": "desktop",
       "auth": "b2c",
       "url": "${BASE}/b2b-portal/?section=quotes",
-      "caption": "My quotes: accept or decline a quote you received.",
-      "needs": "no-company"
+      "caption": "My quotes: accept or decline a quote you received."
     },
     {
       "id": "50-portal-overview",
-      "batch": "b4",
+      "batch": "final",
       "viewport": "desktop",
       "auth": "b2b",
-      "needs": "fixture",
       "url": "${BASE}/b2b-portal/",
-      "caption": "Company portal overview: tier, orders, savings."
+      "caption": "Company portal overview (Demo Signs Co): tier and discount, orders, savings.",
+      "waitMs": 5000
     },
     {
       "id": "51-portal-team",
-      "batch": "b4",
+      "batch": "final",
       "viewport": "desktop",
       "auth": "b2b",
-      "needs": "fixture",
       "url": "${BASE}/b2b-portal/?section=team",
-      "caption": "Teams: members and invitations."
+      "caption": "Teams: members and invitations.",
+      "waitMs": 5000
     },
     {
       "id": "52-portal-store",
-      "batch": "b4",
+      "batch": "final",
       "viewport": "desktop",
       "auth": "b2b",
-      "needs": "fixture",
       "url": "${BASE}/b2b-portal/?section=store",
-      "caption": "B2B Store: company profile."
+      "caption": "B2B Store: company profile.",
+      "waitMs": 5000
     },
     {
       "id": "53-portal-image-zone",
-      "batch": "b4",
+      "batch": "final",
       "viewport": "desktop",
       "auth": "b2b",
-      "needs": "fixture",
       "url": "${BASE}/b2b-portal/?section=images",
-      "caption": "Image Zone: your company's saved artwork."
+      "caption": "Image Zone: upload files (PNG, JPG, TIF, PDF, AI, EPS up to 100 MB each); each card shows pixels, DPI and print size.",
+      "waitMs": 9000,
+      "highlight": [
+        {
+          "sel": "button:has-text('Upload')",
+          "label": "1"
+        },
+        {
+          "sel": "button:has-text('Delete')",
+          "label": "2"
+        }
+      ]
     },
     {
       "id": "54-portal-templates",
-      "batch": "b4",
+      "batch": "final",
       "viewport": "desktop",
       "auth": "b2b",
-      "needs": "fixture",
       "url": "${BASE}/b2b-portal/?section=templates",
-      "caption": "Template library: your company's private templates."
-    },
-    {
-      "id": "57-designer-company-templates",
-      "batch": "b4",
-      "viewport": "desktop",
-      "auth": "b2b",
-      "needs": "fixture",
-      "url": "${BASE}/create-your-own/?product_id=1168&view=m",
-      "designer": true,
-      "actions": [
-        {
-          "designerUpload": "sample-banner-art.png"
-        }
-      ],
+      "caption": "Templates: Start order, Rename, Clone and Delete for each company template.",
+      "waitMs": 4000,
       "highlight": [
         {
-          "sel": "#sg-tpl-bar",
+          "sel": "text=Start order >> visible=true",
           "label": "1"
-        }
-      ],
-      "caption": "In the designer a company member sees the Templates bar: Save as company template, Load template."
-    },
-    {
-      "id": "58-designer-image-zone",
-      "batch": "b4",
-      "viewport": "desktop",
-      "auth": "b2b",
-      "needs": "fixture",
-      "url": "${BASE}/create-your-own/?product_id=1168&view=m",
-      "designer": true,
-      "actions": [
+        },
         {
-          "designerTab": "PHOTOS"
+          "sel": "text=Rename >> visible=true",
+          "label": "2"
+        },
+        {
+          "sel": "text=Clone >> visible=true",
+          "label": "3"
+        },
+        {
+          "sel": "text=Delete >> visible=true",
+          "label": "4"
         }
       ],
-      "caption": "Photos tab for a company member: the Image Zone block with the company images."
+      "waitFor": "text=Start order >> visible=true"
     },
     {
       "id": "55-portal-private-products",
-      "batch": "b4",
+      "batch": "final",
       "viewport": "desktop",
       "auth": "b2b",
-      "needs": "fixture",
-      "url": "${BASE}/shop/",
-      "caption": "Products assigned to your company appear in the shop only for your team."
+      "url": "${BASE}/product/foamcore-single-sided/",
+      "caption": "A product assigned to Demo Signs Co is visible to its members.",
+      "waitMs": 7000
     },
     {
       "id": "56-designer-b2b-price",
-      "batch": "b4",
+      "batch": "final",
       "viewport": "desktop",
       "auth": "b2b",
       "url": "${BASE}/create-your-own/?product_id=1168&view=m",
@@ -729,41 +906,136 @@
       "caption": "Logged in as a B2B client the designer shows your discounted price."
     },
     {
+      "id": "56b-designer-staff-price",
+      "auth": "staff",
+      "url": "${BASE}/create-your-own/?product_id=1168&view=m",
+      "designer": true,
+      "actions": [
+        {
+          "designerUpload": "sample-banner-art.png"
+        },
+        {
+          "mouseAway": true
+        }
+      ],
+      "highlight": [
+        {
+          "sel": "#sg-total-price",
+          "label": "1"
+        }
+      ],
+      "caption": "A staff member of the company sees the company discount in the designer too.",
+      "viewport": "desktop",
+      "batch": "final"
+    },
+    {
+      "id": "57-designer-company-templates",
+      "batch": "final",
+      "viewport": "desktop",
+      "auth": "b2b",
+      "url": "${BASE}/create-your-own/?product_id=1168&view=m&gp_tpl=22",
+      "designer": true,
+      "actions": [
+        {
+          "wait": 6000
+        }
+      ],
+      "highlight": [
+        {
+          "sel": "#sg-tpl-bar",
+          "label": "1"
+        }
+      ],
+      "caption": "Start order from a template (?gp_tpl): the saved artwork is loaded; the Templates bar offers Save as company template and Load template."
+    },
+    {
+      "id": "58-designer-image-zone",
+      "batch": "final",
+      "viewport": "desktop",
+      "auth": "b2b",
+      "url": "${BASE}/create-your-own/?product_id=1168&view=m",
+      "designer": true,
+      "actions": [
+        {
+          "designerTab": "PHOTOS"
+        },
+        {
+          "wait": 2500
+        },
+        {
+          "click": "text=Your company images >> visible=true"
+        },
+        {
+          "wait": 7000
+        },
+        {
+          "mouseAway": true
+        }
+      ],
+      "caption": "Photos tab for a company member: the block Your company images with the Image Zone files; one click places an image."
+    },
+    {
+      "id": "59-private-product-visitor",
+      "url": "${BASE}/product/foamcore-single-sided/",
+      "waitMs": 3000,
+      "caption": "The same product for a visitor or another customer: page not found.",
+      "viewport": "desktop",
+      "auth": "none",
+      "batch": "final"
+    },
+    {
+      "id": "59b-portal-reorder",
+      "auth": "b2b",
+      "url": "${BASE}/b2b-portal/?section=orders",
+      "waitMs": 4000,
+      "highlight": [
+        {
+          "sel": "button:has-text('Reorder'), a:has-text('Reorder')",
+          "label": "1"
+        }
+      ],
+      "caption": "Reorder in the company portal.",
+      "viewport": "desktop",
+      "batch": "final"
+    },
+    {
       "id": "60-mobile-home",
-      "batch": "b4",
+      "batch": "final",
       "viewport": "mobile",
       "auth": "none",
       "url": "${BASE}/",
-      "caption": "Phone: home page."
+      "caption": "Phone: home page.",
+      "waitMs": 3000
     },
     {
       "id": "61-mobile-menu",
-      "batch": "b4",
+      "batch": "final",
       "viewport": "mobile",
       "auth": "none",
       "url": "${BASE}/",
       "actions": [
         {
-          "click": ".mobile-nav-toggle, .menu-toggle, button[aria-label*=enu]"
+          "click": "button.menu-toggle"
         },
         {
-          "wait": 800
+          "wait": 900
         }
       ],
       "caption": "Phone: menu."
     },
     {
       "id": "62-mobile-order-flow",
-      "batch": "b4",
+      "batch": "final",
       "viewport": "mobile",
       "auth": "none",
       "url": "${BASE}/create-your-own/?product_id=1168&view=m",
-      "waitMs": 8000,
-      "caption": "Phone: order flow (upload, preview, size, options, Add to Cart)."
+      "waitMs": 6000,
+      "caption": "Phone: order flow with upload first, then preview, size, options and price.",
+      "waitFor": "#sg-m"
     },
     {
       "id": "63-mobile-upload-preview",
-      "batch": "b4",
+      "batch": "final",
       "viewport": "mobile",
       "auth": "none",
       "url": "${BASE}/create-your-own/?product_id=1168&view=m",
@@ -774,18 +1046,107 @@
           "file": "sample-banner-art.png"
         },
         {
-          "wait": 8000
+          "waitFor": "#sg-m-preview",
+          "timeout": 60000
+        },
+        {
+          "waitFor": "text=Actual size >> visible=true",
+          "timeout": 120000
+        },
+        {
+          "wait": 1500
         }
       ],
-      "caption": "Phone: art preview after upload."
+      "caption": "Phone: the art preview at real size after upload."
+    },
+    {
+      "id": "64-mobile-options-price",
+      "viewport": "mobile",
+      "url": "${BASE}/create-your-own/?product_id=1168&view=m",
+      "waitMs": 6000,
+      "actions": [
+        {
+          "upload": "input[type=file]",
+          "file": "sample-banner-art.png"
+        },
+        {
+          "waitFor": "#sg-m-preview",
+          "timeout": 60000
+        },
+        {
+          "waitFor": "text=Actual size >> visible=true",
+          "timeout": 120000
+        },
+        {
+          "wait": 1500
+        },
+        {
+          "scrollTo": "#sg-m-sec-opts"
+        }
+      ],
+      "highlight": [
+        {
+          "sel": "#sg-m-bar",
+          "label": "1",
+          "noScroll": true
+        }
+      ],
+      "caption": "Phone: options and the sticky bar with the live price and Add to Cart.",
+      "auth": "none",
+      "batch": "final"
+    },
+    {
+      "id": "65-mobile-cart",
+      "viewport": "mobile",
+      "auth": "b2c",
+      "url": "${BASE}/create-your-own/?product_id=1168&view=m",
+      "waitMs": 6000,
+      "actions": [
+        {
+          "upload": "input[type=file]",
+          "file": "sample-banner-art.png"
+        },
+        {
+          "waitFor": "#sg-m-preview",
+          "timeout": 60000
+        },
+        {
+          "waitFor": "text=Actual size >> visible=true",
+          "timeout": 120000
+        },
+        {
+          "wait": 1500
+        },
+        {
+          "wait": 25000
+        },
+        {
+          "click": "#sg-add-to-cart-btn",
+          "force": true
+        },
+        {
+          "waitFor": ".cart_item",
+          "timeout": 240000
+        },
+        {
+          "mouseAway": true
+        }
+      ],
+      "cleanup": [
+        {
+          "emptyCart": true
+        }
+      ],
+      "caption": "Phone: cart after Add to Cart.",
+      "batch": "final"
     },
     {
       "id": "70-admin-dashboard-menu",
-      "batch": "now",
+      "batch": "final",
       "viewport": "desktop",
       "auth": "admin",
-      "url": "${BASE}/wp-admin/",
-      "waitMs": 3000,
+      "url": "${BASE}/wp-admin/users.php",
+      "waitMs": 2500,
       "highlight": [
         {
           "sel": "#menu-posts-product, #toplevel_page_woocommerce",
@@ -804,7 +1165,7 @@
     },
     {
       "id": "71-admin-products-list",
-      "batch": "now",
+      "batch": "final",
       "viewport": "desktop",
       "auth": "admin",
       "url": "${BASE}/wp-admin/edit.php?post_type=product",
@@ -813,7 +1174,7 @@
     },
     {
       "id": "72-admin-product-edit",
-      "batch": "now",
+      "batch": "final",
       "viewport": "desktop",
       "auth": "admin",
       "url": "${BASE}/wp-admin/post.php?post=1168&action=edit",
@@ -838,31 +1199,8 @@
       "caption": "Edit product: the PCD options box; its tab Printing Option has Enable Printing option and the Edit option link."
     },
     {
-      "id": "77-admin-product-designer-settings",
-      "batch": "now",
-      "viewport": "desktop",
-      "auth": "admin",
-      "url": "${BASE}/wp-admin/post.php?post=1168&action=edit",
-      "waitMs": 6000,
-      "actions": [
-        {
-          "scrollTo": "#nbdesigner_setting"
-        },
-        {
-          "wait": 500
-        }
-      ],
-      "highlight": [
-        {
-          "sel": "#nbdesigner_setting",
-          "label": "1"
-        }
-      ],
-      "caption": "Setting PCDesigner: Enable Design, Enable Upload Design, Enable Upload Without Design, designer layout, DPI and unit."
-    },
-    {
       "id": "73-admin-printing-options-list",
-      "batch": "now",
+      "batch": "final",
       "viewport": "desktop",
       "auth": "admin",
       "url": "${BASE}/wp-admin/admin.php?page=nbd_printing_options",
@@ -877,7 +1215,7 @@
     },
     {
       "id": "74-admin-option-set",
-      "batch": "now",
+      "batch": "final",
       "viewport": "desktop",
       "auth": "admin",
       "url": "${BASE}/wp-admin/admin.php?page=nbd_printing_options&action=edit&id=86",
@@ -886,7 +1224,7 @@
     },
     {
       "id": "75-admin-price-matrix",
-      "batch": "now",
+      "batch": "final",
       "viewport": "desktop",
       "auth": "admin",
       "url": "${BASE}/wp-admin/admin.php?page=nbd_printing_options&action=edit&id=86",
@@ -912,7 +1250,7 @@
     },
     {
       "id": "76-admin-addon-field",
-      "batch": "now",
+      "batch": "final",
       "viewport": "desktop",
       "auth": "admin",
       "url": "${BASE}/wp-admin/admin.php?page=nbd_printing_options&action=edit&id=86",
@@ -931,8 +1269,54 @@
       "caption": "An add-on field such as Pole Pocket: its choices and the price per linear foot."
     },
     {
+      "id": "77-admin-product-designer-settings",
+      "batch": "final",
+      "viewport": "desktop",
+      "auth": "admin",
+      "url": "${BASE}/wp-admin/post.php?post=1168&action=edit",
+      "waitMs": 6000,
+      "actions": [
+        {
+          "scrollTo": "#nbdesigner_setting"
+        },
+        {
+          "wait": 500
+        }
+      ],
+      "highlight": [
+        {
+          "sel": "#nbdesigner_setting",
+          "label": "1"
+        }
+      ],
+      "caption": "Setting PCDesigner: Enable Design, Enable Upload Design, Enable Upload Without Design, designer layout, DPI and unit."
+    },
+    {
+      "id": "78-admin-banner-extras",
+      "auth": "admin",
+      "url": "${BASE}/wp-admin/admin.php?page=gp-linear-rates",
+      "waitMs": 4000,
+      "highlight": [
+        {
+          "sel": "#gp-pole_rate",
+          "label": "1"
+        },
+        {
+          "sel": "#gp-pole_setup",
+          "label": "2"
+        },
+        {
+          "sel": "#gp-rope_rate",
+          "label": "3"
+        }
+      ],
+      "caption": "WooCommerce > Banner extras pricing: pole pocket rate and setup fee, rope rate.",
+      "viewport": "desktop",
+      "batch": "final"
+    },
+    {
       "id": "80-admin-tier-ladder",
-      "batch": "now",
+      "batch": "final",
       "viewport": "desktop",
       "auth": "admin",
       "url": "${BASE}/wp-admin/admin.php?page=printcart-stores-pricing",
@@ -941,7 +1325,7 @@
     },
     {
       "id": "81-admin-tier-edit",
-      "batch": "now",
+      "batch": "final",
       "viewport": "desktop",
       "auth": "admin",
       "url": "${BASE}/wp-admin/admin.php?page=printcart-stores-pricing",
@@ -958,7 +1342,7 @@
     },
     {
       "id": "82-admin-b2b-settings",
-      "batch": "now",
+      "batch": "final",
       "viewport": "desktop",
       "auth": "admin",
       "url": "${BASE}/wp-admin/admin.php?page=printcart-stores-settings",
@@ -975,8 +1359,7 @@
     },
     {
       "id": "83-admin-b2b-stores",
-      "batch": "b4",
-      "needs": "fixture",
+      "batch": "final",
       "viewport": "desktop",
       "auth": "admin",
       "url": "${BASE}/wp-admin/admin.php?page=printcart-stores-b2b",
@@ -985,27 +1368,32 @@
     },
     {
       "id": "84-admin-store-detail",
-      "batch": "b4",
-      "needs": "fixture",
+      "batch": "final",
       "viewport": "desktop",
       "auth": "admin",
       "url": "${BASE}/wp-admin/admin.php?page=printcart-stores-b2b",
       "waitMs": 3000,
       "actions": [
         {
-          "click": "table tbody tr:first-child a"
+          "waitFor": "text=Demo Signs Co >> visible=true"
         },
         {
-          "wait": 3000
+          "click": "text=Demo Signs Co >> visible=true"
+        },
+        {
+          "wait": 6000
         },
         {
           "scrollTo": "[id^='pcs-private-products-']"
         },
         {
+          "scrollBy": -250
+        },
+        {
           "wait": 400
         }
       ],
-      "caption": "Company detail: approve, tier, members, and the Private products box.",
+      "caption": "Company detail (Demo Signs Co): team, orders and the Private products box with Hide public templates for this company.",
       "highlight": [
         {
           "sel": "[id^='pcs-private-products-']",
@@ -1014,28 +1402,46 @@
       ]
     },
     {
+      "id": "84b-admin-store-top",
+      "auth": "admin",
+      "url": "${BASE}/wp-admin/admin.php?page=printcart-stores-b2b",
+      "waitMs": 3000,
+      "actions": [
+        {
+          "waitFor": "text=Demo Signs Co >> visible=true"
+        },
+        {
+          "click": "text=Demo Signs Co >> visible=true"
+        },
+        {
+          "wait": 6000
+        }
+      ],
+      "caption": "Company detail: company information, team seats, recent orders, B2B settings.",
+      "viewport": "desktop",
+      "batch": "final"
+    },
+    {
       "id": "85-admin-invitations",
-      "batch": "b4",
+      "batch": "final",
       "viewport": "desktop",
       "auth": "admin",
       "url": "${BASE}/wp-admin/admin.php?page=printcart-stores-invitations",
       "waitMs": 3000,
-      "caption": "B2B & B2C > Invitations.",
-      "needs": "clean-data"
+      "caption": "B2B & B2C > Invitations."
     },
     {
       "id": "86-admin-quotes",
-      "batch": "b4",
+      "batch": "final",
       "viewport": "desktop",
       "auth": "admin",
       "url": "${BASE}/wp-admin/admin.php?page=printcart-quotes",
       "waitMs": 3000,
-      "caption": "B2B & B2C > Custom Quotes.",
-      "needs": "clean-data"
+      "caption": "B2B & B2C > Custom Quotes."
     },
     {
       "id": "87-admin-customers",
-      "batch": "b4",
+      "batch": "final",
       "viewport": "desktop",
       "auth": "admin",
       "url": "${BASE}/wp-admin/admin.php?page=printcart-stores-customers",
@@ -1043,13 +1449,11 @@
       "caption": "B2B & B2C > Customers.",
       "hide": [
         "img.avatar"
-      ],
-      "needs": "clean-data"
+      ]
     },
     {
       "id": "90-admin-orders",
-      "batch": "b4",
-      "needs": "order",
+      "batch": "final",
       "viewport": "desktop",
       "auth": "admin",
       "url": "${BASE}/wp-admin/admin.php?page=wc-orders",
@@ -1058,17 +1462,38 @@
     },
     {
       "id": "91-admin-order-design-files",
-      "batch": "b4",
-      "needs": "order",
+      "batch": "final",
       "viewport": "desktop",
       "auth": "admin",
-      "url": "${BASE}/wp-admin/admin.php?page=wc-orders",
+      "url": "${BASE}/wp-admin/admin.php?page=nbdesigner_detail_order&order_id=${URL:order_id_b2c}",
+      "waitMs": 6000,
+      "caption": "Detail product design > tab Download design: SVG, PNG (High quality images), JPG (CMYK with ICC profile) and PDF, each with a Download button.",
+      "highlight": [
+        {
+          "sel": "text=Download design >> visible=true",
+          "label": "1"
+        }
+      ]
+    },
+    {
+      "id": "91b-admin-order-edit",
+      "auth": "admin",
+      "url": "${URL:order_edit_b2c}",
       "waitMs": 8000,
-      "caption": "Order: download the print-ready files."
+      "caption": "Order screen: customer, addresses, items with all chosen options, shipping, payment, status and notes; the Customer Design box is on the right.",
+      "viewport": "desktop",
+      "batch": "final",
+      "actions": [],
+      "highlight": [
+        {
+          "sel": "text=Payment via Pay by invoice >> visible=true",
+          "label": "1"
+        }
+      ]
     },
     {
       "id": "92-admin-categories",
-      "batch": "now",
+      "batch": "final",
       "viewport": "desktop",
       "auth": "admin",
       "url": "${BASE}/wp-admin/edit-tags.php?taxonomy=product_cat&post_type=product",
@@ -1077,7 +1502,7 @@
     },
     {
       "id": "93-admin-menus",
-      "batch": "now",
+      "batch": "final",
       "viewport": "desktop",
       "auth": "admin",
       "url": "${BASE}/wp-admin/nav-menus.php",
@@ -1086,7 +1511,7 @@
     },
     {
       "id": "94-admin-pages",
-      "batch": "now",
+      "batch": "final",
       "viewport": "desktop",
       "auth": "admin",
       "url": "${BASE}/wp-admin/edit.php?post_type=page",
@@ -1095,7 +1520,7 @@
     },
     {
       "id": "95-admin-posts",
-      "batch": "now",
+      "batch": "final",
       "viewport": "desktop",
       "auth": "admin",
       "url": "${BASE}/wp-admin/edit.php",
@@ -1104,7 +1529,7 @@
     },
     {
       "id": "96-admin-users",
-      "batch": "now",
+      "batch": "final",
       "viewport": "desktop",
       "auth": "admin",
       "url": "${BASE}/wp-admin/users.php",
@@ -1116,7 +1541,7 @@
     },
     {
       "id": "97-admin-emails",
-      "batch": "now",
+      "batch": "final",
       "viewport": "desktop",
       "auth": "admin",
       "url": "${BASE}/wp-admin/admin.php?page=wc-settings&tab=email",
@@ -1134,16 +1559,24 @@
     },
     {
       "id": "98-admin-payments",
-      "batch": "now",
+      "batch": "final",
       "viewport": "desktop",
       "auth": "admin",
       "url": "${BASE}/wp-admin/admin.php?page=wc-settings&tab=checkout",
       "waitMs": 8000,
-      "caption": "WooCommerce > Settings > Payments."
+      "caption": "WooCommerce > Settings > Payments.",
+      "actions": [
+        {
+          "press": "Escape"
+        },
+        {
+          "wait": 1200
+        }
+      ]
     },
     {
       "id": "99-admin-smtp",
-      "batch": "now",
+      "batch": "final",
       "viewport": "desktop",
       "auth": "admin",
       "url": "${BASE}/wp-admin/admin.php?page=wp-mail-smtp",
@@ -1166,7 +1599,7 @@
     },
     {
       "id": "A1-admin-reading",
-      "batch": "now",
+      "batch": "final",
       "viewport": "desktop",
       "auth": "admin",
       "url": "${BASE}/wp-admin/options-reading.php",
@@ -1181,7 +1614,7 @@
     },
     {
       "id": "A2-admin-general",
-      "batch": "now",
+      "batch": "final",
       "viewport": "desktop",
       "auth": "admin",
       "url": "${BASE}/wp-admin/options-general.php",
@@ -1190,7 +1623,7 @@
     },
     {
       "id": "A3-admin-designer-upload-settings",
-      "batch": "now",
+      "batch": "final",
       "viewport": "desktop",
       "auth": "admin",
       "url": "${BASE}/wp-admin/admin.php?page=nbdesigner_settings",
@@ -1207,7 +1640,7 @@
     },
     {
       "id": "A4-admin-designer-notifications",
-      "batch": "now",
+      "batch": "final",
       "viewport": "desktop",
       "auth": "admin",
       "url": "${BASE}/wp-admin/admin.php?page=nbdesigner_settings",
@@ -1234,7 +1667,7 @@
     },
     {
       "id": "A5-admin-profile-password",
-      "batch": "now",
+      "batch": "final",
       "viewport": "desktop",
       "auth": "admin",
       "url": "${BASE}/wp-admin/profile.php",
@@ -1257,12 +1690,44 @@
     },
     {
       "id": "A6-admin-backups",
-      "batch": "now",
+      "batch": "final",
       "viewport": "desktop",
       "auth": "admin",
       "url": "${BASE}/wp-admin/options-general.php?page=updraftplus",
       "waitMs": 4000,
       "caption": "Backups (UpdraftPlus)."
+    },
+    {
+      "id": "A7-admin-shipping",
+      "auth": "admin",
+      "url": "${BASE}/wp-admin/admin.php?page=wc-settings&tab=shipping",
+      "waitMs": 8000,
+      "caption": "WooCommerce > Settings > Shipping: zones and methods.",
+      "viewport": "desktop",
+      "batch": "final",
+      "actions": [
+        {
+          "wait": 1500
+        }
+      ]
+    },
+    {
+      "id": "A8-admin-pay-by-invoice",
+      "auth": "admin",
+      "url": "${BASE}/wp-admin/admin.php?page=wc-settings&tab=checkout&section=bacs",
+      "waitMs": 8000,
+      "caption": "WooCommerce > Settings > Payments > Pay by invoice.",
+      "viewport": "desktop",
+      "batch": "final"
+    },
+    {
+      "id": "A9-admin-paypal",
+      "auth": "admin",
+      "url": "${BASE}/wp-admin/admin.php?page=wc-settings&tab=checkout&section=ppcp-gateway",
+      "waitMs": 9000,
+      "caption": "WooCommerce > Settings > Payments > PayPal: connect your own PayPal account.",
+      "viewport": "desktop",
+      "batch": "final"
     }
   ]
 }

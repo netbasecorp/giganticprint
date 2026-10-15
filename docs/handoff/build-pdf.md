@@ -32,7 +32,7 @@ What it does:
 1. All screenshots captured (`capture/README.md`, "Final run"); `python build_pdf.py` prints `0 screenshot(s) not captured yet`.
 2. Open the PDF and check: headings not orphaned at the bottom of a page, tables not cut, each screenshot readable (zoom 100%), red outlines on the right element.
 3. Search the PDF for words that must not appear: internal server names, IP addresses, `Docker`, `cPanel`, `Cloudflare`, `test user`, `gp_test`, e-mail addresses of Printcart staff.
-4. Send the PDF, or the Markdown plus the `images/` folder; never the `capture/` folder.
+4. Send the PDF, or the Markdown plus the `images/` folder; never the `capture/` folder. The PDF of release 1.0 is committed as `dist/Gigantic-Prints-Handoff-Guide.pdf` (about 16 MB); the self-contained HTML next to it (about 21 MB) is not committed, rebuild it with the command above.
 
 ## Alternatives
 

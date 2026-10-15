@@ -34,10 +34,12 @@ const VIEWPORTS = {
   desktop: { viewport: { width: 1440, height: 900 }, deviceScaleFactor: 1 },
   mobile: { viewport: { width: 390, height: 844 }, deviceScaleFactor: 2, isMobile: true, hasTouch: true },
 };
-const AUTH_FILES = { b2c: 'gp_test_b2c.json', b2b: 'gp_test_b2b.json', reseller: 'gp_test_reseller.json' };
+const AUTH_FILES = { b2c: 'gp_test_b2c.json', b2b: 'gp_test_b2b.json', reseller: 'gp_test_reseller.json', staff: 'gp_test_staff.json' };
 const RED = '#e11d2e';
 
-const sub = (s) => (typeof s === 'string' ? s.replaceAll('${BASE}', BASE) : s);
+let URLS = {};
+try { URLS = JSON.parse(fs.readFileSync(arg('urls', process.env.GP_URLS || '/tmp/handoff/urls.json'), 'utf8')); } catch (e) { /* optional */ }
+const sub = (s) => (typeof s === 'string' ? s.replaceAll('${BASE}', BASE).replace(/\$\{URL:([a-z0-9_]+)\}/g, (m, k) => { if (!URLS[k]) throw new Error('unknown ${URL:' + k + '} (run demo-urls.php)'); return URLS[k]; }) : s);
 const fixture = (f) => (path.isAbsolute(f) ? f : path.join(FIXTURES, f));
 const sleep = (ms) => new Promise(r => setTimeout(r, ms));
 
@@ -94,6 +96,12 @@ async function runAction(page, a) {
     case 'upload': await page.setInputFiles(v, fixture(a.file)); break;
     case 'waitFor': await page.locator(v).first().waitFor({ state: a.state || 'visible', timeout: a.timeout || 30000 }); break;
     case 'wait': await page.waitForTimeout(v); break;
+    case 'emptyCart': { // remove every line of the current cart (undo for shots that add an item)
+      await page.goto(sub('${BASE}/shopping-cart/'), { waitUntil: 'load', timeout: 90000 });
+      const rm = '.cart_item a.remove, .cart_item .product-remove a';
+      for (let i = 0; i < 30 && await page.locator(rm).count() > 0; i++) { await page.locator(rm).first().click({ force: true }).catch(() => {}); await page.waitForTimeout(2500); await page.waitForLoadState('load').catch(() => {}); }
+      break;
+    }
     case 'mouseAway': await page.mouse.move(2, 2); await page.waitForTimeout(300); break;
     case 'scrollTo': await page.locator(v).first().scrollIntoViewIfNeeded(); break;
     case 'scrollBy': await page.evaluate((y) => window.scrollBy(0, y), v); break;
@@ -107,7 +115,9 @@ async function runAction(page, a) {
       await page.locator('text=PHOTOS').first().click({ timeout: 6000, force: true }).catch(() => {});
       await page.waitForTimeout(500);
       await page.setInputFiles('#tab-photo .form-upload input[type="file"], input[type=file]', fixture(v));
-      await waitArtPlaced(page, a.timeout || 120000); break;
+      await waitArtPlaced(page, a.timeout || 120000);
+      await page.locator('#sg-upload-progress').waitFor({ state: 'hidden', timeout: 180000 }).catch(() => {}); // upload to the store finished
+      await page.waitForTimeout(a.settle == null ? 4000 : a.settle); break;
     case 'setSize': { // designer W x H for products without art
       const ins = page.locator('input.nbo-dimension');
       for (const [i, val] of [[0, v[0]], [1, v[1]]]) { const el = ins.nth(i); await el.scrollIntoViewIfNeeded(); await el.fill(String(val)); await el.press('Tab'); await page.waitForTimeout(700); }
@@ -169,6 +179,7 @@ async function redact(page) {
       }
       t = t.split('GP Test').join('Sample');
       if (t.trim() === 'HHH') t = t.replace('HHH', 'Sample Co.');
+      t = t.replace(/\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}/g, '203.0.113.10');
       return t.replace(/[A-Za-z0-9._%+-]+@(?!giganticprints\.com)[A-Za-z0-9.-]+\.[A-Za-z]{2,}/g, 'name@example.com');
     };
     const w = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
@@ -178,9 +189,24 @@ async function redact(page) {
   });
 }
 
+
+// Full-page shots: put the page at the top and turn sticky/fixed bars (header, back-to-top button) into normal absolute/relative boxes,
+// so the screenshot does not repeat or misplace them.
+async function normalizeFullPage(page) {
+  await page.evaluate(() => {
+    window.scrollTo(0, 0);
+    document.querySelectorAll('body *').forEach((e) => {
+      if (e.classList.contains('gp-hl-marker')) return;
+      const p = getComputedStyle(e).position;
+      if (p === 'fixed') { e.style.position = 'absolute'; } else if (p === 'sticky') { e.style.position = 'relative'; }
+    });
+  });
+  await page.waitForTimeout(300);
+}
+
 const ADMIN_CLEAN_CSS = `
   .notice,.updated,.update-nag,#wpfooter,.wpforms-notice,#updraft-dashnotice,.updraft-ad-container,
-  .woocommerce-message,.wc-admin-notice,#screen-meta-links,.wpmudev-notice,[class*="woocommerce-layout__notice"],.woocommerce-store-alerts,.wp-mail-smtp-review-notice,[class*="smtp"][class*="notice"],#wp-mail-smtp-notice-bar,.wp-mail-smtp-lite-upgrade{display:none!important}`;
+  .woocommerce-message,.wc-admin-notice,#screen-meta-links,.wpmudev-notice,[class*="woocommerce-layout__notice"],.woocommerce-store-alerts,.wp-mail-smtp-review-notice,[class*="smtp"][class*="notice"],#wp-mail-smtp-notice-bar,.wp-mail-smtp-lite-upgrade,.shortpixel-notice,.woocommerce-tour-kit,.components-popover,.components-modal__screen-overlay,.sp-quota-exceeded-alert,[id^="MSG_"]{display:none!important}`;
 
 // ---- main --------------------------------------------------------------------------------------------------------
 const results = [];
@@ -196,13 +222,12 @@ try {
     let page;
     try {
       const vp = VIEWPORTS[s.viewport || 'desktop'];
-      const key = (s.auth || 'none') + '|' + (s.viewport || 'desktop');
-      if (!contexts.has(key)) {
-        const ctx = await browser.newContext({ ...vp, ignoreHTTPSErrors: false });
-        await ctx.addCookies(cookiesFor(s.auth));
-        contexts.set(key, ctx);
-      }
-      page = await contexts.get(key).newPage();
+      // a fresh browser context per shot: the designer caches uploaded images in the browser, so shots must not share state
+      const key = s.id;
+      const ctx = await browser.newContext({ ...vp, ignoreHTTPSErrors: false });
+      await ctx.addCookies(cookiesFor(s.auth));
+      contexts.set(key, ctx);
+      page = await ctx.newPage();
       page.on('dialog', d => d.accept().catch(() => {}));
       const url = sub(s.url);
       await page.goto(url, { waitUntil: 'load', timeout: 90000 }).catch(async () => { await sleep(2000); await page.goto(url, { waitUntil: 'load', timeout: 90000 }); });
@@ -216,7 +241,8 @@ try {
       if (s.hide) await page.addStyleTag({ content: s.hide.map(h => `${h}{visibility:hidden!important}`).join('\n') });
       if (s.waitFor) await page.locator(s.waitFor).first().waitFor({ state: 'visible', timeout: 30000 });
       if (s.waitAfter) await page.waitForTimeout(s.waitAfter);
-      if (s.highlight) await highlight(page, s.highlight);
+      if (s.fullPage) await normalizeFullPage(page);
+      if (s.highlight) await highlight(page, s.fullPage ? (Array.isArray(s.highlight) ? s.highlight : [s.highlight]).map(h => ({ noScroll: true, ...(typeof h === 'string' ? { sel: h } : h) })) : s.highlight);
       const file = path.join(OUT_DIR, s.id + '.png');
       if (s.clip) await page.locator(s.clip).first().screenshot({ path: file });
       else await page.screenshot({ path: file, fullPage: !!s.fullPage });
@@ -228,6 +254,7 @@ try {
       try { if (page) await page.screenshot({ path: path.join(OUT_DIR, '_failed-' + s.id + '.png') }); } catch (_) { /* ignore */ }
     } finally {
       if (page) await page.close().catch(() => {});
+      if (contexts.has(s.id)) { await contexts.get(s.id).close().catch(() => {}); contexts.delete(s.id); }
     }
     res.seconds = Math.round((Date.now() - t0) / 100) / 10;
     results.push(res);

@@ -123,11 +123,11 @@ gp_ds_ok( 'company Demo Signs Co exists', (bool) $store );
 if ( $store && $owner ) {
 	$sid = (int) $store->id;
 	if ( $refresh ) {
-		foreach ( $wpdb->get_col( $wpdb->prepare( 'SELECT id FROM ' . PCS_Company_Images::table() . ' WHERE store_id = %d', $sid ) ) as $iid ) { PCS_Company_Images::delete_image( PCS_Company_Images::get( $iid ) ); echo "  refresh: removed Image Zone image #$iid
-"; }
-		$n_t = $wpdb->delete( PCS_Company_Templates::table(), array( 'store_id' => $sid ) );
-		echo "  refresh: removed $n_t template(s)
+		foreach ( $wpdb->get_col( $wpdb->prepare( 'SELECT id FROM ' . PCS_Company_Images::table() . ' WHERE store_id = %d', $sid ) ) as $iid ) {
+			PCS_Company_Images::delete_image( PCS_Company_Images::get( $iid ) );
+			echo '  refresh: removed Image Zone image #' . $iid . "
 ";
+		}
 	}
 	// Image Zone image
 	$have = (int) $wpdb->get_var( $wpdb->prepare( 'SELECT COUNT(*) FROM ' . PCS_Company_Images::table() . ' WHERE store_id = %d', $sid ) );
@@ -142,7 +142,8 @@ if ( $store && $owner ) {
 	gp_ds_ok( 'Image Zone has exactly one image', 1 === (int) $wpdb->get_var( $wpdb->prepare( 'SELECT COUNT(*) FROM ' . PCS_Company_Images::table() . ' WHERE store_id = %d', $sid ) ) );
 	// template made from the design of the b2b sample order
 	$has_tpl = (int) $wpdb->get_var( $wpdb->prepare( 'SELECT COUNT(*) FROM ' . PCS_Company_Templates::table() . ' WHERE store_id = %d', $sid ) );
-	if ( 0 === $has_tpl ) {
+	$tpl_id  = (int) $wpdb->get_var( $wpdb->prepare( 'SELECT MIN(id) FROM ' . PCS_Company_Templates::table() . ' WHERE store_id = %d', $sid ) );
+	if ( 0 === $has_tpl || $refresh ) { // refresh keeps the template id (handoff screenshots link ?gp_tpl=<id>)
 		$cfg = null; $thumb = '';
 		$o = isset( $keep['gp_test_b2b'] ) ? wc_get_order( $keep['gp_test_b2b'] ) : null;
 		if ( $o ) {
@@ -166,7 +167,7 @@ if ( $store && $owner ) {
 		}
 		gp_ds_ok( 'design of the b2b sample order available for the template', is_array( $cfg ) );
 		if ( is_array( $cfg ) ) {
-			$t = PCS_Company_Templates::save( $sid, $owner->ID, 'Demo banner template', 1168, wp_json_encode( $cfg ), $thumb );
+			$t = PCS_Company_Templates::save( $sid, $owner->ID, 'Demo banner template', 1168, wp_json_encode( $cfg ), $thumb, $tpl_id );
 			gp_ds_ok( 'template saved', is_array( $t ) && ! empty( $t['id'] ) );
 		}
 	} else { echo "  company already has $has_tpl template(s)\n"; }
@@ -176,6 +177,11 @@ if ( $store && $owner ) {
 	gp_ds_ok( 'private product 1263 assigned to Demo Signs Co', in_array( 1263, array_map( 'intval', $wpdb->get_col( $wpdb->prepare( 'SELECT product_id FROM ' . PCS_Private_Products::table() . ' WHERE store_id = %d', $sid ) ) ), true ) );
 }
 
+echo "-- retail tiers" . PHP_EOL;
+foreach ( array( 'gp_test_b2c', 'gp_test_staff' ) as $l ) { // the automatic returning tier (5%) must not stick to the demo retail users
+	$u = get_user_by( 'login', $l );
+	if ( $u && 'b2c' !== get_user_meta( $u->ID, '_pcs_tier', true ) ) { update_user_meta( $u->ID, '_pcs_tier', 'b2c' ); echo "  $l tier reset to b2c" . PHP_EOL; }
+}
 echo "-- carts and sessions\n";
 foreach ( GP_DS_USERS as $l ) {
 	$u = get_user_by( 'login', $l );

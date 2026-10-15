@@ -149,7 +149,7 @@ class SG_Cart {
             $frame = self::frame_of( $img );
             if ( $content !== null && $frame !== null && isset( $content[ $frame ] ) && $content[ $frame ] === false ) continue;
             $src = Nbdesigner_IO::convert_path_to_url( $img ) . '?t=' . (int) @filemtime( $img );
-            return '<img src="' . esc_url( $src ) . '" class="sg-cart-thumb" alt="" loading="lazy" />';
+            return '<img src="' . esc_url( $src ) . '" class="sg-cart-thumb" alt="" />';
         }
         return $image;
     }

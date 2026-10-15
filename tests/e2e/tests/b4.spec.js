@@ -151,7 +151,7 @@ test('Image Zone: company members upload / list / use / delete, strangers see no
     const po = await owner.newPage();
     po.on('dialog', d => d.accept());
     await po.goto(G.BASE + '/b2b-portal/?section=images', { waitUntil: 'load' });
-    await po.waitForTimeout(2500);
+    await po.waitForFunction(() => !/Loading your images/i.test(document.body.innerText), null, { timeout: 60000 }); // list arrives by AJAX
     const beforeIds = await po.$$eval('.pcs-iz-card', els => els.map(e => e.getAttribute('data-iz-id')));
     await po.setInputFiles('#pcs-iz-file', 'testimg/test-24x16in-150dpi.png');
     await po.locator('#pcs-iz-go').click();

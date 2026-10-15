@@ -655,7 +655,7 @@ Printcart does the technical steps marked **(Printcart)**; you do the steps mark
 | 8 | **Test order:** place one real order with a small print file; check the order e-mails, the download links in the order, the PayPal invoice you send, and the confirmation page. Then cancel or refund it. | you + Printcart | [ ] |
 | 9 | **Remove the demo data:** the sample companies (**Demo Signs Co**, **Demo Reseller Co**) with their Image Zone image, template and the product assigned to Demo Signs Co; the demo customer accounts and their sample orders (#2046 to #2049); sample quotes and invitations. | Printcart | [ ] |
 | 10 | **Public pages:** unpublish pages that are not part of your store (sample and placeholder pages). | Printcart | [ ] |
-| 11 | **Designer licence:** active for giganticprints.com and the staging address under your Printcart Store package (Premium, renews on 21 November 2026). It covers the designer, PDF export and print-file downloads for your orders. At go-live nothing changes; keep the package renewed. | Printcart | [x] |
+| 11 | **Designer licence:** active for giganticprints.com and the staging address under your Printcart Store package (Premium, renews on 21 November 2026). It covers the designer, PDF export and print-file downloads for your orders. At go-live Printcart connects the live store to your own Printcart store account, so the licence follows your package; keep the package renewed. | Printcart | [x] |
 | 12 | **Updates and backup:** all software updates installed, a fresh backup taken and a restore test noted. | Printcart | [ ] |
 | 13 | **Sign-off:** the person who approves the go-live confirms in writing (Part 5, question 6). | you | [ ] |
 | 14 | **After go-live:** check the first real orders the same day and tell us about anything unexpected. | you | [ ] |
@@ -668,7 +668,7 @@ Where to untick the search engine box (step 2):
 
 ## 5. Questions for you
 
-Please answer these so we can finish the details.
+Please answer these so we can finish the details. **None of them holds back publishing:** until you answer, the store keeps the settings described under "Today", and each one can be changed after go-live.
 
 1. **Wind slits:** is the price **$0.50 per square foot** of the banner, or a **flat** amount per banner? Today the option charges a flat $0.50 and its label says so.
 2. **Pole pocket setup fee:** is the **$10 setup** charged **per item**, or **once per order line** (one size on the order, whatever the quantity)? Today it is charged per item.

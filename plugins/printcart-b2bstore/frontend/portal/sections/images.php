@@ -155,8 +155,11 @@ document.addEventListener('DOMContentLoaded', function () { // PCS_FE is localiz
     return c;
   }
 
+  // first paint uses the list embedded in the page (no extra admin-ajax round trip); later reloads (after upload / delete) ask the server
+  var INITIAL = <?php echo wp_json_encode( array( 'items' => PCS_Company_Images::list_for_store( (int) $iz_store_id, get_current_user_id() ) ) ); ?>;
   function load() {
-    post('gp_iz_list', {}, null, null, function (err, data) {
+    var pre = INITIAL; INITIAL = null;
+    (pre ? function (cb) { cb(null, pre); } : function (cb) { post('gp_iz_list', {}, null, null, cb); })(function (err, data) {
       grid.innerHTML = '';
       if (err) { msg.className = 'pcs-iz-msg err'; msg.textContent = err; return; }
       if (!data.items.length) { msg.className = 'pcs-iz-empty'; msg.textContent = 'No images yet. Upload your logos and artwork above.'; return; }

@@ -14,7 +14,8 @@ class PCS_Company_Images {
     const NONCE_ACTION    = 'pcs_ajax';
     const MAX_FILE_BYTES  = 104857600;   // 100 MB
     const MAX_STORE_BYTES = 2147483648;  // 2 GB per company
-    const THUMB_MAX       = 320;
+    const THUMB_MAX       = 400;
+    const THUMB_TOKEN_TTL = 86400;  // signed thumbnail URLs are valid 24-48 h (quantised so the URL, and the browser cache, is stable for a day)
     const RATE_MAX        = 60;          // uploads per user ...
     const RATE_WINDOW     = 600;         // ... per 10 minutes
     const FALLBACK_DPI    = 150;
@@ -285,6 +286,81 @@ class PCS_Company_Images {
         return array( $w, $h, $dpi, $thumb_ok );
     }
 
+
+    /* ---------------------------------------------------------------- */
+    /* Fast thumbnails: signed URL to a standalone script (no WordPress)  */
+    /* ---------------------------------------------------------------- */
+
+    /** HMAC key kept next to the images (denied by .htaccess), created on first use. '' when it cannot be written. */
+    public static function thumb_key() {
+        $base = self::base_dir();
+        $file = $base . '/.thumbkey';
+        if ( is_readable( $file ) ) {
+            $k = trim( (string) file_get_contents( $file ) );
+            if ( strlen( $k ) >= 32 ) {
+                return $k;
+            }
+        }
+        if ( ! wp_mkdir_p( $base ) ) {
+            return '';
+        }
+        $k = bin2hex( random_bytes( 32 ) );
+        if ( false === @file_put_contents( $file, $k, LOCK_EX ) ) {
+            return '';
+        }
+        @chmod( $file, 0640 );
+        return $k;
+    }
+
+    /** True when gp-iz-thumb.php (which finds the folder relative to itself) will look at the same folder as base_dir(). */
+    private static function thumb_script_ok() {
+        static $ok = null;
+        if ( null === $ok ) {
+            $a  = realpath( dirname( PCS_PLUGIN_DIR . 'x' ) . '/../../uploads/gp-imagezone' );
+            $b  = realpath( self::base_dir() );
+            $ok = $a && $b && $a === $b && is_file( PCS_PLUGIN_DIR . 'gp-iz-thumb.php' );
+        }
+        return $ok;
+    }
+
+    /**
+     * Signed URL of the 400 px thumbnail, served by gp-iz-thumb.php without loading WordPress (about 20 ms instead of
+     * 5-15 s on a busy host). Issued only to members (callers are the member-checked list endpoints); valid 24-48 h;
+     * the full file is NOT reachable with it. '' when not possible (caller falls back to the admin-ajax URL).
+     */
+    public static function signed_thumb_url( $row ) {
+        if ( ! $row || empty( $row->file ) || ! self::thumb_script_ok() ) {
+            return '';
+        }
+        $path = self::file_path( $row );
+        if ( ! $path || ! is_file( $path . '-t.jpg' ) ) {
+            return '';
+        }
+        $key = self::thumb_key();
+        if ( '' === $key ) {
+            return '';
+        }
+        $store = (int) $row->store_id;
+        $exp   = ( (int) ceil( time() / self::THUMB_TOKEN_TTL ) + 1 ) * self::THUMB_TOKEN_TTL;
+        $sig   = hash_hmac( 'sha256', $store . '|' . $row->file . '|' . $exp, $key );
+        return PCS_PLUGIN_URL . 'gp-iz-thumb.php?s=' . $store . '&f=' . rawurlencode( $row->file ) . '&e=' . $exp . '&t=' . $sig;
+    }
+
+    /** (Re)build the thumbnail of one stored image. Used by the backfill script. @return bool */
+    public static function rebuild_thumb( $row ) {
+        $path = self::file_path( $row );
+        if ( ! $path || ! is_file( $path ) ) {
+            return false;
+        }
+        $thumb = $path . '-t.jpg';
+        $res   = self::inspect( $path, (string) $row->ext, $thumb );
+        if ( $res[3] ) {
+            @chmod( $thumb, 0640 );
+            return true;
+        }
+        return false;
+    }
+
     /* ---------------------------------------------------------------- */
     /* Core: store a file (testable without HTTP)                         */
     /* ---------------------------------------------------------------- */
@@ -431,7 +507,7 @@ class PCS_Company_Images {
             'created'     => mysql2date( 'M j, Y', get_date_from_gmt( $row->created_at ) ),
             'uploader'    => $user ? $user->display_name : '',
             'url'         => $url,
-            'thumb'       => $url . '&thumb=1',
+            'thumb'       => ( $signed = self::signed_thumb_url( $row ) ) ? $signed : $url . '&thumb=1',
             'print_w'     => $print_w,
             'print_h'     => $print_h,
             'print_label' => $print,
@@ -583,7 +659,7 @@ class PCS_Company_Images {
             ob_end_clean();
         }
         nocache_headers();
-        header( 'Cache-Control: private, max-age=300' );
+        header( 'Cache-Control: private, max-age=3600' );
         header( 'Pragma:' );
         header( 'Expires:' );
         header( 'Vary: Cookie' );
